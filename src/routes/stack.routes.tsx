@@ -6,9 +6,9 @@ const { Screen, Navigator } = createNativeStackNavigator();
 
 const StackRoutes: React.FC = () => {
   return (
-    <Navigator initialRouteName='Home'>
+    <Navigator initialRouteName="home">
       <Screen
-        name='Home'
+        name="home"
         component={Home}
       />
     </Navigator>
