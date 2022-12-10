@@ -3,8 +3,11 @@ import { Text, Button } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { AccountInfo, AccountSection, Container, Header, ManageAccountButtonContainer, MonthSelector, UpdatedAt } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 const Home: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
     <Container>
       <Header>
@@ -34,7 +37,10 @@ const Home: React.FC = () => {
         </AccountInfo>
       </AccountSection>
       <ManageAccountButtonContainer>
-        <Button title='Gerenciar contas' />
+        <Button
+          title='Gerenciar contas'
+          onPress={() => navigation.navigate('accounts')}
+        />
       </ManageAccountButtonContainer>
     </Container>
   );
