@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Text, Button } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,7 +7,6 @@ import { AccountInfo, AccountSection, Container, Header, ManageAccountButtonCont
 const Home: React.FC = () => {
   return (
     <Container>
-      <StatusBar style="auto" />
       <Header>
         <MonthSelector>
           <Text>Maio</Text>
