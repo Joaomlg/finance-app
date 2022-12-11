@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Text } from 'react-native';
 import { SvgUri } from 'react-native-svg';
-import usePluggyService from '../../hooks/pluggy';
+import usePluggyService from '../../hooks/pluggyService';
 import { Connector } from '../../services/pluggy/types/connector';
 
 import { Container, Item, ItemSeparator, Title } from './styles';
