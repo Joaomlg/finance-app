@@ -1,8 +1,8 @@
 import { BaseApi } from './baseApi';
-import { Connector, PageResponse } from './types';
+import { Connector, ConnectorFilters, PageResponse } from './types';
 
 export class PluggyClient extends BaseApi {
-  async fetchConnectors() {
-    return this.getRequest<PageResponse<Connector>>('/connectors');
+  async fetchConnectors(filters: ConnectorFilters = {}) {
+    return this.getRequest<PageResponse<Connector>>('/connectors', filters);
   }
 }
