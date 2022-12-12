@@ -1,6 +1,6 @@
-import { CurrencyCode, PageFilters } from './common'
+import { CurrencyCode, PageFilters } from './common';
 
-export const TRANSACTION_TYPES = ['DEBIT', 'CREDIT'] as const
+export const TRANSACTION_TYPES = ['DEBIT', 'CREDIT'] as const;
 
 export enum TransactionStatus {
   PENDING = 'PENDING',
@@ -13,86 +13,86 @@ export enum TransactionStatus {
  * If DEBIT money going out of the account.
  * If CREDIT money going into the account.
  */
-export type TransactionType = typeof TRANSACTION_TYPES[number]
+export type TransactionType = typeof TRANSACTION_TYPES[number];
 
 export type TransactionPaymentParticipantDocument = {
   /** document number */
-  value?: string
+  value?: string;
   /** Type of document provided, ie. CPF / CNPJ */
-  type?: 'CPF' | 'CNPJ'
-}
+  type?: 'CPF' | 'CNPJ';
+};
 
 export type TransactionPaymentParticipant = {
   /** Document number object */
-  documentNumber?: TransactionPaymentParticipantDocument
+  documentNumber?: TransactionPaymentParticipantDocument;
   /** Name of the participant */
-  name?: string
+  name?: string;
   /** Number of the account */
-  accountNumber?: string
+  accountNumber?: string;
   /** Number of the agency / branch */
-  branchNumber?: string
+  branchNumber?: string;
   /** Number of the bank */
-  routingNumber?: string
-}
+  routingNumber?: string;
+};
 
 export type TransactionPaymentData = {
   /** The identity of the sender of the transfer */
-  payer?: TransactionPaymentParticipant
+  payer?: TransactionPaymentParticipant;
   /** The identity of the receiver of the transfer */
-  receiver?: TransactionPaymentParticipant
+  receiver?: TransactionPaymentParticipant;
   /** Identifier for the transaction provided by the institution */
-  paymentMethod?: string
+  paymentMethod?: string;
   /** The type of transfer used "PIX", "TED", "DOC". */
-  referenceNumber?: string
+  referenceNumber?: string;
   /** The payer description / motive of the transfer */
-  reason?: string
-}
+  reason?: string;
+};
 
 export type TransactionMerchantData = {
   /** Name of the merchant */
-  name: string
+  name: string;
   /** Legal business name of the merchant */
-  businessName: string
+  businessName: string;
   /** Cnpj number associated to the merchant */
-  cnpj: string
+  cnpj: string;
   /** Cnae number associated to the merchant */
-  cnae?: string
+  cnae?: string;
   /** Category of the merchant */
-  category?: string
-}
+  category?: string;
+};
 
 export type TransactionFilters = PageFilters & {
   /** Filter less than date. Format can be ISO Date or 'YYYY-MM-dd' string. */
-  to?: string
+  to?: string;
   /** Filter greater than date. Format can be ISO Date, or 'YYYY-MM-dd' string. */
-  from?: string
-}
+  from?: string;
+};
 
 export type Transaction = {
   /** Primary identifier of the transaction */
-  id: string
+  id: string;
   /** Primary identifier of the Account */
-  accountId: string
+  accountId: string;
   /** Date of the transaction that was made. */
-  date: Date
+  date: Date;
   /** Transaction original description */
-  description: string
+  description: string;
   /** Transation type of movement */
-  type: TransactionType
+  type: TransactionType;
   /** Amount of the transaction */
-  amount: number
+  amount: number;
   /** Current balance of the trasaction, after transaction was made. */
-  balance: number
+  balance: number;
   /** ISO Currency code of the Transaction */
-  currencyCode: CurrencyCode
+  currencyCode: CurrencyCode;
   /** Assigned category of the transaction. */
-  category?: string
+  category?: string;
   /** Status of the transaction, default to `POSTED` */
-  status?: TransactionStatus
+  status?: TransactionStatus;
   /** Code provided by the financial institution for the transaction type, not unique. */
-  providerCode?: string
+  providerCode?: string;
   /** Additional data related to payment or transfers */
-  paymentData?: TransactionPaymentData
+  paymentData?: TransactionPaymentData;
   /** Additional data related to the merchant associated to the transaction */
-  merchant?: TransactionMerchantData
-}
+  merchant?: TransactionMerchantData;
+};

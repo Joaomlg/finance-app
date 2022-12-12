@@ -7,7 +7,7 @@ const Routes: React.FC = () => {
     <NavigationContainer>
       <StackRoutes />
     </NavigationContainer>
-  )
-}
+  );
+};
 
 export default Routes;

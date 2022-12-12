@@ -9,22 +9,13 @@ const { Screen, Navigator } = createNativeStackNavigator();
 const StackRoutes: React.FC = () => {
   return (
     <Navigator initialRouteName="home">
-      <Screen
-        name="home"
-        component={Home}
-      />
+      <Screen name="home" component={Home} />
 
-      <Screen
-        name="accounts"
-        component={Accounts}
-      />
+      <Screen name="accounts" component={Accounts} />
 
-      <Screen
-        name="connect"
-        component={Connect}
-      />
+      <Screen name="connect" component={Connect} />
     </Navigator>
-  )
-}
+  );
+};
 
 export default StackRoutes;

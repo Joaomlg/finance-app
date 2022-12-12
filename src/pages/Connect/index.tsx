@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Text } from 'react-native';
+import { FlatList, Text } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import usePluggyService from '../../hooks/pluggyService';
 import { Connector } from '../../services/pluggy/types/connector';
@@ -7,7 +7,7 @@ import { Connector } from '../../services/pluggy/types/connector';
 import { Container, Item, ItemSeparator, Title } from './styles';
 
 const Connect: React.FC = () => {
-  const [connectors, setConnectors] = useState([] as Connector[])
+  const [connectors, setConnectors] = useState([] as Connector[]);
   const [isLoading, setIsLoading] = useState(true);
   const pluggyService = usePluggyService();
 
@@ -15,14 +15,14 @@ const Connect: React.FC = () => {
     const fetchData = async () => {
       const { results } = await pluggyService.fetchConnectors({
         countries: ['BR'],
-        types: ['PERSONAL_BANK']
+        types: ['PERSONAL_BANK'],
       });
       setConnectors(results);
       setIsLoading(false);
-    }
+    };
 
     fetchData();
-  }, []);
+  }, [pluggyService]);
 
   return (
     <Container>
@@ -31,20 +31,18 @@ const Connect: React.FC = () => {
       ) : (
         <FlatList
           data={connectors}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Item>
               <SvgUri height={60} width={60} uri={item.imageUrl} />
               <Title>{item.name}</Title>
             </Item>
           )}
-          ItemSeparatorComponent={() => (
-            <ItemSeparator />
-          )}
+          ItemSeparatorComponent={() => <ItemSeparator />}
         />
       )}
     </Container>
   );
-}
+};
 
 export default Connect;

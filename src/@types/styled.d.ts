@@ -4,5 +4,6 @@ import light from '../theme/light';
 declare module 'styled-components' {
   type ThemeProvider = typeof light;
 
-  export interface DefaultTheme extends ThemeProvider { }
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  export interface DefaultTheme extends ThemeProvider {}
 }

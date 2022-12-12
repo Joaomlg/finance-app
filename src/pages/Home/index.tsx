@@ -2,7 +2,15 @@ import React from 'react';
 import { Text, Button } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { AccountInfo, AccountSection, Container, Header, ManageAccountButtonContainer, MonthSelector, UpdatedAt } from './styles';
+import {
+  AccountInfo,
+  AccountSection,
+  Container,
+  Header,
+  ManageAccountButtonContainer,
+  MonthSelector,
+  UpdatedAt,
+} from './styles';
 import { useNavigation } from '@react-navigation/native';
 
 const Home: React.FC = () => {
@@ -37,13 +45,10 @@ const Home: React.FC = () => {
         </AccountInfo>
       </AccountSection>
       <ManageAccountButtonContainer>
-        <Button
-          title='Gerenciar contas'
-          onPress={() => navigation.navigate('accounts')}
-        />
+        <Button title="Gerenciar contas" onPress={() => navigation.navigate('accounts')} />
       </ManageAccountButtonContainer>
     </Container>
   );
-}
+};
 
 export default Home;

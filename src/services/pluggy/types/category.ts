@@ -1,10 +1,10 @@
 export type Category = {
   /** primary identifier of the category */
-  id: string
+  id: string;
   /** Category's name or description. */
-  description: string
+  description: string;
   /** Parent category hierachy primary identifier */
-  parentId?: string
+  parentId?: string;
   /** Parent category hierachy name or description */
-  parentDescription?: string
-}
+  parentDescription?: string;
+};

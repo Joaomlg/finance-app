@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
@@ -19,6 +19,4 @@ export const ItemSeparator = styled.View`
   margin: 0 12px;
 `;
 
-export const Title = styled.Text`
-
-`;
+export const Title = styled.Text``;

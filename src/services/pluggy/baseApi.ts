@@ -4,7 +4,9 @@ import jwtDecode from 'jwt-decode';
 export type PluggyClientParams = {
   clientId: string;
   clientSecret: string;
-}
+};
+
+type QueryParameters = { [key: string]: number | number[] | string | string[] | boolean };
 
 export class BaseApi {
   private client: ApisauceInstance;
@@ -18,24 +20,24 @@ export class BaseApi {
     this.clientSecret = clientSecret;
 
     this.client = create({
-      baseURL: 'https://api.pluggy.ai'
+      baseURL: 'https://api.pluggy.ai',
     });
 
     this.apiKey = '';
 
     this.defaultHeaders = {
-      'accept': 'application/json',
-      'content-type': 'application/json'
+      accept: 'application/json',
+      'content-type': 'application/json',
     };
   }
 
-  protected async getRequest<T>(url: string, params?: {}): Promise<T> {
+  protected async getRequest<T>(url: string, params?: QueryParameters): Promise<T> {
     try {
       const response = await this.client.get<T>(url, params, {
         headers: {
           ...this.defaultHeaders,
-          'X-API-KEY': await this.getApiKey()
-        }
+          'X-API-KEY': await this.getApiKey(),
+        },
       });
 
       if (!response.ok) {
@@ -53,8 +55,8 @@ export class BaseApi {
       const response = await this.client.post<T>(url, body, {
         headers: {
           ...this.defaultHeaders,
-          'X-API-KEY': await this.getApiKey()
-        }
+          'X-API-KEY': await this.getApiKey(),
+        },
       });
 
       if (!response.ok) {
@@ -72,8 +74,8 @@ export class BaseApi {
       const response = await this.client.patch<T>(url, body, {
         headers: {
           ...this.defaultHeaders,
-          'X-API-KEY': await this.getApiKey()
-        }
+          'X-API-KEY': await this.getApiKey(),
+        },
       });
 
       if (!response.ok) {
@@ -86,13 +88,13 @@ export class BaseApi {
     }
   }
 
-  protected async deleteRequest<T>(url: string, params?: {}): Promise<T> {
+  protected async deleteRequest<T>(url: string, params?: QueryParameters): Promise<T> {
     try {
       const response = await this.client.delete<T>(url, params, {
         headers: {
           ...this.defaultHeaders,
-          'X-API-KEY': await this.getApiKey()
-        }
+          'X-API-KEY': await this.getApiKey(),
+        },
       });
 
       if (!response.ok) {
@@ -123,7 +125,7 @@ export class BaseApi {
   public async createApiKey(): Promise<string> {
     const response = await this.client.post<{ apiKey: string }>('/auth', {
       clientId: this.clientId,
-      clientSecret: this.clientSecret
+      clientSecret: this.clientSecret,
     });
 
     if (!response.ok) {
