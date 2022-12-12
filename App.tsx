@@ -1,7 +1,8 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider } from 'styled-components/native'
+import { ThemeProvider } from 'styled-components/native';
 import HooksProvider from './src/hooks';
-import Routes from "./src/routes";
+import Routes from './src/routes';
 import light from './src/theme/light';
 
 export default function App() {
