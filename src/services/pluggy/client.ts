@@ -21,4 +21,12 @@ export class PluggyClient extends BaseApi {
       ...(options || {}),
     });
   }
+
+  async fetchItem(id: string) {
+    return this.getRequest<Item>(`items/${id}`);
+  }
+
+  async deleteItem(id: string) {
+    await this.deleteRequest<void>(`items/${id}`);
+  }
 }

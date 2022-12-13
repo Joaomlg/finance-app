@@ -1,14 +1,64 @@
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Button } from 'react-native';
+import { StackActions, useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AsyncStorage, Button, Text } from 'react-native';
+import usePluggyService from '../../hooks/pluggyService';
+import { Item } from '../../services/pluggy';
+import { ItemsAsyncStorageKey } from '../../utils/contants';
 
-import { Container } from './styles';
+import { Container, ItemCard } from './styles';
 
 const Accounts: React.FC = () => {
   const navigation = useNavigation();
 
+  const [items, setItems] = useState([] as Item[]);
+
+  const pluggyService = usePluggyService();
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchItems = async () => {
+        const itemsId: string[] = JSON.parse(
+          (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
+        );
+
+        const items = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
+
+        setItems(items);
+      };
+
+      fetchItems();
+    }, [pluggyService]),
+  );
+
+  const handleDeleteItem = async (id: string) => {
+    try {
+      await pluggyService.deleteItem(id);
+
+      const previousItemsId: string[] = JSON.parse(
+        (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
+      );
+
+      const newItemsId = previousItemsId.filter((itemId) => itemId !== id);
+
+      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
+
+      const newItems = items.filter((item) => item.id !== id);
+      setItems(newItems);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Container>
+      {items.map((item) => (
+        <ItemCard key={item.id} onPress={() => handleDeleteItem(item.id)}>
+          <Text>{item.id}</Text>
+          <Text>{item.connector.name}</Text>
+          <Text>{item.status}</Text>
+          <Text>{item.connector.hasMFA ? 'With MFA' : 'Without MFA'}</Text>
+        </ItemCard>
+      ))}
       <Button title="Conectar uma conta" onPress={() => navigation.navigate('connect')}></Button>
     </Container>
   );
