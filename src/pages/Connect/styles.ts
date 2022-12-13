@@ -5,7 +5,7 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.COLORS.BACKGROUND};
 `;
 
-export const Item = styled.View`
+export const Item = styled.TouchableOpacity`
   padding: 12px 24px;
   border-bottom: 1px solid black;
   flex-direction: row;

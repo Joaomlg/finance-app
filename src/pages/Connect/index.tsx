@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text } from 'react-native';
 import { SvgUri } from 'react-native-svg';
@@ -9,7 +10,14 @@ import { Container, Item, ItemSeparator, Title } from './styles';
 const Connect: React.FC = () => {
   const [connectors, setConnectors] = useState([] as Connector[]);
   const [isLoading, setIsLoading] = useState(true);
+
   const pluggyService = usePluggyService();
+
+  const navigation = useNavigation();
+
+  const handleItemPressed = (id: number) => {
+    navigation.navigate('createConnection', { connectorId: id });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +41,7 @@ const Connect: React.FC = () => {
           data={connectors}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <Item>
+            <Item onPress={() => handleItemPressed(item.id)}>
               <SvgUri height={60} width={60} uri={item.imageUrl} />
               <Title>{item.name}</Title>
             </Item>
