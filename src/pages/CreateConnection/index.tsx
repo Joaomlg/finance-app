@@ -44,11 +44,11 @@ const CreateConnection: React.FC = () => {
     try {
       const item = await pluggyService.createItem(connectorId, formData);
 
-      const previousItems: Item[] = JSON.parse(
+      const previousItems: string[] = JSON.parse(
         (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
       );
 
-      const newItems = [...previousItems, item];
+      const newItems = [...previousItems, item.id];
 
       await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItems));
 
