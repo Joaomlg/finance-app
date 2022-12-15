@@ -2,6 +2,10 @@ import { BaseApi } from './baseApi';
 import { Connector, ConnectorFilters, CreateItemOptions, Item, PageResponse } from './types';
 
 export class PluggyClient extends BaseApi {
+  async createConnectToken() {
+    return this.postRequest<{ accessToken: string }>('/connect_token');
+  }
+
   async fetchConnectors(filters: ConnectorFilters = {}) {
     return this.getRequest<PageResponse<Connector>>('/connectors', filters);
   }

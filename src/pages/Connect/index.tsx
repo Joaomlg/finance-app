@@ -1,35 +1,64 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Text } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { AsyncStorage, Text } from 'react-native';
+import { PluggyConnect } from 'react-native-pluggy-connect';
 import usePluggyService from '../../hooks/pluggyService';
-import { Connector } from '../../services/pluggy/types/connector';
+import { Item } from '../../services/pluggy';
+import { ItemsAsyncStorageKey } from '../../utils/contants';
 
-import { Container, Item, ItemSeparator, Title } from './styles';
+import { Container } from './styles';
 
 const Connect: React.FC = () => {
-  const [connectors, setConnectors] = useState([] as Connector[]);
+  const [connectToken, setConnectToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const pluggyService = usePluggyService();
 
   const navigation = useNavigation();
 
-  const handleItemPressed = (id: number) => {
-    navigation.navigate('createConnection', { connectorId: id });
+  const handleOnSuccess = async (data: { item: Item }) => {
+    const { item } = data;
+    await saveConnection(item);
+  };
+
+  const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
+    const { message, data } = error;
+
+    console.error(message);
+
+    if (data) {
+      await saveConnection(data.item);
+    }
+  };
+
+  const saveConnection = async (item: Item) => {
+    try {
+      const previousItems: string[] = JSON.parse(
+        (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
+      );
+
+      const newItems = [...previousItems, item.id];
+
+      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItems));
+
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOnClose = () => {
+    navigation.goBack();
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { results } = await pluggyService.fetchConnectors({
-        countries: ['BR'],
-        types: ['PERSONAL_BANK'],
-      });
-      setConnectors(results);
+    const createConnectToken = async () => {
+      const { accessToken } = await pluggyService.createConnectToken();
+      setConnectToken(accessToken);
       setIsLoading(false);
     };
 
-    fetchData();
+    createConnectToken();
   }, [pluggyService]);
 
   return (
@@ -37,17 +66,16 @@ const Connect: React.FC = () => {
       {isLoading ? (
         <Text>Carregando...</Text>
       ) : (
-        <FlatList
-          data={connectors}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <Item onPress={() => handleItemPressed(item.id)}>
-              <SvgUri height={60} width={60} uri={item.imageUrl} />
-              <Title>{item.name}</Title>
-            </Item>
-          )}
-          ItemSeparatorComponent={() => <ItemSeparator />}
-        />
+        <Container>
+          <PluggyConnect
+            connectToken={connectToken}
+            includeSandbox={true}
+            countries={['BR']}
+            onSuccess={handleOnSuccess}
+            onError={handleOnError}
+            onClose={handleOnClose}
+          />
+        </Container>
       )}
     </Container>
   );

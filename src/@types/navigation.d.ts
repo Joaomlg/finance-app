@@ -4,9 +4,6 @@ export declare global {
       home: undefined;
       accounts: undefined;
       connect: undefined;
-      createConnection: {
-        connectorId: number;
-      };
     }
   }
 }
