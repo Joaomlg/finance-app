@@ -19,6 +19,7 @@ const Connect: React.FC = () => {
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
     await saveConnection(item);
+    navigation.goBack();
   };
 
   const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
@@ -40,8 +41,6 @@ const Connect: React.FC = () => {
       const newItems = [...previousItems, item.id];
 
       await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItems));
-
-      navigation.goBack();
     } catch (error) {
       console.log(error);
     }
