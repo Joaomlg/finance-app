@@ -1,6 +1,6 @@
 import { StackActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { AsyncStorage, Button, Text } from 'react-native';
+import { Alert, AsyncStorage, Button, Text } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
@@ -31,6 +31,13 @@ const Accounts: React.FC = () => {
   );
 
   const handleDeleteItem = async (id: string) => {
+    Alert.alert('Apagar conexão?', 'Tem certeza que deseja apagar a conexão?', [
+      { text: 'Cancelar', onPress: () => {} },
+      { text: 'Apagar', onPress: async () => await tryDeleteItem(id) },
+    ]);
+  };
+
+  const tryDeleteItem = async (id: string) => {
     try {
       await pluggyService.deleteItem(id);
 
