@@ -13,9 +13,8 @@ export const LoadingContainer = styled.View`
   align-items: center;
 `;
 
-export const ItemCard = styled.TouchableOpacity`
+export const ItemCard = styled.View`
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
   border: 1px solid black;
   border-radius: 8px;
@@ -27,6 +26,8 @@ export const ItemAvatar = styled(SvgUri)`
   margin-right: 12px;
 `;
 
-export const ItemInfo = styled.View``;
+export const ItemInfo = styled.View`
+  flex: 1;
+`;
 
 export const ItemAction = styled.View``;

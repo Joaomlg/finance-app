@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Text } from 'react-native';
+import { ActivityIndicator, Alert, Button, FlatList, Text } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
@@ -67,18 +67,26 @@ const Accounts: React.FC = () => {
         </LoadingContainer>
       ) : (
         <>
-          {items.map((item) => (
-            <ItemCard key={item.id} onPress={() => console.log('teste')}>
-              <ItemAvatar uri={item.connector.imageUrl} />
-              <ItemInfo>
-                <Text>{item.connector.name}</Text>
-                <Text>Status: {item.status}</Text>
-              </ItemInfo>
-              <ItemAction>
-                <MaterialIcons name="delete" size={28} onPress={() => handleDeleteItem(item.id)} />
-              </ItemAction>
-            </ItemCard>
-          ))}
+          <FlatList
+            data={items}
+            renderItem={({ item }) => (
+              <ItemCard key={item.id}>
+                <ItemAvatar uri={item.connector.imageUrl} />
+                <ItemInfo>
+                  <Text>{item.connector.name}</Text>
+                  <Text>Status: {item.status}</Text>
+                </ItemInfo>
+                <ItemAction>
+                  <MaterialIcons
+                    name="delete"
+                    size={28}
+                    onPress={() => handleDeleteItem(item.id)}
+                  />
+                </ItemAction>
+              </ItemCard>
+            )}
+            keyExtractor={(item) => item.id}
+          />
           <Button
             title="Conectar uma conta"
             onPress={() => navigation.navigate('connect')}
