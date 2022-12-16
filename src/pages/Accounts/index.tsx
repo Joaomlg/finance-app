@@ -1,6 +1,7 @@
-import { StackActions, useFocusEffect, useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, AsyncStorage, Button, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { Alert, Button, Text } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';

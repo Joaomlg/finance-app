@@ -1,6 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { AsyncStorage, Text } from 'react-native';
+import { Text } from 'react-native';
 import { PluggyConnect } from 'react-native-pluggy-connect';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
