@@ -5,8 +5,9 @@ import { Alert, Button, Text } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
+import { MaterialIcons } from '@expo/vector-icons';
 
-import { Container, ItemCard } from './styles';
+import { Container, ItemAction, ItemAvatar, ItemCard, ItemInfo } from './styles';
 
 const Accounts: React.FC = () => {
   const navigation = useNavigation();
@@ -60,11 +61,15 @@ const Accounts: React.FC = () => {
   return (
     <Container>
       {items.map((item) => (
-        <ItemCard key={item.id} onPress={() => handleDeleteItem(item.id)}>
-          <Text>{item.id}</Text>
-          <Text>{item.connector.name}</Text>
-          <Text>{item.status}</Text>
-          <Text>{item.connector.hasMFA ? 'With MFA' : 'Without MFA'}</Text>
+        <ItemCard key={item.id} onPress={() => console.log('teste')}>
+          <ItemAvatar uri={item.connector.imageUrl} />
+          <ItemInfo>
+            <Text>{item.connector.name}</Text>
+            <Text>Status: {item.status}</Text>
+          </ItemInfo>
+          <ItemAction>
+            <MaterialIcons name="delete" size={28} onPress={() => handleDeleteItem(item.id)} />
+          </ItemAction>
         </ItemCard>
       ))}
       <Button title="Conectar uma conta" onPress={() => navigation.navigate('connect')}></Button>
