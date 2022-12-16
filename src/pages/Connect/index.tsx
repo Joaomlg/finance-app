@@ -66,16 +66,14 @@ const Connect: React.FC = () => {
       {isLoading ? (
         <Text>Carregando...</Text>
       ) : (
-        <Container>
-          <PluggyConnect
-            connectToken={connectToken}
-            includeSandbox={true}
-            countries={['BR']}
-            onSuccess={handleOnSuccess}
-            onError={handleOnError}
-            onClose={handleOnClose}
-          />
-        </Container>
+        <PluggyConnect
+          connectToken={connectToken}
+          includeSandbox={true}
+          countries={['BR']}
+          onSuccess={handleOnSuccess}
+          onError={handleOnError}
+          onClose={handleOnClose}
+        />
       )}
     </Container>
   );
