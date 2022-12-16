@@ -1,19 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
-import { Alert, Button, Text } from 'react-native';
+import { ActivityIndicator, Alert, Button, Text } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { Container, ItemAction, ItemAvatar, ItemCard, ItemInfo } from './styles';
+import { Container, ItemAction, ItemAvatar, ItemCard, ItemInfo, LoadingContainer } from './styles';
 
 const Accounts: React.FC = () => {
-  const navigation = useNavigation();
-
   const [items, setItems] = useState([] as Item[]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const navigation = useNavigation();
   const pluggyService = usePluggyService();
 
   useFocusEffect(
@@ -26,6 +26,7 @@ const Accounts: React.FC = () => {
         const items = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
 
         setItems(items);
+        setIsLoading(false);
       };
 
       fetchItems();
@@ -60,19 +61,30 @@ const Accounts: React.FC = () => {
 
   return (
     <Container>
-      {items.map((item) => (
-        <ItemCard key={item.id} onPress={() => console.log('teste')}>
-          <ItemAvatar uri={item.connector.imageUrl} />
-          <ItemInfo>
-            <Text>{item.connector.name}</Text>
-            <Text>Status: {item.status}</Text>
-          </ItemInfo>
-          <ItemAction>
-            <MaterialIcons name="delete" size={28} onPress={() => handleDeleteItem(item.id)} />
-          </ItemAction>
-        </ItemCard>
-      ))}
-      <Button title="Conectar uma conta" onPress={() => navigation.navigate('connect')}></Button>
+      {isLoading ? (
+        <LoadingContainer>
+          <ActivityIndicator size="large" />
+        </LoadingContainer>
+      ) : (
+        <>
+          {items.map((item) => (
+            <ItemCard key={item.id} onPress={() => console.log('teste')}>
+              <ItemAvatar uri={item.connector.imageUrl} />
+              <ItemInfo>
+                <Text>{item.connector.name}</Text>
+                <Text>Status: {item.status}</Text>
+              </ItemInfo>
+              <ItemAction>
+                <MaterialIcons name="delete" size={28} onPress={() => handleDeleteItem(item.id)} />
+              </ItemAction>
+            </ItemCard>
+          ))}
+          <Button
+            title="Conectar uma conta"
+            onPress={() => navigation.navigate('connect')}
+          ></Button>
+        </>
+      )}
     </Container>
   );
 };

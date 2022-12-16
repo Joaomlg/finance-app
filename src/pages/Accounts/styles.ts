@@ -7,6 +7,12 @@ export const Container = styled.View`
   padding: 24px 12px;
 `;
 
+export const LoadingContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const ItemCard = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: space-between;
