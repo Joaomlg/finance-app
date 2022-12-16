@@ -26,6 +26,13 @@ export class PluggyClient extends BaseApi {
     });
   }
 
+  async updateItem(id: string, parameters?: Record<string, string>) {
+    return this.patchRequest<Item>(`items/${id}`, {
+      id,
+      parameters,
+    });
+  }
+
   async fetchItem(id: string) {
     return this.getRequest<Item>(`items/${id}`);
   }
