@@ -9,8 +9,8 @@ const { Screen, Navigator, Group } = createNativeStackNavigator();
 const StackRoutes: React.FC = () => {
   return (
     <Navigator initialRouteName="home">
-      <Screen name="home" component={Home} />
-      <Screen name="accounts" component={Accounts} />
+      <Screen name="home" component={Home} options={{ title: 'Home' }} />
+      <Screen name="accounts" component={Accounts} options={{ title: 'Conexões' }} />
       <Group screenOptions={{ headerShown: false }}>
         <Screen name="connect" component={Connect} />
       </Group>
