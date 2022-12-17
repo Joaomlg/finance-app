@@ -6,7 +6,9 @@ export type PluggyClientParams = {
   clientSecret: string;
 };
 
-type QueryParameters = { [key: string]: number | number[] | string | string[] | boolean };
+type QueryParameters = {
+  [key: string]: number | number[] | string | string[] | boolean | undefined;
+};
 
 export class BaseApi {
   private client: ApisauceInstance;

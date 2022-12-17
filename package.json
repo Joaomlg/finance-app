@@ -11,12 +11,14 @@
     "format": "prettier --check ./src"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.5",
     "apisauce": "^2.1.6",
     "expo": "~47.0.8",
     "expo-status-bar": "~1.4.2",
     "jwt-decode": "^3.1.2",
+    "moment": "^2.29.4",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
@@ -27,8 +29,7 @@
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.9",
     "react-native-webview": "^11.26.0",
-    "styled-components": "^5.3.6",
-    "@react-native-async-storage/async-storage": "~1.17.3"
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

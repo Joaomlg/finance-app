@@ -1,5 +1,15 @@
 import { BaseApi } from './baseApi';
-import { Connector, ConnectorFilters, CreateItemOptions, Item, PageResponse } from './types';
+import {
+  Account,
+  AccountType,
+  Connector,
+  ConnectorFilters,
+  CreateItemOptions,
+  Investment,
+  InvestmentType,
+  Item,
+  PageResponse,
+} from './types';
 
 export class PluggyClient extends BaseApi {
   async createConnectToken() {
@@ -39,5 +49,13 @@ export class PluggyClient extends BaseApi {
 
   async deleteItem(id: string) {
     await this.deleteRequest<void>(`items/${id}`);
+  }
+
+  async fetchAccounts(itemId: string, type?: AccountType) {
+    return this.getRequest<PageResponse<Account>>('/accounts', { itemId, type });
+  }
+
+  async fetchInvestments(itemId: string, type?: InvestmentType) {
+    return this.getRequest<PageResponse<Investment>>('/investments', { itemId, type });
   }
 }
