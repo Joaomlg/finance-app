@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, ScrollView, RefreshControl } from 'react-native';
+import { ScrollView, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { AccountInfo, AccountSection, Container, UpdatedAt } from './styles';
+import { Container } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import usePluggyService from '../../hooks/pluggyService';
 import moment from 'moment';
-import { Fab, Icon } from 'native-base';
+import { Box, Fab, Icon, VStack, Text, HStack, Divider } from 'native-base';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -83,25 +83,35 @@ const Home: React.FC = () => {
   return (
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchData} />}>
-        <UpdatedAt>Atualizado em: {lastUpdate}</UpdatedAt>
-        <AccountSection>
-          <AccountInfo>
-            <Text>Saldo das contas</Text>
-            <Text>R$ {formatMoney(totalBalance)}</Text>
-          </AccountInfo>
-          <AccountInfo>
-            <Text>Fatura dos cartões</Text>
-            <Text>-R$ {formatMoney(totalInvoice)}</Text>
-          </AccountInfo>
-          <AccountInfo>
-            <Text>Investimentos</Text>
-            <Text>R$ {formatMoney(totalInvestment)}</Text>
-          </AccountInfo>
-          <AccountInfo>
-            <Text>Total</Text>
-            <Text>R$ {formatMoney(totalValue)}</Text>
-          </AccountInfo>
-        </AccountSection>
+        <VStack space={3}>
+          <Text fontSize="xs" fontWeight="thin">
+            Atualizado em: {lastUpdate}
+          </Text>
+          <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg">
+            <VStack padding={4} space={3}>
+              <Text fontSize="md" fontWeight="extrabold">
+                Balanço
+              </Text>
+              <HStack justifyContent="space-between">
+                <Text>Saldo das contas</Text>
+                <Text>R$ {formatMoney(totalBalance)}</Text>
+              </HStack>
+              <HStack justifyContent="space-between">
+                <Text>Fatura dos cartões</Text>
+                <Text>-R$ {formatMoney(totalInvoice)}</Text>
+              </HStack>
+              <HStack justifyContent="space-between">
+                <Text>Investimentos</Text>
+                <Text>R$ {formatMoney(totalInvestment)}</Text>
+              </HStack>
+              <Divider />
+              <HStack justifyContent="space-between">
+                <Text fontWeight="bold">Total</Text>
+                <Text fontWeight="bold">R$ {formatMoney(totalValue)}</Text>
+              </HStack>
+            </VStack>
+          </Box>
+        </VStack>
       </ScrollView>
       <Fab
         renderInPortal={false}
