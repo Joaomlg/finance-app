@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import usePluggyService from '../../hooks/pluggyService';
 import moment from 'moment';
+import { Fab, Icon, Select } from 'native-base';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -90,12 +91,6 @@ const Home: React.FC = () => {
   return (
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchData} />}>
-        <Header>
-          <MonthSelector>
-            <Text>Maio</Text>
-            <MaterialIcons name="expand-more" />
-          </MonthSelector>
-        </Header>
         <UpdatedAt>Atualizado em: {lastUpdate}</UpdatedAt>
         <AccountSection>
           <AccountInfo>
@@ -115,10 +110,14 @@ const Home: React.FC = () => {
             <Text>R$ {formatMoney(totalValue)}</Text>
           </AccountInfo>
         </AccountSection>
-        <ManageAccountButtonContainer>
-          <Button title="Gerenciar contas" onPress={() => navigation.navigate('accounts')} />
-        </ManageAccountButtonContainer>
       </ScrollView>
+      <Fab
+        renderInPortal={false}
+        size="lg"
+        icon={<Icon name="account-balance" as={MaterialIcons} color="white" />}
+        label="Contas"
+        onPress={() => navigation.navigate('accounts')}
+      />
     </Container>
   );
 };
