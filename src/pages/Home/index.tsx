@@ -95,7 +95,6 @@ const Home: React.FC = () => {
             <Text>Maio</Text>
             <MaterialIcons name="expand-more" />
           </MonthSelector>
-          <MaterialIcons name="refresh" />
         </Header>
         <UpdatedAt>Atualizado em: {lastUpdate}</UpdatedAt>
         <AccountSection>
