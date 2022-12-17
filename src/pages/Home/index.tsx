@@ -74,15 +74,9 @@ const Home: React.FC = () => {
     setIsLoading(false);
   }, [pluggyService]);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [fetchData]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [fetchData]),
-  );
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const totalValue = totalBalance + totalInvestment - totalInvoice;
 
