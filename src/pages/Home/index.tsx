@@ -1,22 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, Button, ScrollView, RefreshControl } from 'react-native';
+import { Text, ScrollView, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import {
-  AccountInfo,
-  AccountSection,
-  Container,
-  Header,
-  ManageAccountButtonContainer,
-  MonthSelector,
-  UpdatedAt,
-} from './styles';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AccountInfo, AccountSection, Container, UpdatedAt } from './styles';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import usePluggyService from '../../hooks/pluggyService';
 import moment from 'moment';
-import { Fab, Icon, Select } from 'native-base';
+import { Fab, Icon } from 'native-base';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
