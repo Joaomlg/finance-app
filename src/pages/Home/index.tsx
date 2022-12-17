@@ -113,13 +113,6 @@ const Home: React.FC = () => {
           </Box>
         </VStack>
       </ScrollView>
-      <Fab
-        renderInPortal={false}
-        size="lg"
-        icon={<Icon name="account-balance" as={MaterialIcons} color="white" />}
-        label="Contas"
-        onPress={() => navigation.navigate('accounts')}
-      />
     </Container>
   );
 };
