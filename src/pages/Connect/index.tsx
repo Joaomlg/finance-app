@@ -39,9 +39,9 @@ const Connect: React.FC = () => {
         (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
       );
 
-      const newItems = [...previousItems, item.id];
+      const newUniqueItems = [...new Set([...previousItems, item.id])];
 
-      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItems));
+      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
     } catch (error) {
       console.log(error);
     }
