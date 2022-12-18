@@ -102,7 +102,7 @@ const Connections: React.FC = () => {
             <TouchableOpacity onPress={() => handleItemPressed(item.id)}>
               <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg" marginBottom={3}>
                 <HStack padding={4} space={3} alignItems="center">
-                  <ItemAvatar uri={item.connector.imageUrl} />
+                  <ItemAvatar height="100%" uri={item.connector.imageUrl} />
                   <VStack>
                     <Text isTruncated maxWidth="150">
                       {item.connector.name}
