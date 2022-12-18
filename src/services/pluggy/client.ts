@@ -9,6 +9,8 @@ import {
   InvestmentType,
   Item,
   PageResponse,
+  Transaction,
+  TransactionFilters,
 } from './types';
 
 export class PluggyClient extends BaseApi {
@@ -57,5 +59,9 @@ export class PluggyClient extends BaseApi {
 
   async fetchInvestments(itemId: string, type?: InvestmentType) {
     return this.getRequest<PageResponse<Investment>>('/investments', { itemId, type });
+  }
+
+  async fetchTransactions(accountId: string, options: TransactionFilters = {}) {
+    return this.getRequest<PageResponse<Transaction>>('/transactions', { ...options, accountId });
   }
 }
