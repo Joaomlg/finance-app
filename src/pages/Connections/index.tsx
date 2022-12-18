@@ -11,7 +11,7 @@ import moment from 'moment';
 import { Actionsheet, Badge, Box, Fab, HStack, Icon, Spacer, Text, VStack } from 'native-base';
 import { Container, ItemAvatar, LoadingContainer } from './styles';
 
-const Accounts: React.FC = () => {
+const Connections: React.FC = () => {
   const [items, setItems] = useState([] as Item[]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItemId, setSelectedItemId] = useState('');
@@ -149,4 +149,4 @@ const Accounts: React.FC = () => {
   );
 };
 
-export default Accounts;
+export default Connections;

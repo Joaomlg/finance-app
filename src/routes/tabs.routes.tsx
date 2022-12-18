@@ -1,6 +1,6 @@
 import React from 'react';
 import Home from '../pages/Home';
-import Accounts from '../pages/Accounts';
+import Connections from '../pages/Connections';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,8 +21,8 @@ const TabsRoutes: React.FC = () => {
         }}
       />
       <Screen
-        name="accounts"
-        component={Accounts}
+        name="connections"
+        component={Connections}
         options={{
           title: 'Conexões',
           tabBarIcon: ({ color }) => (
