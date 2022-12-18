@@ -70,6 +70,7 @@ const Connect: React.FC = () => {
           connectToken={connectToken}
           includeSandbox={true}
           countries={['BR']}
+          connectorTypes={['PERSONAL_BANK', 'INVESTMENT']}
           onSuccess={handleOnSuccess}
           onError={handleOnError}
           onClose={handleOnClose}
