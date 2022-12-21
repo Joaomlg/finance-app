@@ -9,6 +9,7 @@ import { ItemsAsyncStorageKey } from '../../utils/contants';
 import usePluggyService from '../../hooks/pluggyService';
 import moment from 'moment';
 import { Box, Fab, Icon, VStack, Text, HStack, Divider } from 'native-base';
+import { formatMoney } from '../../utils/money';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -72,13 +73,6 @@ const Home: React.FC = () => {
   }, [fetchData]);
 
   const totalValue = totalBalance + totalInvestment - totalInvoice;
-
-  const formatMoney = (value: number) => {
-    return value
-      .toFixed(2)
-      .replace('.', ',')
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  };
 
   return (
     <Container>
