@@ -66,7 +66,7 @@ const Transactions: React.FC = () => {
 
   const transactionsListSeparator = (transaction: Transaction, index: number) => {
     const date = moment(transaction.date).startOf('day');
-    console.log(index, date, previousDate.current);
+
     const component =
       index === 0 || date.isAfter(previousDate.current, 'day') ? (
         <HStack space={3} alignItems="center">
