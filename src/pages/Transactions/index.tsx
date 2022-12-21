@@ -45,15 +45,20 @@ const Transactions: React.FC = () => {
     const promiseResults = await Promise.all(
       accounts.map(({ id }) =>
         pluggyService.fetchTransactions(id, {
-          from: startDate.toISOString(),
-          to: endDate.toISOString(),
+          pageSize: 500,
+          from: startDate.format('YYYY-MM-DD'),
+          to: endDate.format('YYYY-MM-DD'),
         }),
       ),
     );
 
+    promiseResults.forEach((item) => {
+      console.log(item.results);
+    });
+
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
-      // .filter((item) => item.category != 'Same person transfer')
+      .filter((item) => item.category != 'Same person transfer')
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     setTransactions(transactionsList);
