@@ -53,6 +53,7 @@ const Transactions: React.FC = () => {
 
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
+      // .filter((item) => item.category != 'Same person transfer')
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     setTransactions(transactionsList);
@@ -63,11 +64,11 @@ const Transactions: React.FC = () => {
     fetchTransactions();
   }, [fetchTransactions]);
 
-  const transactionsListSeparator = (transaction: Transaction, ignoreCondition = false) => {
+  const transactionsListSeparator = (transaction: Transaction, index: number) => {
     const date = moment(transaction.date).startOf('day');
-
+    console.log(index, date, previousDate.current);
     const component =
-      ignoreCondition || date.isAfter(previousDate.current) ? (
+      index === 0 || date.isAfter(previousDate.current, 'day') ? (
         <HStack space={3} alignItems="center">
           <VStack alignItems="center">
             <Text fontWeight="bold" fontSize="xl" color="coolGray.400">
@@ -128,7 +129,7 @@ const Transactions: React.FC = () => {
         data={transactions}
         renderItem={({ item, index }) => (
           <>
-            {index === 0 && transactionsListSeparator(item, true)}
+            {transactionsListSeparator(item, index)}
             <HStack paddingY={3} alignItems="center" space={3}>
               <Avatar
                 backgroundColor="transparent"
@@ -152,7 +153,6 @@ const Transactions: React.FC = () => {
           </>
         )}
         keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={({ leadingItem }) => transactionsListSeparator(leadingItem)}
         paddingX={3}
       />
     </Container>
