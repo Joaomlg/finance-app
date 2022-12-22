@@ -109,7 +109,7 @@ const Transactions: React.FC = () => {
       <FlatList
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchTransactions} />}
         ListHeaderComponent={() => (
-          <HStack space={3} marginBottom={3}>
+          <HStack space={3} marginY={3}>
             <Select
               flexGrow={1}
               selectedValue={selectedMonth}
@@ -153,7 +153,9 @@ const Transactions: React.FC = () => {
                 <Text isTruncated>{item.description}</Text>
               </VStack>
               <Spacer />
-              <Text fontWeight="bold">R$ {formatMoney(item.amount)}</Text>
+              <Text fontWeight="bold">
+                {item.type === 'DEBIT' ? '-' : ''}R$ {formatMoney(item.amount, true)}
+              </Text>
             </HStack>
           </>
         )}
