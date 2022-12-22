@@ -54,7 +54,7 @@ const Transactions: React.FC = () => {
 
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
-      .filter((item) => item.category != 'Same person transfer')
+      .filter((item) => item.description !== 'Dinheiro guardado')
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     setTransactions(transactionsList);
@@ -145,7 +145,7 @@ const Transactions: React.FC = () => {
                 />
               </Avatar>
               <VStack flexShrink={1}>
-                <Text fontWeight="thin">{item.category}</Text>
+                {item.category && <Text fontWeight="thin">{item.category}</Text>}
                 <Text isTruncated>{item.description}</Text>
               </VStack>
               <Spacer />
