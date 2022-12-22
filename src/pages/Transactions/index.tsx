@@ -52,10 +52,6 @@ const Transactions: React.FC = () => {
       ),
     );
 
-    promiseResults.forEach((item) => {
-      console.log(item.results);
-    });
-
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
       .filter((item) => item.category != 'Same person transfer')

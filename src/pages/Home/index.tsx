@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
+import { Box, Divider, HStack, Icon, Text, VStack } from 'native-base';
+import usePluggyService from '../../hooks/pluggyService';
+import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
+import { formatMoney } from '../../utils/money';
+import { Container } from './styles';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { Container } from './styles';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ItemsAsyncStorageKey } from '../../utils/contants';
-import usePluggyService from '../../hooks/pluggyService';
-import moment from 'moment';
-import { Box, Fab, Icon, VStack, Text, HStack, Divider } from 'native-base';
-import { formatMoney } from '../../utils/money';
+const lastUpdateDateFormat = 'DD/MM/YYYY hh:mm:ss';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,55 +19,74 @@ const Home: React.FC = () => {
   const [totalInvoice, setTotalInvoice] = useState(0);
   const [totalInvestment, setTotalInvestment] = useState(0);
 
-  const navigation = useNavigation();
-
   const pluggyService = usePluggyService();
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
+  const fetchData = useCallback(
+    async (forceUpdate = false) => {
+      setIsLoading(true);
 
-    const itemsId: string[] = JSON.parse(
-      (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
-    );
+      const itemsId: string[] = JSON.parse(
+        (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
+      );
 
-    const accounts = await Promise.all(itemsId.map((id) => pluggyService.fetchAccounts(id)));
+      let lastUpdateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
+      const now = moment();
 
-    setTotalBalance(
-      accounts.reduce(
-        (total, { results }) =>
-          total +
-          results
-            .filter((item) => item.type == 'BANK')
-            .reduce((acc, item) => acc + item.balance, 0),
-        0,
-      ),
-    );
+      const shouldUpdate = lastUpdateDate
+        ? now.isAfter(moment(lastUpdateDate, lastUpdateDateFormat), 'day')
+        : true;
 
-    setTotalInvoice(
-      accounts.reduce(
-        (total, { results }) =>
-          total +
-          results
-            .filter((item) => item.type == 'CREDIT')
-            .reduce((acc, item) => acc + item.balance, 0),
-        0,
-      ),
-    );
+      if (shouldUpdate || forceUpdate) {
+        await Promise.all(itemsId.map((id) => pluggyService.updateItem(id)));
+        lastUpdateDate = now.format(lastUpdateDateFormat);
+        await AsyncStorage.setItem(LastUpdateDateStorageKey, lastUpdateDate);
+      }
 
-    const investiments = await Promise.all(itemsId.map((id) => pluggyService.fetchInvestments(id)));
+      setLastUpdate(lastUpdateDate as string);
 
-    setTotalInvestment(
-      investiments.reduce(
-        (total, { results }) => total + results.reduce((acc, item) => acc + item.balance, 0),
-        0,
-      ),
-    );
+      const accounts = await Promise.all(itemsId.map((id) => pluggyService.fetchAccounts(id)));
 
-    const nowString = moment().format('DD/MM/YYYY hh:mm:ss');
-    setLastUpdate(nowString);
+      setTotalBalance(
+        accounts.reduce(
+          (total, { results }) =>
+            total +
+            results
+              .filter((item) => item.type == 'BANK')
+              .reduce((acc, item) => acc + item.balance, 0),
+          0,
+        ),
+      );
 
-    setIsLoading(false);
-  }, [pluggyService]);
+      setTotalInvoice(
+        accounts.reduce(
+          (total, { results }) =>
+            total +
+            results
+              .filter((item) => item.type == 'CREDIT')
+              .reduce((acc, item) => acc + item.balance, 0),
+          0,
+        ),
+      );
+
+      const investiments = await Promise.all(
+        itemsId.map((id) => pluggyService.fetchInvestments(id)),
+      );
+
+      setTotalInvestment(
+        investiments.reduce(
+          (total, { results }) => total + results.reduce((acc, item) => acc + item.balance, 0),
+          0,
+        ),
+      );
+
+      setIsLoading(false);
+    },
+    [pluggyService],
+  );
+
+  const handleUpdateData = async () => {
+    await fetchData(true);
+  };
 
   useEffect(() => {
     fetchData();
@@ -76,7 +96,9 @@ const Home: React.FC = () => {
 
   return (
     <Container>
-      <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchData} />}>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleUpdateData} />}
+      >
         <VStack space={3}>
           <Text fontSize="xs" fontWeight="thin">
             Atualizado em: {lastUpdate}
