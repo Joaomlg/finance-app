@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item, ItemStatus } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
@@ -20,21 +20,23 @@ const Connections: React.FC = () => {
   const navigation = useNavigation();
   const pluggyService = usePluggyService();
 
+  const fetchItems = useCallback(async () => {
+    setIsLoading(true);
+
+    const itemsId: string[] = JSON.parse(
+      (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
+    );
+
+    const items = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
+
+    setItems(items);
+    setIsLoading(false);
+  }, [pluggyService]);
+
   useFocusEffect(
     useCallback(() => {
-      const fetchItems = async () => {
-        const itemsId: string[] = JSON.parse(
-          (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
-        );
-
-        const items = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
-
-        setItems(items);
-        setIsLoading(false);
-      };
-
       fetchItems();
-    }, [pluggyService]),
+    }, [fetchItems]),
   );
 
   const handleItemPressed = (id: string) => {
@@ -91,35 +93,31 @@ const Connections: React.FC = () => {
 
   return (
     <Container>
-      {isLoading ? (
-        <LoadingContainer>
-          <ActivityIndicator size="large" />
-        </LoadingContainer>
-      ) : (
-        <FlatList
-          data={items}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleItemPressed(item.id)}>
-              <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg" marginBottom={3}>
-                <HStack padding={4} space={3} alignItems="center">
-                  <ItemAvatar height="100%" uri={item.connector.imageUrl} />
-                  <VStack>
-                    <Text isTruncated maxWidth="150">
-                      {item.connector.name}
-                    </Text>
-                    <Text fontWeight="thin">
-                      Criado em: {moment(item.createdAt).format('DD/MM/YYYY hh:mm')}
-                    </Text>
-                  </VStack>
-                  <Spacer />
-                  {getItemStatusBadge(item.status)}
-                </HStack>
-              </Box>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-        />
-      )}
+      <FlatList
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchItems} />}
+        data={items}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handleItemPressed(item.id)}>
+            <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg" marginBottom={3}>
+              <HStack padding={4} space={3} alignItems="center">
+                <ItemAvatar height="100%" uri={item.connector.imageUrl} />
+                <VStack>
+                  <Text isTruncated maxWidth="150">
+                    {item.connector.name}
+                  </Text>
+                  <Text fontWeight="thin">
+                    Criado em: {moment(item.createdAt).format('DD/MM/YYYY hh:mm')}
+                  </Text>
+                </VStack>
+                <Spacer />
+                {getItemStatusBadge(item.status)}
+              </HStack>
+            </Box>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id}
+        style={{ flex: 1 }}
+      />
       <Actionsheet isOpen={isActionSheetOpened} onClose={handleActionSheetClosed} size="full">
         <Actionsheet.Content>
           <Box px={4}>
