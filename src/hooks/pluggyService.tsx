@@ -1,4 +1,4 @@
-import { CLIENT_ID, CLIENT_SECRET } from '@env';
+import { CLIENT_ID, CLIENT_SECRET } from 'react-native-dotenv';
 import React, { createContext, useContext } from 'react';
 import { PluggyClient } from '../services/pluggy';
 
