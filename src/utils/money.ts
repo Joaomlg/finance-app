@@ -1,4 +1,14 @@
-export const formatMoney = (value: number, absolute = false) => {
+export type FormatMoneyProps = {
+  value: number;
+  absolute?: boolean;
+  hidden?: boolean;
+};
+
+export const formatMoney = ({ value, absolute, hidden }: FormatMoneyProps) => {
+  if (hidden) {
+    return '••••••••';
+  }
+
   return (absolute ? Math.abs(value) : value)
     .toFixed(2)
     .replace('.', ',')

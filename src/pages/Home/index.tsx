@@ -15,6 +15,7 @@ const lastUpdateDateFormat = 'DD/MM/YYYY hh:mm:ss';
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState('');
+  const [hideMoney, setHideMoney] = useState(false);
   const [totalBalance, setTotalBalance] = useState(0);
   const [totalInvoice, setTotalInvoice] = useState(0);
   const [totalInvestment, setTotalInvestment] = useState(0);
@@ -100,9 +101,17 @@ const Home: React.FC = () => {
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleUpdateData} />}
       >
         <VStack space={3}>
-          <Text fontSize="xs" fontWeight="thin">
-            Atualizado em: {lastUpdate}
-          </Text>
+          <HStack justifyContent="space-between" alignItems="center">
+            <Text fontSize="xs" fontWeight="thin">
+              Atualizado em: {lastUpdate}
+            </Text>
+            <Icon
+              as={MaterialIcons}
+              name={hideMoney ? 'visibility-off' : 'visibility'}
+              size="md"
+              onPress={() => setHideMoney(!hideMoney)}
+            />
+          </HStack>
           <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg">
             <VStack padding={4} space={3}>
               <Text fontSize="md" fontWeight="extrabold">
@@ -110,20 +119,22 @@ const Home: React.FC = () => {
               </Text>
               <HStack justifyContent="space-between">
                 <Text>Saldo das contas</Text>
-                <Text>R$ {formatMoney(totalBalance)}</Text>
+                <Text>R$ {formatMoney({ value: totalBalance, hidden: hideMoney })}</Text>
               </HStack>
               <HStack justifyContent="space-between">
                 <Text>Fatura dos cartões</Text>
-                <Text>-R$ {formatMoney(totalInvoice)}</Text>
+                <Text>-R$ {formatMoney({ value: totalInvoice, hidden: hideMoney })}</Text>
               </HStack>
               <HStack justifyContent="space-between">
                 <Text>Investimentos</Text>
-                <Text>R$ {formatMoney(totalInvestment)}</Text>
+                <Text>R$ {formatMoney({ value: totalInvestment, hidden: hideMoney })}</Text>
               </HStack>
               <Divider />
               <HStack justifyContent="space-between">
                 <Text fontWeight="bold">Total</Text>
-                <Text fontWeight="bold">R$ {formatMoney(totalValue)}</Text>
+                <Text fontWeight="bold">
+                  R$ {formatMoney({ value: totalValue, hidden: hideMoney })}
+                </Text>
               </HStack>
             </VStack>
           </Box>

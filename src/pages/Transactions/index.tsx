@@ -119,11 +119,11 @@ const Transactions: React.FC = () => {
             </Select>
             <VStack>
               <Text>Renda</Text>
-              <Text>R$ {formatMoney(totalIncomes)}</Text>
+              <Text>R$ {formatMoney({ value: totalIncomes })}</Text>
             </VStack>
             <VStack>
               <Text>Gasto</Text>
-              <Text>R$ {formatMoney(totalExpenses)}</Text>
+              <Text>R$ {formatMoney({ value: totalExpenses })}</Text>
             </VStack>
           </HStack>
         )}
@@ -150,7 +150,8 @@ const Transactions: React.FC = () => {
               </VStack>
               <Spacer />
               <Text fontWeight="bold">
-                {item.type === 'DEBIT' ? '-' : ''}R$ {formatMoney(item.amount, true)}
+                {item.type === 'DEBIT' ? '-' : ''}R${' '}
+                {formatMoney({ value: item.amount, absolute: true })}
               </Text>
             </HStack>
           </>
