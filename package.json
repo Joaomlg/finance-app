@@ -4,6 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "build:preview": "eas build -p android --profile preview",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -31,7 +32,8 @@
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.7",
     "react-native-webview": "11.23.1",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "expo-updates": "~0.15.6"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
