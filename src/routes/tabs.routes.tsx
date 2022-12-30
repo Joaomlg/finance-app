@@ -10,7 +10,13 @@ const { Screen, Navigator } = createBottomTabNavigator();
 
 const TabsRoutes: React.FC = () => {
   return (
-    <Navigator initialRouteName="home">
+    <Navigator
+      initialRouteName="home"
+      screenOptions={{
+        tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
+        tabBarItemStyle: { marginVertical: 5 },
+      }}
+    >
       <Screen
         name="home"
         component={Home}
