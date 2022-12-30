@@ -65,7 +65,7 @@ const Transactions: React.FC = () => {
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
       .filter((item) => item.description !== 'Dinheiro guardado')
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     setTransactions(transactionsList);
     setIsLoading(false);
@@ -106,7 +106,7 @@ const Transactions: React.FC = () => {
     const date = moment(transaction.date).startOf('day');
 
     const component =
-      index === 0 || date.isAfter(previousDate.current, 'day') ? (
+      index === 0 || date.isBefore(previousDate.current, 'day') ? (
         <HStack space={3} alignItems="center">
           <VStack alignItems="center">
             <Text fontWeight="bold" fontSize="xl" color="coolGray.400">
