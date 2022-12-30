@@ -2,15 +2,26 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
+import { Alert, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item, ItemStatus } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 
 import moment from 'moment';
-import { Actionsheet, Avatar, Badge, Box, Fab, HStack, Icon, Spacer, Text, VStack } from 'native-base';
-import { Container, ItemAvatar, LoadingContainer } from './styles';
+import {
+  Actionsheet,
+  Avatar,
+  Badge,
+  Box,
+  Fab,
+  HStack,
+  Icon,
+  Spacer,
+  Text,
+  VStack,
+} from 'native-base';
 import { SvgWithCssUri } from 'react-native-svg';
+import { Container } from './styles';
 
 const Connections: React.FC = () => {
   const [items, setItems] = useState([] as Item[]);
@@ -101,7 +112,11 @@ const Connections: React.FC = () => {
           <TouchableOpacity onPress={() => handleItemPressed(item.id)}>
             <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg" marginBottom={3}>
               <HStack padding={4} space={3} alignItems="center">
-                <Avatar backgroundColor="transparent" borderWidth="1" borderColor="coolGray.200">
+                <Avatar
+                  backgroundColor="transparent"
+                  borderWidth="1"
+                  borderColor={'#' + item.connector.primaryColor}
+                >
                   <SvgWithCssUri height="100%" width="100%" uri={item.connector.imageUrl} />
                 </Avatar>
                 <VStack>
