@@ -8,8 +8,9 @@ import { Item, ItemStatus } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 
 import moment from 'moment';
-import { Actionsheet, Badge, Box, Fab, HStack, Icon, Spacer, Text, VStack } from 'native-base';
+import { Actionsheet, Avatar, Badge, Box, Fab, HStack, Icon, Spacer, Text, VStack } from 'native-base';
 import { Container, ItemAvatar, LoadingContainer } from './styles';
+import { SvgWithCssUri } from 'react-native-svg';
 
 const Connections: React.FC = () => {
   const [items, setItems] = useState([] as Item[]);
@@ -100,7 +101,9 @@ const Connections: React.FC = () => {
           <TouchableOpacity onPress={() => handleItemPressed(item.id)}>
             <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg" marginBottom={3}>
               <HStack padding={4} space={3} alignItems="center">
-                <ItemAvatar height="100%" uri={item.connector.imageUrl} />
+                <Avatar backgroundColor="transparent" borderWidth="1" borderColor="coolGray.200">
+                  <SvgWithCssUri height="100%" width="100%" uri={item.connector.imageUrl} />
+                </Avatar>
                 <VStack>
                   <Text isTruncated maxWidth="150">
                     {item.connector.name}
