@@ -10,7 +10,7 @@ import { formatMoney } from '../../utils/money';
 import { Container } from './styles';
 import { MaterialIcons } from '@expo/vector-icons';
 
-const lastUpdateDateFormat = 'DD/MM/YYYY hh:mm:ss';
+const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
