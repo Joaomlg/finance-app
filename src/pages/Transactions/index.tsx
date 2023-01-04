@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment, { months } from 'moment';
 import { Avatar, Divider, FlatList, HStack, Icon, Select, Spacer, Text, VStack } from 'native-base';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ListRenderItemInfo, RefreshControl } from 'react-native';
 import usePluggyService from '../../hooks/pluggyService';
 import { Account, Transaction } from '../../services/pluggy';
@@ -23,14 +23,23 @@ const Transactions: React.FC = () => {
 
   const previousDate = useRef(moment(0));
 
-  const totalIncomes = transactions.reduce(
-    (total, transaction) => (transaction.type === 'CREDIT' ? total + transaction.amount : total),
-    0,
+  const totalIncomes = useMemo(
+    () =>
+      transactions.reduce(
+        (total, transaction) =>
+          transaction.type === 'CREDIT' ? total + transaction.amount : total,
+        0,
+      ),
+    [transactions],
   );
 
-  const totalExpenses = transactions.reduce(
-    (total, transaction) => (transaction.type === 'DEBIT' ? total - transaction.amount : total),
-    0,
+  const totalExpenses = useMemo(
+    () =>
+      transactions.reduce(
+        (total, transaction) => (transaction.type === 'DEBIT' ? total - transaction.amount : total),
+        0,
+      ),
+    [transactions],
   );
 
   const fetchTransactions = useCallback(async () => {
