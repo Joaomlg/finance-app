@@ -1,15 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import moment, { Moment } from 'moment';
-import { Button, Divider, HStack, Icon, Text, VStack } from 'native-base';
+import { Button, Divider, HStack, Icon, Modal, Text, VStack } from 'native-base';
 import React, { useState } from 'react';
 
 type MonthYearPickerProps = {
+  isOpen: boolean;
   onChange?: (value: Moment) => void;
+  onClose?: () => void;
 };
 
 const now = moment();
 
-const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ onChange }) => {
+const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onClose }) => {
   const [currentYearBase, setCurrentYearBase] = useState(now.startOf('year'));
 
   const prevYear = () => setCurrentYearBase(moment(currentYearBase).subtract(1, 'years'));
@@ -18,6 +20,12 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ onChange }) => {
   const handleMonthOnPress = (value: Moment) => {
     if (onChange) {
       onChange(value);
+    }
+  };
+
+  const handleModalOnClose = () => {
+    if (onClose) {
+      onClose();
     }
   };
 
@@ -47,17 +55,23 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ onChange }) => {
   };
 
   return (
-    <VStack flex={1} space={3}>
-      <HStack justifyContent="space-between">
-        <Icon as={MaterialIcons} name="chevron-left" size="xl" onPress={prevYear} />
-        <Text>{currentYearBase.format('YYYY')}</Text>
-        <Icon as={MaterialIcons} name="chevron-right" size="xl" onPress={nextYear} />
-      </HStack>
-      <Divider />
-      <HStack flexWrap="wrap" justifyContent="space-between">
-        {renderMonthItem()}
-      </HStack>
-    </VStack>
+    <Modal isOpen={isOpen} closeOnOverlayClick onClose={handleModalOnClose}>
+      <Modal.Content>
+        <Modal.Body>
+          <VStack flex={1} space={3}>
+            <HStack justifyContent="space-between">
+              <Icon as={MaterialIcons} name="chevron-left" size="xl" onPress={prevYear} />
+              <Text>{currentYearBase.format('YYYY')}</Text>
+              <Icon as={MaterialIcons} name="chevron-right" size="xl" onPress={nextYear} />
+            </HStack>
+            <Divider />
+            <HStack flexWrap="wrap" justifyContent="space-between">
+              {renderMonthItem()}
+            </HStack>
+          </VStack>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal>
   );
 };
 
