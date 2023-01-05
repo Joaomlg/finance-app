@@ -1,23 +1,24 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import moment, { months } from 'moment';
-import { Avatar, Divider, FlatList, HStack, Icon, Select, Spacer, Text, VStack } from 'native-base';
+import moment, { Moment } from 'moment';
+import { Avatar, Divider, FlatList, HStack, Icon, Spacer, Text, VStack } from 'native-base';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ListRenderItemInfo, RefreshControl } from 'react-native';
+import { ListRenderItemInfo, RefreshControl, TouchableOpacity } from 'react-native';
+import MonthYearPicker from '../../components/MonthYearPicker';
 import usePluggyService from '../../hooks/pluggyService';
 import { Account, Transaction } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
-import { capitalize } from '../../utils/text';
 
 import { Container } from './styles';
 
-const currentMonthNumber = moment().format('MM');
+const now = moment();
 
 const Transactions: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState([] as Transaction[]);
-  const [selectedMonth, setSelectedMonth] = useState(currentMonthNumber);
+  const [selectedMonth, setSelectedMonth] = useState(now);
+  const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
 
   const pluggyService = usePluggyService();
 
@@ -58,8 +59,8 @@ const Transactions: React.FC = () => {
       [] as Account[],
     );
 
-    const startDate = moment(selectedMonth, 'MM').startOf('month');
-    const endDate = moment(selectedMonth, 'MM').endOf('month');
+    const startDate = moment(selectedMonth).startOf('month');
+    const endDate = moment(selectedMonth).endOf('month');
 
     const promiseResults = await Promise.all(
       accounts.map(({ id }) =>
@@ -87,17 +88,14 @@ const Transactions: React.FC = () => {
   const listHeaderComponent = useCallback(
     () => (
       <HStack space={3} marginY={3}>
-        <Select
-          flexGrow={1}
-          selectedValue={selectedMonth}
-          borderRadius={100}
-          onValueChange={(value) => setSelectedMonth(value)}
-          fontSize="md"
-        >
-          {months().map((month, index) => (
-            <Select.Item key={index} label={capitalize(month)} value={(index + 1).toString()} />
-          ))}
-        </Select>
+        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => setMonthYearPickerOpened(true)}>
+          <HStack flex={1} space={1} alignItems="center">
+            <Text fontSize="xl" textTransform="capitalize" fontWeight="bold">
+              {selectedMonth.format('MMMM YYYY')}
+            </Text>
+            <Icon as={MaterialIcons} name="expand-more" size="xl" />
+          </HStack>
+        </TouchableOpacity>
         <VStack>
           <Text>Renda</Text>
           <Text>R$ {formatMoney({ value: totalIncomes })}</Text>
@@ -170,6 +168,11 @@ const Transactions: React.FC = () => {
 
   const keyExtractor = useCallback((item: Transaction) => item.id, []);
 
+  const handleMonthYearPickerChange = (value: Moment) => {
+    setSelectedMonth(value);
+    setMonthYearPickerOpened(false);
+  };
+
   return (
     <Container>
       <FlatList
@@ -179,6 +182,11 @@ const Transactions: React.FC = () => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         paddingX={3}
+      />
+      <MonthYearPicker
+        isOpen={monthYearPickerOpened}
+        onChange={(value) => handleMonthYearPickerChange(value)}
+        onClose={() => setMonthYearPickerOpened(false)}
       />
     </Container>
   );
