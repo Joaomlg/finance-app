@@ -17,8 +17,7 @@ const Authenticate: React.FC<AuthenticateProps> = ({ onAuthenticationChange }) =
   );
 
   const authenticationRoutine = useCallback(async () => {
-    // const isAuthenticated = __DEV__ || (await authenticate());
-    const isAuthenticated = await authenticate();
+    const isAuthenticated = __DEV__ || (await authenticate());
     handleAuthenticationChange(isAuthenticated);
   }, [handleAuthenticationChange]);
 
