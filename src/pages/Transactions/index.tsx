@@ -28,7 +28,7 @@ const Transactions: React.FC = () => {
     () =>
       transactions.reduce(
         (total, transaction) =>
-          transaction.type === 'CREDIT' ? total + transaction.amount : total,
+          transaction.type === 'CREDIT' ? total + Math.abs(transaction.amount) : total,
         0,
       ),
     [transactions],
@@ -37,7 +37,8 @@ const Transactions: React.FC = () => {
   const totalExpenses = useMemo(
     () =>
       transactions.reduce(
-        (total, transaction) => (transaction.type === 'DEBIT' ? total - transaction.amount : total),
+        (total, transaction) =>
+          transaction.type === 'DEBIT' ? total + Math.abs(transaction.amount) : total,
         0,
       ),
     [transactions],
