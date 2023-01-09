@@ -4,7 +4,8 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "build:preview": "eas build -p android --profile preview",
+    "build:preview": "eas build --profile preview",
+    "update:preview": "eas update --channel staging",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
