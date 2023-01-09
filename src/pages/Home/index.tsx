@@ -140,7 +140,7 @@ const Home: React.FC = () => {
           </Box>
         </VStack>
       </ScrollView>
-      <VersionTag>v1.0.4</VersionTag>
+      <VersionTag>v1.0.5</VersionTag>
     </Container>
   );
 };
