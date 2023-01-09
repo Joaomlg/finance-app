@@ -12,6 +12,13 @@ import { formatMoney } from '../../utils/money';
 
 import { Container } from './styles';
 
+const NUBANK_IGNORED_TRANSACTIONS = [
+  'Pagamento da fatura',
+  'Pagamento recebido',
+  'Dinheiro guardado',
+  'Dinheiro resgatado',
+];
+
 const now = moment();
 
 const Transactions: React.FC = () => {
@@ -75,7 +82,7 @@ const Transactions: React.FC = () => {
 
     const transactionsList = promiseResults
       .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
-      .filter((item) => item.description !== 'Dinheiro guardado')
+      .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     setTransactions(transactionsList);
