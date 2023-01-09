@@ -5,3 +5,12 @@ export const Container = styled.SafeAreaView`
   background-color: ${({ theme }) => theme.COLORS.BACKGROUND};
   padding: 12px;
 `;
+
+export const VersionTag = styled.Text`
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  color: #eee;
+  font-weight: bold;
+  font-size: 10px;
+`;

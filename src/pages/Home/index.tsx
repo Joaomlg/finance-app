@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { Box, Divider, HStack, Icon, Text, VStack } from 'native-base';
 import usePluggyService from '../../hooks/pluggyService';
 import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
-import { Container } from './styles';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Container, VersionTag } from './styles';
 
 const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
@@ -140,6 +140,7 @@ const Home: React.FC = () => {
           </Box>
         </VStack>
       </ScrollView>
+      <VersionTag>v1.0.4</VersionTag>
     </Container>
   );
 };
