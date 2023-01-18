@@ -10,6 +10,7 @@ import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/cont
 import { formatMoney } from '../../utils/money';
 import { Container, VersionTag } from './styles';
 import { Account, Investment } from '../../services/pluggy';
+import { sleep } from '../../utils/time';
 
 const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
@@ -43,6 +44,20 @@ const Home: React.FC = () => {
     [investments],
   );
 
+  const updateItemAndWaitForFinish = useCallback(
+    async (itemId: string) => {
+      let item = await pluggyService.updateItem(itemId);
+
+      while (item.status === 'UPDATING') {
+        await sleep(2000);
+        item = await pluggyService.fetchItem(itemId);
+      }
+
+      return item;
+    },
+    [pluggyService],
+  );
+
   const fetchData = useCallback(
     async (forceUpdate = false) => {
       setIsLoading(true);
@@ -59,7 +74,8 @@ const Home: React.FC = () => {
         : true;
 
       if (shouldUpdate || forceUpdate) {
-        await Promise.all(itemsId.map((id) => pluggyService.updateItem(id)));
+        await Promise.all(itemsId.map((id) => updateItemAndWaitForFinish(id)));
+
         lastUpdateDate = now.format(lastUpdateDateFormat);
         await AsyncStorage.setItem(LastUpdateDateStorageKey, lastUpdateDate);
       }
@@ -90,7 +106,7 @@ const Home: React.FC = () => {
 
       setIsLoading(false);
     },
-    [pluggyService],
+    [pluggyService, updateItemAndWaitForFinish],
   );
 
   const handleUpdateData = async () => {
