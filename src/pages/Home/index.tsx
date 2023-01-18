@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import usePluggyService from '../../hooks/pluggyService';
 import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
 import { Container, VersionTag } from './styles';
+import { Account, Investment } from '../../services/pluggy';
 
 const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
@@ -16,11 +17,31 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState('');
   const [hideMoney, setHideMoney] = useState(false);
-  const [totalBalance, setTotalBalance] = useState(0);
-  const [totalInvoice, setTotalInvoice] = useState(0);
-  const [totalInvestment, setTotalInvestment] = useState(0);
+  const [accounts, setAccounts] = useState([] as Account[]);
+  const [investments, setInvestments] = useState([] as Investment[]);
 
   const pluggyService = usePluggyService();
+
+  const totalBalance = useMemo(
+    () =>
+      accounts
+        .filter(({ type }) => type === 'BANK')
+        .reduce((total, { balance }) => total + balance, 0),
+    [accounts],
+  );
+
+  const totalInvoice = useMemo(
+    () =>
+      accounts
+        .filter(({ type }) => type === 'CREDIT')
+        .reduce((total, { balance }) => total + balance, 0),
+    [accounts],
+  );
+
+  const totalInvestment = useMemo(
+    () => investments.reduce((total, { balance }) => total + balance, 0),
+    [investments],
+  );
 
   const fetchData = useCallback(
     async (forceUpdate = false) => {
@@ -45,40 +66,27 @@ const Home: React.FC = () => {
 
       setLastUpdate(lastUpdateDate as string);
 
-      const accounts = await Promise.all(itemsId.map((id) => pluggyService.fetchAccounts(id)));
-
-      setTotalBalance(
-        accounts.reduce(
-          (total, { results }) =>
-            total +
-            results
-              .filter((item) => item.type == 'BANK')
-              .reduce((acc, item) => acc + item.balance, 0),
-          0,
-        ),
+      const accountsPromiseResult = await Promise.all(
+        itemsId.map((id) => pluggyService.fetchAccounts(id)),
       );
 
-      setTotalInvoice(
-        accounts.reduce(
-          (total, { results }) =>
-            total +
-            results
-              .filter((item) => item.type == 'CREDIT')
-              .reduce((acc, item) => acc + item.balance, 0),
-          0,
-        ),
+      const accountsList = accountsPromiseResult.reduce(
+        (list, { results }) => [...list, ...results],
+        [] as Account[],
       );
 
-      const investiments = await Promise.all(
+      setAccounts(accountsList);
+
+      const investimentsPromiseResult = await Promise.all(
         itemsId.map((id) => pluggyService.fetchInvestments(id)),
       );
 
-      setTotalInvestment(
-        investiments.reduce(
-          (total, { results }) => total + results.reduce((acc, item) => acc + item.balance, 0),
-          0,
-        ),
+      const investmentsList = investimentsPromiseResult.reduce(
+        (list, { results }) => [...list, ...results],
+        [] as Investment[],
       );
+
+      setInvestments(investmentsList);
 
       setIsLoading(false);
     },
