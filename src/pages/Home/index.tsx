@@ -1,18 +1,25 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl } from 'react-native';
+import { RefreshControl, Text } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-import { Box, Divider, HStack, Icon, Text, VStack } from 'native-base';
 import usePluggyService from '../../hooks/pluggyService';
 import { Account, Investment } from '../../services/pluggy';
 import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
 import { sleep } from '../../utils/time';
 import {
+  BalanceCard,
+  BalanceRow,
+  BalanceTitle,
+  BalanceTotal,
   Container,
-  Content,
+  Divider,
+  LastUpdatedAtBar,
+  LastUpdatedAtText,
+  ScrollView,
+  TotalText,
   UpdatingToastActivityIndicator,
   UpdatingToastContainer,
   UpdatingToastContent,
@@ -144,49 +151,39 @@ const Home: React.FC = () => {
           </UpdatingToastContent>
         </UpdatingToastContainer>
       )}
-      <Content
+      <ScrollView
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleUpdateData} />}
       >
-        <VStack space={3}>
-          <HStack justifyContent="space-between" alignItems="center">
-            <Text fontSize="xs" fontWeight="thin">
-              Atualizado em: {lastUpdate}
-            </Text>
-            <Icon
-              as={MaterialIcons}
-              name={hideMoney ? 'visibility-off' : 'visibility'}
-              size="md"
-              onPress={() => setHideMoney(!hideMoney)}
-            />
-          </HStack>
-          <Box borderWidth="1" borderColor="coolGray.200" borderRadius="lg">
-            <VStack padding={4} space={3}>
-              <Text fontSize="md" fontWeight="extrabold">
-                Balanço
-              </Text>
-              <HStack justifyContent="space-between">
-                <Text>Saldo das contas</Text>
-                <Text>R$ {formatMoney({ value: totalBalance, hidden: hideMoney })}</Text>
-              </HStack>
-              <HStack justifyContent="space-between">
-                <Text>Fatura dos cartões</Text>
-                <Text>-R$ {formatMoney({ value: totalInvoice, hidden: hideMoney })}</Text>
-              </HStack>
-              <HStack justifyContent="space-between">
-                <Text>Investimentos</Text>
-                <Text>R$ {formatMoney({ value: totalInvestment, hidden: hideMoney })}</Text>
-              </HStack>
-              <Divider />
-              <HStack justifyContent="space-between">
-                <Text fontWeight="bold">Total</Text>
-                <Text fontWeight="bold">
-                  R$ {formatMoney({ value: totalValue, hidden: hideMoney })}
-                </Text>
-              </HStack>
-            </VStack>
-          </Box>
-        </VStack>
-      </Content>
+        <LastUpdatedAtBar>
+          <LastUpdatedAtText>Atualizado em: {lastUpdate}</LastUpdatedAtText>
+          <MaterialIcons
+            name={hideMoney ? 'visibility-off' : 'visibility'}
+            color="gray"
+            size={24}
+            onPress={() => setHideMoney(!hideMoney)}
+          />
+        </LastUpdatedAtBar>
+        <BalanceCard>
+          <BalanceTitle>Balanço</BalanceTitle>
+          <BalanceRow>
+            <Text>Saldo das contas</Text>
+            <Text>R$ {formatMoney({ value: totalBalance, hidden: hideMoney })}</Text>
+          </BalanceRow>
+          <BalanceRow>
+            <Text>Fatura dos cartões</Text>
+            <Text>-R$ {formatMoney({ value: totalInvoice, hidden: hideMoney })}</Text>
+          </BalanceRow>
+          <BalanceRow>
+            <Text>Investimentos</Text>
+            <Text>R$ {formatMoney({ value: totalInvestment, hidden: hideMoney })}</Text>
+          </BalanceRow>
+          <Divider />
+          <BalanceTotal>
+            <TotalText>Total</TotalText>
+            <TotalText>R$ {formatMoney({ value: totalValue, hidden: hideMoney })}</TotalText>
+          </BalanceTotal>
+        </BalanceCard>
+      </ScrollView>
       <VersionTag>v1.0.5</VersionTag>
     </Container>
   );
