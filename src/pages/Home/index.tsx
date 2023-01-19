@@ -1,21 +1,31 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView } from 'react-native';
+import { RefreshControl } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { Box, Divider, HStack, Icon, Text, VStack } from 'native-base';
 import usePluggyService from '../../hooks/pluggyService';
+import { Account, Investment } from '../../services/pluggy';
 import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
-import { Container, VersionTag } from './styles';
-import { Account, Investment } from '../../services/pluggy';
 import { sleep } from '../../utils/time';
+import {
+  Container,
+  Content,
+  UpdatingToastActivityIndicator,
+  UpdatingToastContainer,
+  UpdatingToastContent,
+  UpdatingToastSubtitle,
+  UpdatingToastTitle,
+  VersionTag,
+} from './styles';
 
 const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdate, setLastUpdate] = useState('');
   const [hideMoney, setHideMoney] = useState(false);
   const [accounts, setAccounts] = useState([] as Account[]);
@@ -74,10 +84,14 @@ const Home: React.FC = () => {
         : true;
 
       if (shouldUpdate || forceUpdate) {
+        setIsUpdating(true);
+
         await Promise.all(itemsId.map((id) => updateItemAndWaitForFinish(id)));
 
         lastUpdateDate = now.format(lastUpdateDateFormat);
         await AsyncStorage.setItem(LastUpdateDateStorageKey, lastUpdateDate);
+
+        setIsUpdating(false);
       }
 
       setLastUpdate(lastUpdateDate as string);
@@ -121,7 +135,16 @@ const Home: React.FC = () => {
 
   return (
     <Container>
-      <ScrollView
+      {isUpdating && (
+        <UpdatingToastContainer>
+          <UpdatingToastActivityIndicator color="black" />
+          <UpdatingToastContent>
+            <UpdatingToastTitle>Sincronizando dados</UpdatingToastTitle>
+            <UpdatingToastSubtitle>Isso poderá levar algum tempo...</UpdatingToastSubtitle>
+          </UpdatingToastContent>
+        </UpdatingToastContainer>
+      )}
+      <Content
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleUpdateData} />}
       >
         <VStack space={3}>
@@ -163,7 +186,7 @@ const Home: React.FC = () => {
             </VStack>
           </Box>
         </VStack>
-      </ScrollView>
+      </Content>
       <VersionTag>v1.0.5</VersionTag>
     </Container>
   );
