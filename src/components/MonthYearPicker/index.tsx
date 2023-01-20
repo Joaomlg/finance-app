@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import moment, { Moment } from 'moment';
-import { Button, Divider, HStack, Icon, Modal, Text, VStack } from 'native-base';
 import React, { useState } from 'react';
+import { Modal, StyleSheet, Text } from 'react-native';
+import { Card, Content, Divider, Header, MonthButton, MonthButtonText, Overlay } from './styles';
 
 type MonthYearPickerProps = {
   isOpen: boolean;
@@ -36,43 +37,46 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
       const isDisabled = currentMonth.isAfter(now);
 
       return (
-        <Button
-          key={i}
-          flexGrow={1}
-          flexBasis="30%"
-          variant="ghost"
-          _text={{
-            textTransform: 'uppercase',
-          }}
-          disabled={isDisabled}
-          opacity={isDisabled ? 0.3 : 1}
-          onPress={() => handleMonthOnPress(currentMonth)}
-        >
-          {currentMonth.format('MMM')}
-        </Button>
+        <MonthButton key={i} disabled={isDisabled} onPress={() => handleMonthOnPress(currentMonth)}>
+          <MonthButtonText>{currentMonth.format('MMM').toUpperCase()}</MonthButtonText>
+        </MonthButton>
       );
     });
   };
 
   return (
-    <Modal isOpen={isOpen} closeOnOverlayClick onClose={handleModalOnClose}>
-      <Modal.Content>
-        <Modal.Body>
-          <VStack flex={1} space={3}>
-            <HStack justifyContent="space-between">
-              <Icon as={MaterialIcons} name="chevron-left" size="xl" onPress={prevYear} />
-              <Text>{currentYearBase.format('YYYY')}</Text>
-              <Icon as={MaterialIcons} name="chevron-right" size="xl" onPress={nextYear} />
-            </HStack>
-            <Divider />
-            <HStack flexWrap="wrap" justifyContent="space-between">
-              {renderMonthItem()}
-            </HStack>
-          </VStack>
-        </Modal.Body>
-      </Modal.Content>
+    <Modal
+      animationType="fade"
+      visible={isOpen}
+      transparent={true}
+      onRequestClose={handleModalOnClose}
+    >
+      <Overlay onPress={handleModalOnClose}>
+        <Card style={styles.modalShadow}>
+          <Header>
+            <MaterialIcons name="chevron-left" size={28} color="gray" onPress={prevYear} />
+            <Text>{currentYearBase.format('YYYY')}</Text>
+            <MaterialIcons name="chevron-right" size={28} color="gray" onPress={nextYear} />
+          </Header>
+          <Divider />
+          <Content>{renderMonthItem()}</Content>
+        </Card>
+      </Overlay>
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  modalShadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
 
 export default MonthYearPicker;
