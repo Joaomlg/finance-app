@@ -17,11 +17,20 @@ export const Card = styled.View`
 export const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+`;
+
+export const Year = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0.6;
 `;
 
 export const ActionButton = styled.TouchableHighlight.attrs({ underlayColor: '#eee' })`
+  padding: 4px;
   border-radius: 100px;
   color: #eee;
+  opacity: ${(props) => (props.disabled ? 0.2 : 1)};
 `;
 
 export const Divider = styled.View`
@@ -36,7 +45,9 @@ export const Content = styled.View`
   justify-content: space-between;
 `;
 
-export const MonthButton = styled.TouchableHighlight.attrs({ underlayColor: '#eee' })`
+export const MonthButton = styled.TouchableHighlight.attrs({ underlayColor: '#eee' })<{
+  active?: boolean;
+}>`
   flex-grow: 1;
   flex-basis: 30%;
   display: flex;
@@ -45,6 +56,7 @@ export const MonthButton = styled.TouchableHighlight.attrs({ underlayColor: '#ee
   height: 40px;
   opacity: ${(props) => (props.disabled ? 0.2 : 0.6)};
   border-radius: 12px;
+  background-color: ${(props) => (props.active ? '#eee' : 'transparent')};
 `;
 
 export const MonthButtonText = styled.Text`

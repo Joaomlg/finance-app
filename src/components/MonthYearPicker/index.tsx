@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import moment, { Moment } from 'moment';
+import moment, { Moment, monthsShort } from 'moment';
 import React, { useState } from 'react';
 import { Modal, Text } from 'react-native';
 import {
@@ -11,6 +11,7 @@ import {
   MonthButton,
   MonthButtonText,
   Overlay,
+  Year,
 } from './styles';
 
 type MonthYearPickerProps = {
@@ -21,15 +22,24 @@ type MonthYearPickerProps = {
 
 const now = moment();
 
+const currentMonthNumber = parseInt(now.format('M'));
+const currentYearNumber = parseInt(now.format('YYYY'));
+
 const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onClose }) => {
-  const [currentYearBase, setCurrentYearBase] = useState(now.startOf('year'));
+  const [displayedYear, setDisplayedYear] = useState(currentYearNumber);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthNumber);
+  const [selectedYear, setSelectedYear] = useState(currentYearNumber);
 
-  const prevYear = () => setCurrentYearBase(moment(currentYearBase).subtract(1, 'years'));
-  const nextYear = () => setCurrentYearBase(moment(currentYearBase).add(1, 'years'));
+  const prevYear = () => setDisplayedYear(displayedYear - 1);
+  const nextYear = () => setDisplayedYear(displayedYear + 1);
 
-  const handleMonthOnPress = (value: Moment) => {
+  const handleMonthOnPress = (month: number) => {
+    setSelectedMonth(month);
+    setSelectedYear(displayedYear);
+
     if (onChange) {
-      onChange(value);
+      const date = moment({ day: 1, month: month - 1, year: displayedYear });
+      onChange(date);
     }
   };
 
@@ -41,13 +51,21 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
 
   const renderMonthItem = () => {
     return [...Array(12).keys()].map((i) => {
-      const currentMonth = moment(currentYearBase).add(i, 'months');
+      const currentMonthIndex = i + 1;
 
-      const isDisabled = currentMonth.isAfter(now);
+      const isDisabled =
+        displayedYear >= currentYearNumber && currentMonthIndex > currentMonthNumber;
+
+      const isSelected = displayedYear === selectedYear && currentMonthIndex === selectedMonth;
 
       return (
-        <MonthButton key={i} disabled={isDisabled} onPress={() => handleMonthOnPress(currentMonth)}>
-          <MonthButtonText>{currentMonth.format('MMM').toUpperCase()}</MonthButtonText>
+        <MonthButton
+          key={i}
+          disabled={isDisabled}
+          onPress={() => handleMonthOnPress(currentMonthIndex)}
+          active={isSelected}
+        >
+          <MonthButtonText>{monthsShort(i).toUpperCase()}</MonthButtonText>
         </MonthButton>
       );
     });
@@ -75,11 +93,11 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
         >
           <Header>
             <ActionButton onPress={prevYear}>
-              <MaterialIcons name="chevron-left" size={28} color="gray" />
+              <MaterialIcons name="chevron-left" size={32} color="gray" />
             </ActionButton>
-            <Text>{currentYearBase.format('YYYY')}</Text>
-            <ActionButton onPress={nextYear}>
-              <MaterialIcons name="chevron-right" size={28} color="gray" />
+            <Year>{displayedYear}</Year>
+            <ActionButton onPress={nextYear} disabled={displayedYear >= currentYearNumber}>
+              <MaterialIcons name="chevron-right" size={32} color="gray" />
             </ActionButton>
           </Header>
           <Divider />
