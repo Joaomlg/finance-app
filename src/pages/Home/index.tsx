@@ -184,7 +184,7 @@ const Home: React.FC = () => {
           </BalanceTotal>
         </BalanceCard>
       </ScrollView>
-      <VersionTag>v1.0.5</VersionTag>
+      <VersionTag>v1.0.6</VersionTag>
     </Container>
   );
 };
