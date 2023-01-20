@@ -1,16 +1,34 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment, { Moment } from 'moment';
-import { Avatar, Divider, FlatList, HStack, Icon, Spacer, Text, VStack } from 'native-base';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ListRenderItemInfo, RefreshControl, TouchableOpacity } from 'react-native';
+import { FlatList, ListRenderItemInfo, RefreshControl, Text } from 'react-native';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import usePluggyService from '../../hooks/pluggyService';
 import { Account, Transaction } from '../../services/pluggy';
 import { ItemsAsyncStorageKey } from '../../utils/contants';
 import { formatMoney } from '../../utils/money';
 
-import { Container } from './styles';
+import {
+  Container,
+  Divider,
+  ListHeader,
+  ListItem,
+  ListItemAmount,
+  ListItemAmountValue,
+  ListItemAvatar,
+  ListItemCategory,
+  ListItemContent,
+  ListItemLabel,
+  ListSeparatorContainer,
+  ListSeparatorDate,
+  ListSeparatorDateDay,
+  ListSeparatorDateMonth,
+  MonthSelectorButton,
+  MonthSelectorButtonText,
+  MonthSelectorContainer,
+  TotalInfo,
+} from './styles';
 
 const NUBANK_IGNORED_TRANSACTIONS = [
   'Pagamento da fatura',
@@ -95,44 +113,38 @@ const Transactions: React.FC = () => {
 
   const listHeaderComponent = useCallback(
     () => (
-      <HStack space={3} marginY={3}>
-        <TouchableOpacity style={{ flexGrow: 1 }} onPress={() => setMonthYearPickerOpened(true)}>
-          <HStack flex={1} space={1} alignItems="center">
-            <Text fontSize="xl" textTransform="capitalize" fontWeight="bold">
-              {selectedMonth.format('MMMM YYYY')}
-            </Text>
-            <Icon as={MaterialIcons} name="expand-more" size="xl" />
-          </HStack>
-        </TouchableOpacity>
-        <VStack>
+      <ListHeader>
+        <MonthSelectorContainer>
+          <MonthSelectorButton onPress={() => setMonthYearPickerOpened(true)}>
+            <MonthSelectorButtonText>{selectedMonth.format('MMMM YYYY')}</MonthSelectorButtonText>
+            <MaterialIcons name="expand-more" size={32} color="gray" />
+          </MonthSelectorButton>
+        </MonthSelectorContainer>
+        <TotalInfo>
           <Text>Renda</Text>
           <Text>R$ {formatMoney({ value: totalIncomes })}</Text>
-        </VStack>
-        <VStack>
+        </TotalInfo>
+        <TotalInfo>
           <Text>Gasto</Text>
           <Text>R$ {formatMoney({ value: totalExpenses })}</Text>
-        </VStack>
-      </HStack>
+        </TotalInfo>
+      </ListHeader>
     ),
     [selectedMonth, totalExpenses, totalIncomes],
   );
 
-  const transactionsListSeparator = useCallback((transaction: Transaction, index: number) => {
+  const renderListItemSeparator = useCallback((transaction: Transaction, index: number) => {
     const date = moment(transaction.date).startOf('day');
 
     const component =
       index === 0 || date.isBefore(previousDate.current, 'day') ? (
-        <HStack space={3} alignItems="center">
-          <VStack alignItems="center">
-            <Text fontWeight="bold" fontSize="xl" color="coolGray.400">
-              {date.format('DD')}
-            </Text>
-            <Text textTransform="uppercase" fontWeight="light" color="coolGray.400">
-              {date.format('MMM')}
-            </Text>
-          </VStack>
+        <ListSeparatorContainer>
+          <ListSeparatorDate>
+            <ListSeparatorDateDay>{date.format('DD')}</ListSeparatorDateDay>
+            <ListSeparatorDateMonth>{date.format('MMM')}</ListSeparatorDateMonth>
+          </ListSeparatorDate>
           <Divider />
-        </HStack>
+        </ListSeparatorContainer>
       ) : (
         <></>
       );
@@ -145,33 +157,31 @@ const Transactions: React.FC = () => {
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<Transaction>) => (
       <>
-        {transactionsListSeparator(item, index)}
-        <HStack paddingY={3} alignItems="center" space={3}>
-          <Avatar
-            backgroundColor="transparent"
-            borderStyle="solid"
-            borderColor="coolGray.500"
-            borderWidth="1"
-          >
-            <Icon
-              as={MaterialIcons}
+        {renderListItemSeparator(item, index)}
+        <ListItem>
+          <ListItemAvatar>
+            <MaterialIcons
               name={item.type == 'DEBIT' ? 'shopping-cart' : 'attach-money'}
-              size="md"
+              size={24}
+              color="gray"
             />
-          </Avatar>
-          <VStack flexShrink={1}>
-            {item.category && <Text fontWeight="thin">{item.category}</Text>}
-            <Text isTruncated>{item.description}</Text>
-          </VStack>
-          <Spacer />
-          <Text fontWeight="bold">
-            {item.type === 'DEBIT' ? '-' : ''}R${' '}
-            {formatMoney({ value: item.amount, absolute: true })}
-          </Text>
-        </HStack>
+          </ListItemAvatar>
+          <ListItemContent>
+            {item.category && <ListItemCategory>{item.category}</ListItemCategory>}
+            <ListItemLabel numberOfLines={1} ellipsizeMode="tail">
+              {item.description}
+            </ListItemLabel>
+          </ListItemContent>
+          <ListItemAmount>
+            <ListItemAmountValue>
+              {item.type === 'DEBIT' ? '-' : ''}R${' '}
+              {formatMoney({ value: item.amount, absolute: true })}
+            </ListItemAmountValue>
+          </ListItemAmount>
+        </ListItem>
       </>
     ),
-    [transactionsListSeparator],
+    [renderListItemSeparator],
   );
 
   const keyExtractor = useCallback((item: Transaction) => item.id, []);
@@ -189,7 +199,7 @@ const Transactions: React.FC = () => {
         data={transactions}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        paddingX={3}
+        style={{ paddingHorizontal: 12 }}
       />
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
