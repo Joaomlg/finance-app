@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
-import { NativeBaseProvider } from 'native-base';
 import React, { useState } from 'react';
 import { ThemeProvider } from 'styled-components/native';
 import Authenticate from './src/components/Authentication';
@@ -15,17 +14,15 @@ export default function App() {
   const [isAuthenticated, setAuthenticated] = useState(false);
 
   return (
-    <NativeBaseProvider>
-      <HooksProvider>
-        <ThemeProvider theme={light}>
-          <StatusBar style="auto" />
-          {isAuthenticated ? (
-            <Routes />
-          ) : (
-            <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
-          )}
-        </ThemeProvider>
-      </HooksProvider>
-    </NativeBaseProvider>
+    <HooksProvider>
+      <ThemeProvider theme={light}>
+        <StatusBar style="auto" />
+        {isAuthenticated ? (
+          <Routes />
+        ) : (
+          <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
+        )}
+      </ThemeProvider>
+    </HooksProvider>
   );
 }
