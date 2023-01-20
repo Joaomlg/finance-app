@@ -19,6 +19,11 @@ export const Header = styled.View`
   justify-content: space-between;
 `;
 
+export const ActionButton = styled.TouchableHighlight.attrs({ underlayColor: '#eee' })`
+  border-radius: 100px;
+  color: #eee;
+`;
+
 export const Divider = styled.View`
   height: 1px;
   background-color: #e5e7eb;
@@ -31,7 +36,7 @@ export const Content = styled.View`
   justify-content: space-between;
 `;
 
-export const MonthButton = styled.TouchableOpacity`
+export const MonthButton = styled.TouchableHighlight.attrs({ underlayColor: '#eee' })`
   flex-grow: 1;
   flex-basis: 30%;
   display: flex;
@@ -39,6 +44,7 @@ export const MonthButton = styled.TouchableOpacity`
   align-items: center;
   height: 40px;
   opacity: ${(props) => (props.disabled ? 0.2 : 0.6)};
+  border-radius: 12px;
 `;
 
 export const MonthButtonText = styled.Text`

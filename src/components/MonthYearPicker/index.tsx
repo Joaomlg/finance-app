@@ -2,7 +2,16 @@ import { MaterialIcons } from '@expo/vector-icons';
 import moment, { Moment } from 'moment';
 import React, { useState } from 'react';
 import { Modal, Text } from 'react-native';
-import { Card, Content, Divider, Header, MonthButton, MonthButtonText, Overlay } from './styles';
+import {
+  ActionButton,
+  Card,
+  Content,
+  Divider,
+  Header,
+  MonthButton,
+  MonthButtonText,
+  Overlay,
+} from './styles';
 
 type MonthYearPickerProps = {
   isOpen: boolean;
@@ -65,9 +74,13 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
           }}
         >
           <Header>
-            <MaterialIcons name="chevron-left" size={28} color="gray" onPress={prevYear} />
+            <ActionButton onPress={prevYear}>
+              <MaterialIcons name="chevron-left" size={28} color="gray" />
+            </ActionButton>
             <Text>{currentYearBase.format('YYYY')}</Text>
-            <MaterialIcons name="chevron-right" size={28} color="gray" onPress={nextYear} />
+            <ActionButton onPress={nextYear}>
+              <MaterialIcons name="chevron-right" size={28} color="gray" />
+            </ActionButton>
           </Header>
           <Divider />
           <Content>{renderMonthItem()}</Content>
