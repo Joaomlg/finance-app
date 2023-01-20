@@ -2,7 +2,6 @@ import React from 'react';
 import Home from '../pages/Home';
 import Connections from '../pages/Connections';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Icon } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
 import Transactions from '../pages/Transactions';
 
@@ -22,9 +21,7 @@ const TabsRoutes: React.FC = () => {
         component={Home}
         options={{
           title: 'Início',
-          tabBarIcon: ({ color }) => (
-            <Icon name="home" size="md" color={color} as={MaterialIcons} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={20} color={color} />,
         }}
       />
       <Screen
@@ -33,7 +30,7 @@ const TabsRoutes: React.FC = () => {
         options={{
           title: 'Conexões',
           tabBarIcon: ({ color }) => (
-            <Icon name="account-balance" size="md" color={color} as={MaterialIcons} />
+            <MaterialIcons name="account-balance" size={20} color={color} />
           ),
         }}
       />
@@ -42,9 +39,7 @@ const TabsRoutes: React.FC = () => {
         component={Transactions}
         options={{
           title: 'Transações',
-          tabBarIcon: ({ color }) => (
-            <Icon name="payments" size="md" color={color} as={MaterialIcons} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialIcons name="payments" size={20} color={color} />,
         }}
       />
     </Navigator>
