@@ -43,7 +43,7 @@ export default function App() {
     <HooksProvider>
       <ThemeProvider theme={light}>
         <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
-          <StatusBar style="auto" />
+          <StatusBar style="light" backgroundColor={light.COLORS.PRIMARY} />
           {isAuthenticated ? (
             <Routes />
           ) : (
