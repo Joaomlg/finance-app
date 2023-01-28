@@ -1,4 +1,7 @@
+import common from './common';
+
 export default {
+  ...common,
   COLORS: {
     BACKGROUND_WHITE: '#FFF',
     PRIMARY: '#284D63',
@@ -12,12 +15,5 @@ export default {
     TEXT: '#465C4F',
     TEXT_LIGHT: '#B4B4B4',
     TEXT_WHITE: '#FFF',
-  },
-  TEXT: {
-    HEADING: 24,
-    TITLE: 16,
-    DEFAULT: 14,
-    SMALL: 12,
-    EXTRA_SMALL: 10,
   },
 };
