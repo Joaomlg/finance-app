@@ -8,8 +8,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
-import React, { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { SafeAreaView } from 'react-native';
 import { ThemeProvider } from 'styled-components/native';
 import Authenticate from './src/components/Authentication';
 import HooksProvider from './src/hooks';
@@ -29,6 +29,8 @@ export default function App() {
     Inter_700Bold,
   });
 
+  const theme = light;
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
@@ -41,15 +43,15 @@ export default function App() {
 
   return (
     <HooksProvider>
-      <ThemeProvider theme={light}>
-        <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
-          <StatusBar style="light" backgroundColor={light.COLORS.PRIMARY} />
+      <ThemeProvider theme={theme}>
+        <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
+          <StatusBar style="light" backgroundColor={theme.COLORS.PRIMARY} />
           {isAuthenticated ? (
             <Routes />
           ) : (
             <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
           )}
-        </View>
+        </SafeAreaView>
       </ThemeProvider>
     </HooksProvider>
   );
