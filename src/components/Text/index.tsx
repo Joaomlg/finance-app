@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextProps as RNTextProps } from 'react-native';
+import { TextProps as RNTextProps, TextStyle } from 'react-native';
 import { useTheme } from 'styled-components';
 import light from '../../theme/light';
 import { Default, DefaultBold, ExtraLight, Heading, Light, LightBold, Title } from './styles';
@@ -21,12 +21,14 @@ type COLOR = keyof typeof light.COLORS;
 export interface TextProps extends RNTextProps {
   variant?: Variant;
   color?: COLOR;
+  transform?: TextStyle['textTransform'];
 }
 
-const Text: React.FC<TextProps> = ({ variant, color, ...rnProps }) => {
+const Text: React.FC<TextProps> = ({ variant, color, style, transform, ...rnProps }) => {
   const theme = useTheme();
 
-  const props = { color: theme.COLORS[color || 'TEXT'], ...rnProps };
+  const appendStyle = transform ? { textTransform: transform } : {};
+  const props = { color: theme.COLORS[color || 'TEXT'], style: [style, appendStyle], ...rnProps };
 
   switch (variant) {
     case 'default-bold':
