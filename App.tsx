@@ -43,17 +43,19 @@ export default function App() {
   }
 
   return (
-    <HooksProvider>
-      <ThemeProvider theme={theme}>
-        <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-          <StatusBar style="light" backgroundColor={theme.colors.primary} />
-          {isAuthenticated ? (
-            <Routes />
-          ) : (
-            <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
-          )}
-        </SafeAreaView>
-      </ThemeProvider>
-    </HooksProvider>
+    <AppContextProvider>
+      <HooksProvider>
+        <ThemeProvider theme={theme}>
+          <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
+            <StatusBar style="light" backgroundColor={theme.colors.primary} />
+            {isAuthenticated ? (
+              <Routes />
+            ) : (
+              <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
+            )}
+          </SafeAreaView>
+        </ThemeProvider>
+      </HooksProvider>
+    </AppContextProvider>
   );
 }
