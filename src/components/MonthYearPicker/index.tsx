@@ -1,18 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import moment, { Moment, monthsShort } from 'moment';
 import React, { useState } from 'react';
-import { Modal, Text } from 'react-native';
-import {
-  ActionButton,
-  Card,
-  Content,
-  Divider,
-  Header,
-  MonthButton,
-  MonthButtonText,
-  Overlay,
-  Year,
-} from './styles';
+import { Modal } from 'react-native';
+import { useTheme } from 'styled-components/native';
+import Divider from '../Divider';
+import Text from '../Text';
+import { ActionButton, Card, Content, Header, MonthButton, Overlay } from './styles';
 
 type MonthYearPickerProps = {
   isOpen: boolean;
@@ -29,6 +22,8 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
   const [displayedYear, setDisplayedYear] = useState(currentYearNumber);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthNumber);
   const [selectedYear, setSelectedYear] = useState(currentYearNumber);
+
+  const theme = useTheme();
 
   const prevYear = () => setDisplayedYear(displayedYear - 1);
   const nextYear = () => setDisplayedYear(displayedYear + 1);
@@ -65,7 +60,9 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
           onPress={() => handleMonthOnPress(currentMonthIndex)}
           active={isSelected}
         >
-          <MonthButtonText>{monthsShort(i).toUpperCase()}</MonthButtonText>
+          <Text variant="title" color="primary">
+            {monthsShort(i).toUpperCase()}
+          </Text>
         </MonthButton>
       );
     });
@@ -93,11 +90,13 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
         >
           <Header>
             <ActionButton onPress={prevYear}>
-              <MaterialIcons name="chevron-left" size={32} color="gray" />
+              <MaterialIcons name="navigate-before" size={32} color={theme.colors.secondary} />
             </ActionButton>
-            <Year>{displayedYear}</Year>
+            <Text variant="heading" color="primary">
+              {displayedYear}
+            </Text>
             <ActionButton onPress={nextYear} disabled={displayedYear >= currentYearNumber}>
-              <MaterialIcons name="chevron-right" size={32} color="gray" />
+              <MaterialIcons name="navigate-next" size={32} color={theme.colors.secondary} />
             </ActionButton>
           </Header>
           <Divider />
