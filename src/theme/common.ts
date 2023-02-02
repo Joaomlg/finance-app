@@ -1,14 +1,14 @@
 export default {
-  TEXT: {
-    HEADING: '24px',
-    TITLE: '16px',
-    DEFAULT: '14px',
-    SMALL: '12px',
-    EXTRA_SMALL: '10px',
+  text: {
+    heading: '24px',
+    title: '16px',
+    default: '14px',
+    small: '12px',
+    extraSmall: '10px',
   },
-  FONT: {
-    LIGHT: 'Inter_300Light',
-    REGULAR: 'Inter_400Regular',
-    BOLD: 'Inter_700Bold',
+  font: {
+    light: 'Inter_300Light',
+    regular: 'Inter_400Regular',
+    bold: 'Inter_700Bold',
   },
 };

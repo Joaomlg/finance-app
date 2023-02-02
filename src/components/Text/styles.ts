@@ -5,34 +5,34 @@ export const Base = styled.Text<{ color?: string }>`
 `;
 
 export const Default = styled(Base)`
-  font-family: ${({ theme }) => theme.FONT.REGULAR};
-  font-size: ${({ theme }) => theme.TEXT.DEFAULT};
+  font-family: ${({ theme }) => theme.font.regular};
+  font-size: ${({ theme }) => theme.text.default};
 `;
 
 export const DefaultBold = styled(Default)`
-  font-family: ${({ theme }) => theme.FONT.BOLD};
+  font-family: ${({ theme }) => theme.font.bold};
 `;
 
 export const Heading = styled(Base)`
-  font-family: ${({ theme }) => theme.FONT.BOLD};
-  font-size: ${({ theme }) => theme.TEXT.HEADING};
+  font-family: ${({ theme }) => theme.font.bold};
+  font-size: ${({ theme }) => theme.text.heading};
 `;
 
 export const Title = styled(Base)`
-  font-family: ${({ theme }) => theme.FONT.BOLD};
-  font-size: ${({ theme }) => theme.TEXT.TITLE};
+  font-family: ${({ theme }) => theme.font.bold};
+  font-size: ${({ theme }) => theme.text.title};
 `;
 
 export const Light = styled(Base)`
-  font-family: ${({ theme }) => theme.FONT.LIGHT};
-  font-size: ${({ theme }) => theme.TEXT.SMALL};
+  font-family: ${({ theme }) => theme.font.light};
+  font-size: ${({ theme }) => theme.text.small};
 `;
 
 export const LightBold = styled(Light)`
-  font-family: ${({ theme }) => theme.FONT.BOLD};
+  font-family: ${({ theme }) => theme.font.bold};
 `;
 
 export const ExtraLight = styled(Base)`
-  font-family: ${({ theme }) => theme.FONT.LIGHT};
-  font-size: ${({ theme }) => theme.TEXT.EXTRA_SMALL};
+  font-family: ${({ theme }) => theme.font.light};
+  font-size: ${({ theme }) => theme.text.extraSmall};
 `;

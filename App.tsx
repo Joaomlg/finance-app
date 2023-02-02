@@ -12,6 +12,7 @@ import React, { useCallback, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { ThemeProvider } from 'styled-components/native';
 import Authenticate from './src/components/Authentication';
+import { AppContextProvider } from './src/contexts/AppContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import light from './src/theme/light';
@@ -45,7 +46,7 @@ export default function App() {
     <HooksProvider>
       <ThemeProvider theme={theme}>
         <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-          <StatusBar style="light" backgroundColor={theme.COLORS.PRIMARY} />
+          <StatusBar style="light" backgroundColor={theme.colors.primary} />
           {isAuthenticated ? (
             <Routes />
           ) : (

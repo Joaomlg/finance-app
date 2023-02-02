@@ -4,6 +4,6 @@ export const Container = styled.View`
   flex: 1;
   align-content: center;
   justify-content: center;
-  background-color: ${({ theme }) => theme.COLORS.BACKGROUND_WHITE};
+  background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
   padding-top: 12px;
 `;
