@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "finance-app",
-    "slug": "finance-app",
+    "name": "Finans",
+    "slug": "Finans",
     "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#284D63"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
@@ -24,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#284D63"
       },
       "package": "com.joaomlg.financeapp"
     },
