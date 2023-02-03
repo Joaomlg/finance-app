@@ -60,8 +60,8 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onC
           onPress={() => handleMonthOnPress(currentMonthIndex)}
           active={isSelected}
         >
-          <Text variant="title" color="primary">
-            {monthsShort(i).toUpperCase()}
+          <Text variant="title" color="primary" transform="capitalize">
+            {monthsShort(i)}
           </Text>
         </MonthButton>
       );
