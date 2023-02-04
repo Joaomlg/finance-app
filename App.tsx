@@ -43,9 +43,9 @@ export default function App() {
   }
 
   return (
-    <AppContextProvider>
-      <HooksProvider>
-        <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <AppContextProvider>
+        <HooksProvider>
           <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
             <StatusBar style="light" backgroundColor={theme.colors.primary} />
             {isAuthenticated ? (
@@ -54,8 +54,8 @@ export default function App() {
               <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
             )}
           </SafeAreaView>
-        </ThemeProvider>
-      </HooksProvider>
-    </AppContextProvider>
+        </HooksProvider>
+      </AppContextProvider>
+    </ThemeProvider>
   );
 }
