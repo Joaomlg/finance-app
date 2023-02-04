@@ -13,7 +13,7 @@ export default {
     black: '#000',
     lightGray: '#E5E7EB',
     text: '#465C4F',
-    text_light: '#B4B4B4',
-    text_white: '#FFF',
+    textLight: '#B4B4B4',
+    textWhite: '#FFF',
   },
 };

@@ -81,7 +81,7 @@ const Home: React.FC = () => {
           <Header>
             <MonthButton onPress={() => setMonthYearPickerOpened(true)}>
               <>
-                <Text variant="heading" color="text_white" transform="capitalize">
+                <Text variant="heading" color="textWhite" transform="capitalize">
                   {date.format('MMMM')}
                 </Text>
                 <MaterialIcons name="expand-more" color={theme.colors.secondary} size={32} />
@@ -90,39 +90,39 @@ const Home: React.FC = () => {
             <HeaderActions>
               <MaterialIcons
                 name={hideValues ? 'visibility-off' : 'visibility'}
-                color={theme.colors.text_white}
+                color={theme.colors.textWhite}
                 size={32}
                 onPress={() => setHideValues(!hideValues)}
               />
             </HeaderActions>
           </Header>
-          <Text variant="light" color="text_white">
+          <Text variant="light" color="textWhite">
             Atualizado em {lastUpdateDate}
           </Text>
           <BalanceLine>
-            <Text color="text_white">Saldo das contas</Text>
+            <Text color="textWhite">Saldo das contas</Text>
             <BalanceFillLine />
-            <Money value={totalBalance} color="text_white" />
+            <Money value={totalBalance} color="textWhite" />
           </BalanceLine>
           <BalanceLine>
-            <Text color="text_white">Fatura dos cartões</Text>
+            <Text color="textWhite">Fatura dos cartões</Text>
             <BalanceFillLine />
-            <Money value={-1 * totalInvoice} color="text_white" />
+            <Money value={-1 * totalInvoice} color="textWhite" />
           </BalanceLine>
           <BalanceLine>
-            <Text color="text_white">Investimentos</Text>
+            <Text color="textWhite">Investimentos</Text>
             <BalanceFillLine />
-            <Money value={totalInvestment} color="text_white" />
+            <Money value={totalInvestment} color="textWhite" />
           </BalanceLine>
           <BalanceLine>
-            <Text variant="title" color="text_white">
+            <Text variant="title" color="textWhite">
               Total
             </Text>
             <BalanceFillLine />
             <Money
               value={totalBalance + totalInvestment - totalInvoice}
               variant="title"
-              color="text_white"
+              color="textWhite"
             />
           </BalanceLine>
           <ConnectionsButton onPress={() => navigation.navigate('connections')}>
@@ -159,10 +159,10 @@ const Home: React.FC = () => {
           <TransactionsListHeader>
             <Text variant="title">Últimas transações</Text>
             <SeeMoreTransactionsButton onPress={() => navigation.navigate('transactions')}>
-              <Text variant="light-bold" color="text_light">
+              <Text variant="light-bold" color="textLight">
                 Ver mais
               </Text>
-              <MaterialIcons name="navigate-next" color={theme.colors.text_light} size={14} />
+              <MaterialIcons name="navigate-next" color={theme.colors.textLight} size={14} />
             </SeeMoreTransactionsButton>
           </TransactionsListHeader>
           <FlexContainer gap={24}>

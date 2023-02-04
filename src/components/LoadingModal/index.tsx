@@ -34,7 +34,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ text }) => {
           <Image source={require('../../assets/icon.png')} style={{ height: 100, width: 100 }} />
         </Animated.View>
         {text && (
-          <StatusText variant="title" color="text_white">
+          <StatusText variant="title" color="textWhite">
             {text}
           </StatusText>
         )}

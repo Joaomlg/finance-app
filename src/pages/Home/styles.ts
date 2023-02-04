@@ -41,7 +41,7 @@ export const BalanceLine = styled.View`
 export const BalanceFillLine = styled.View`
   flex-grow: 1;
   height: 0.5px;
-  background-color: ${({ theme }) => theme.colors.text_white};
+  background-color: ${({ theme }) => theme.colors.textWhite};
   opacity: 0.3;
   margin: 0 4px;
 `;

@@ -26,7 +26,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...view
       />
       <ListItemContent>
         {item.category && (
-          <Text variant="extra-light" color="text_light">
+          <Text variant="extra-light" color="textLight">
             {item.category}
           </Text>
         )}
