@@ -5,6 +5,7 @@ import React, { useContext, useMemo, useState } from 'react';
 import { Alert, RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
+import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
 import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
@@ -19,10 +20,7 @@ import {
   ConnectionsButton,
   Container,
   Divider,
-  Header,
-  HeaderActions,
   HorizontalBarContainer,
-  MonthButton,
   SeeMoreTransactionsButton,
   TopContainer,
   TransactionsListHeader,
@@ -103,24 +101,17 @@ const Home: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <TopContainer>
-          <Header>
-            <MonthButton onPress={() => setMonthYearPickerOpened(true)}>
-              <>
-                <Text variant="heading" color="textWhite" transform="capitalize">
-                  {date.format('MMMM')}
-                </Text>
-                <MaterialIcons name="expand-more" color={theme.colors.secondary} size={32} />
-              </>
-            </MonthButton>
-            <HeaderActions>
-              <MaterialIcons
-                name={hideValues ? 'visibility-off' : 'visibility'}
-                color={theme.colors.textWhite}
-                size={32}
-                onPress={() => setHideValues(!hideValues)}
-              />
-            </HeaderActions>
-          </Header>
+          <Header
+            title={date.format('MMMM')}
+            titleIcon="expand-more"
+            onTitlePress={() => setMonthYearPickerOpened(true)}
+            actions={[
+              {
+                icon: hideValues ? 'visibility-off' : 'visibility',
+                onPress: () => setHideValues(!hideValues),
+              },
+            ]}
+          />
           <Text variant="light" color="textWhite">
             Atualizado em {lastUpdateDate}
           </Text>

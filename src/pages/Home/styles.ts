@@ -11,13 +11,6 @@ export const TopContainer = styled(FlexContainer).attrs({ gap: 12 })`
   padding: 24px;
 `;
 
-export const Header = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-`;
-
 export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
   background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
   border-top-left-radius: 24px;
@@ -25,12 +18,6 @@ export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
   padding: 24px;
   flex-grow: 1;
 `;
-
-export const MonthButton = styled.TouchableOpacity`
-  flex-direction: row;
-`;
-
-export const HeaderActions = styled(FlexContainer).attrs({ direction: 'row', gap: 12 })``;
 
 export const BalanceLine = styled.View`
   flex-direction: row;
