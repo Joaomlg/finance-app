@@ -1,6 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
+import TextButton from '../../components/TextButton';
 
 export const Container = styled(SafeAreaView)`
   flex: 1;
@@ -33,13 +34,8 @@ export const BalanceFillLine = styled.View`
   margin: 0 4px;
 `;
 
-export const ConnectionsButton = styled.TouchableOpacity`
+export const ConnectionsButton = styled(TextButton)`
   padding: 8px 0;
-  align-self: flex-start;
-`;
-
-export const ConnectionButtonContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 4 })`
-  align-items: center;
 `;
 
 export const HorizontalBarContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 16 })`
@@ -57,8 +53,6 @@ export const TransactionsListHeader = styled.View`
   align-items: center;
 `;
 
-export const SeeMoreTransactionsButton = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
+export const SeeMoreTransactionsButton = styled(TextButton)`
   height: 100%;
 `;

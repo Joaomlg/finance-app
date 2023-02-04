@@ -1,4 +1,3 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
@@ -16,7 +15,6 @@ import {
   BalanceFillLine,
   BalanceLine,
   BottomSheet,
-  ConnectionButtonContainer,
   ConnectionsButton,
   Container,
   Divider,
@@ -141,14 +139,12 @@ const Home: React.FC = () => {
               color="textWhite"
             />
           </BalanceLine>
-          <ConnectionsButton onPress={() => navigation.navigate('connections')}>
-            <ConnectionButtonContainer>
-              <Text variant="light-bold" color="secondary">
-                Ver minhas conexões
-              </Text>
-              <MaterialIcons name="account-balance" color={theme.colors.secondary} size={14} />
-            </ConnectionButtonContainer>
-          </ConnectionsButton>
+          <ConnectionsButton
+            text="Ver minhas conexões"
+            color="secondary"
+            icon="account-balance"
+            onPress={() => navigation.navigate('connections')}
+          />
         </TopContainer>
         <BottomSheet>
           <FlexContainer gap={16}>
@@ -174,12 +170,13 @@ const Home: React.FC = () => {
           <Divider />
           <TransactionsListHeader>
             <Text variant="title">Últimas transações</Text>
-            <SeeMoreTransactionsButton onPress={() => navigation.navigate('transactions')}>
-              <Text variant="light-bold" color="textLight">
-                Ver mais
-              </Text>
-              <MaterialIcons name="navigate-next" color={theme.colors.textLight} size={14} />
-            </SeeMoreTransactionsButton>
+            <SeeMoreTransactionsButton
+              text="Ver mais"
+              color="textLight"
+              icon="navigate-next"
+              iconGap={0}
+              onPress={() => navigation.navigate('transactions')}
+            />
           </TransactionsListHeader>
           <FlexContainer gap={24}>
             {lastTransactions.map((item, index) => (
