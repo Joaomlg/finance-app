@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView } from 'react-native';
+import { Alert, RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
 import HorizontalBar from '../../components/HorizontalBar';
@@ -44,6 +44,7 @@ const Home: React.FC = () => {
     lastUpdateDate,
     setHideValues,
     updateItems,
+    fetchItems,
     transactions,
     totalBalance,
     totalInvestment,
@@ -65,13 +66,37 @@ const Home: React.FC = () => {
     setMonthYearPickerOpened(false);
   };
 
+  const handleRefreshPage = () => {
+    Alert.alert(
+      'Deseja sincronizar as conexões?',
+      'Ao sincronizar as conexões, os dados mais recentes serão obtidos. Isso pode levar alguns minutos.\n\nAtualizar irá apenas obter o que já foi sincronizado previamente.',
+      [
+        {
+          text: 'Atualizar',
+          onPress: async () => {
+            await fetchItems();
+          },
+        },
+        {
+          text: 'Sincronizar',
+          onPress: async () => {
+            await updateItems();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+      },
+    );
+  };
+
   return (
     <Container>
       <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
-            onRefresh={updateItems}
+            onRefresh={handleRefreshPage}
             colors={[theme.colors.primary]}
           />
         }
