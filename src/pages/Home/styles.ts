@@ -1,94 +1,77 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
+import FlexContainer from '../../components/FlexContainer';
 
-export const Container = styled.SafeAreaView`
+export const Container = styled(SafeAreaView)`
   flex: 1;
-  background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
+  background-color: ${({ theme }) => theme.colors.primary};
 `;
 
-export const ScrollView = styled.ScrollView`
-  padding: 12px;
+export const TopContainer = styled(FlexContainer).attrs({ gap: 12 })`
+  padding: 24px;
 `;
 
-export const UpdatingToastContainer = styled.View`
-  padding: 6px 12px;
-  background-color: #eee;
-  width: 100%;
-  display: flex;
+export const Header = styled.View`
   flex-direction: row;
-`;
-
-export const UpdatingToastActivityIndicator = styled.ActivityIndicator`
-  margin-right: 12px;
-`;
-
-export const UpdatingToastContent = styled.View`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-export const UpdatingToastTitle = styled.Text`
-  font-weight: bold;
-`;
-
-export const UpdatingToastSubtitle = styled.Text`
-  font-weight: 100;
-`;
-
-export const LastUpdatedAtBar = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-`;
-
-export const LastUpdatedAtText = styled.Text`
-  font-weight: 100;
-  font-size: 12px;
-`;
-
-export const BalanceCard = styled.View`
-  border-width: 1px;
-  border-color: #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-`;
-
-export const BalanceTitle = styled.Text`
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 12px;
-`;
-
-export const BalanceRow = styled.View`
-  display: flex;
-  flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 8px;
+  padding-bottom: 8px;
+`;
+
+export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
+  background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 24px;
+  flex-grow: 1;
+`;
+
+export const MonthButton = styled.TouchableOpacity`
+  flex-direction: row;
+`;
+
+export const HeaderActions = styled(FlexContainer).attrs({ direction: 'row', gap: 12 })``;
+
+export const BalanceLine = styled.View`
+  flex-direction: row;
+  align-items: baseline;
+  margin-bottom: 12px;
+`;
+
+export const BalanceFillLine = styled.View`
+  flex-grow: 1;
+  height: 0.5px;
+  background-color: ${({ theme }) => theme.colors.text_white};
+  opacity: 0.3;
+  margin: 0 4px;
+`;
+
+export const ConnectionsButton = styled.TouchableOpacity`
+  padding: 8px 0;
+  align-self: flex-start;
+`;
+
+export const ConnectionButtonContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 4 })`
+  align-items: center;
+`;
+
+export const HorizontalBarContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 16 })`
+  align-items: center;
 `;
 
 export const Divider = styled.View`
   height: 1px;
-  width: 100%;
-  background-color: #e5e7eb;
-  margin-bottom: 8px;
+  background-color: ${({ theme }) => theme.colors.lightGray};
 `;
 
-export const BalanceTotal = styled.View`
-  display: flex;
+export const TransactionsListHeader = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 `;
 
-export const TotalText = styled.Text`
-  font-weight: bold;
-`;
-
-export const VersionTag = styled.Text`
-  position: absolute;
-  bottom: 6px;
-  right: 8px;
-  color: #eee;
-  font-weight: bold;
-  font-size: 10px;
+export const SeeMoreTransactionsButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
 `;

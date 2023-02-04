@@ -1,190 +1,182 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl, Text } from 'react-native';
-
 import { MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import moment from 'moment';
-import usePluggyService from '../../hooks/pluggyService';
-import { Account, Investment } from '../../services/pluggy';
-import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../../utils/contants';
-import { formatMoney } from '../../utils/money';
-import { sleep } from '../../utils/time';
+import { useNavigation } from '@react-navigation/native';
+import { Moment } from 'moment';
+import React, { useContext, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView } from 'react-native';
+import { useTheme } from 'styled-components/native';
+import FlexContainer from '../../components/FlexContainer';
+import HorizontalBar from '../../components/HorizontalBar';
+import Money from '../../components/Money';
+import MonthYearPicker from '../../components/MonthYearPicker';
+import Text from '../../components/Text';
+import TransactionListItem from '../../components/TransactionListItem';
+import AppContext from '../../contexts/AppContext';
 import {
-  BalanceCard,
-  BalanceRow,
-  BalanceTitle,
-  BalanceTotal,
+  BalanceFillLine,
+  BalanceLine,
+  BottomSheet,
+  ConnectionButtonContainer,
+  ConnectionsButton,
   Container,
   Divider,
-  LastUpdatedAtBar,
-  LastUpdatedAtText,
-  ScrollView,
-  TotalText,
-  UpdatingToastActivityIndicator,
-  UpdatingToastContainer,
-  UpdatingToastContent,
-  UpdatingToastSubtitle,
-  UpdatingToastTitle,
-  VersionTag,
+  Header,
+  HeaderActions,
+  HorizontalBarContainer,
+  MonthButton,
+  SeeMoreTransactionsButton,
+  TopContainer,
+  TransactionsListHeader,
 } from './styles';
 
-const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
+const LAST_TRANSACTIONS_COUNT = 3;
 
 const Home: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState('');
-  const [hideMoney, setHideMoney] = useState(false);
-  const [accounts, setAccounts] = useState([] as Account[]);
-  const [investments, setInvestments] = useState([] as Investment[]);
+  const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
 
-  const pluggyService = usePluggyService();
+  const theme = useTheme();
+  const navigation = useNavigation();
 
-  const totalBalance = useMemo(
-    () =>
-      accounts
-        .filter(({ type }) => type === 'BANK')
-        .reduce((total, { balance }) => total + balance, 0),
-    [accounts],
+  const {
+    isLoading,
+    hideValues,
+    date,
+    setDate,
+    lastUpdateDate,
+    setHideValues,
+    updateItems,
+    transactions,
+    totalBalance,
+    totalInvestment,
+    totalInvoice,
+    totalIncomes,
+    totalExpenses,
+  } = useContext(AppContext);
+
+  const incomesBarGrow = totalIncomes >= totalExpenses ? 1 : totalIncomes / totalExpenses;
+  const expensesBarGrow = totalExpenses >= totalIncomes ? 1 : totalExpenses / totalIncomes;
+
+  const lastTransactions = useMemo(
+    () => transactions.slice(0, LAST_TRANSACTIONS_COUNT),
+    [transactions],
   );
 
-  const totalInvoice = useMemo(
-    () =>
-      accounts
-        .filter(({ type }) => type === 'CREDIT')
-        .reduce((total, { balance }) => total + balance, 0),
-    [accounts],
-  );
-
-  const totalInvestment = useMemo(
-    () => investments.reduce((total, { balance }) => total + balance, 0),
-    [investments],
-  );
-
-  const updateItemAndWaitForFinish = useCallback(
-    async (itemId: string) => {
-      let item = await pluggyService.updateItem(itemId);
-
-      while (item.status === 'UPDATING') {
-        await sleep(2000);
-        item = await pluggyService.fetchItem(itemId);
-      }
-
-      return item;
-    },
-    [pluggyService],
-  );
-
-  const fetchData = useCallback(
-    async (forceUpdate = false) => {
-      setIsLoading(true);
-
-      const itemsId: string[] = JSON.parse(
-        (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
-      );
-
-      let lastUpdateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
-      const now = moment();
-
-      const shouldUpdate = lastUpdateDate
-        ? now.isAfter(moment(lastUpdateDate, lastUpdateDateFormat), 'day')
-        : true;
-
-      if (shouldUpdate || forceUpdate) {
-        setIsUpdating(true);
-
-        await Promise.all(itemsId.map((id) => updateItemAndWaitForFinish(id)));
-
-        lastUpdateDate = now.format(lastUpdateDateFormat);
-        await AsyncStorage.setItem(LastUpdateDateStorageKey, lastUpdateDate);
-
-        setIsUpdating(false);
-      }
-
-      setLastUpdate(lastUpdateDate as string);
-
-      const accountsPromiseResult = await Promise.all(
-        itemsId.map((id) => pluggyService.fetchAccounts(id)),
-      );
-
-      const accountsList = accountsPromiseResult.reduce(
-        (list, { results }) => [...list, ...results],
-        [] as Account[],
-      );
-
-      setAccounts(accountsList);
-
-      const investimentsPromiseResult = await Promise.all(
-        itemsId.map((id) => pluggyService.fetchInvestments(id)),
-      );
-
-      const investmentsList = investimentsPromiseResult.reduce(
-        (list, { results }) => [...list, ...results],
-        [] as Investment[],
-      );
-
-      setInvestments(investmentsList);
-
-      setIsLoading(false);
-    },
-    [pluggyService, updateItemAndWaitForFinish],
-  );
-
-  const handleUpdateData = async () => {
-    await fetchData(true);
+  const handleMonthYearPickerChange = (value: Moment) => {
+    setDate(value);
+    setMonthYearPickerOpened(false);
   };
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const totalValue = totalBalance + totalInvestment - totalInvoice;
 
   return (
     <Container>
-      {isUpdating && (
-        <UpdatingToastContainer>
-          <UpdatingToastActivityIndicator color="black" />
-          <UpdatingToastContent>
-            <UpdatingToastTitle>Sincronizando dados</UpdatingToastTitle>
-            <UpdatingToastSubtitle>Isso poderá levar algum tempo...</UpdatingToastSubtitle>
-          </UpdatingToastContent>
-        </UpdatingToastContainer>
-      )}
       <ScrollView
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleUpdateData} />}
-      >
-        <LastUpdatedAtBar>
-          <LastUpdatedAtText>Atualizado em: {lastUpdate}</LastUpdatedAtText>
-          <MaterialIcons
-            name={hideMoney ? 'visibility-off' : 'visibility'}
-            color="gray"
-            size={24}
-            onPress={() => setHideMoney(!hideMoney)}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={updateItems}
+            colors={[theme.colors.primary]}
           />
-        </LastUpdatedAtBar>
-        <BalanceCard>
-          <BalanceTitle>Balanço</BalanceTitle>
-          <BalanceRow>
-            <Text>Saldo das contas</Text>
-            <Text>R$ {formatMoney({ value: totalBalance, hidden: hideMoney })}</Text>
-          </BalanceRow>
-          <BalanceRow>
-            <Text>Fatura dos cartões</Text>
-            <Text>-R$ {formatMoney({ value: totalInvoice, hidden: hideMoney })}</Text>
-          </BalanceRow>
-          <BalanceRow>
-            <Text>Investimentos</Text>
-            <Text>R$ {formatMoney({ value: totalInvestment, hidden: hideMoney })}</Text>
-          </BalanceRow>
+        }
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <TopContainer>
+          <Header>
+            <MonthButton onPress={() => setMonthYearPickerOpened(true)}>
+              <>
+                <Text variant="heading" color="text_white" transform="capitalize">
+                  {date.format('MMMM')}
+                </Text>
+                <MaterialIcons name="expand-more" color={theme.colors.secondary} size={32} />
+              </>
+            </MonthButton>
+            <HeaderActions>
+              <MaterialIcons
+                name={hideValues ? 'visibility-off' : 'visibility'}
+                color={theme.colors.text_white}
+                size={32}
+                onPress={() => setHideValues(!hideValues)}
+              />
+            </HeaderActions>
+          </Header>
+          <Text variant="light" color="text_white">
+            Atualizado em {lastUpdateDate}
+          </Text>
+          <BalanceLine>
+            <Text color="text_white">Saldo das contas</Text>
+            <BalanceFillLine />
+            <Money value={totalBalance} color="text_white" />
+          </BalanceLine>
+          <BalanceLine>
+            <Text color="text_white">Fatura dos cartões</Text>
+            <BalanceFillLine />
+            <Money value={-1 * totalInvoice} color="text_white" />
+          </BalanceLine>
+          <BalanceLine>
+            <Text color="text_white">Investimentos</Text>
+            <BalanceFillLine />
+            <Money value={totalInvestment} color="text_white" />
+          </BalanceLine>
+          <BalanceLine>
+            <Text variant="title" color="text_white">
+              Total
+            </Text>
+            <BalanceFillLine />
+            <Money
+              value={totalBalance + totalInvestment - totalInvoice}
+              variant="title"
+              color="text_white"
+            />
+          </BalanceLine>
+          <ConnectionsButton onPress={() => navigation.navigate('connections')}>
+            <ConnectionButtonContainer>
+              <Text variant="light-bold" color="secondary">
+                Ver minhas conexões
+              </Text>
+              <MaterialIcons name="account-balance" color={theme.colors.secondary} size={14} />
+            </ConnectionButtonContainer>
+          </ConnectionsButton>
+        </TopContainer>
+        <BottomSheet>
+          <FlexContainer gap={16}>
+            <Text variant="title">Resumo do mês</Text>
+            <Text>
+              Saldo: <Money value={totalIncomes - totalExpenses} variant="default-bold" />
+            </Text>
+            <FlexContainer gap={12}>
+              <Text variant="default-bold">Entradas</Text>
+              <HorizontalBarContainer>
+                <HorizontalBar color="income" grow={incomesBarGrow} />
+                <Money value={totalIncomes} />
+              </HorizontalBarContainer>
+            </FlexContainer>
+            <FlexContainer gap={12}>
+              <Text variant="default-bold">Saídas</Text>
+              <HorizontalBarContainer>
+                <HorizontalBar color="expense" grow={expensesBarGrow} />
+                <Money value={totalExpenses} />
+              </HorizontalBarContainer>
+            </FlexContainer>
+          </FlexContainer>
           <Divider />
-          <BalanceTotal>
-            <TotalText>Total</TotalText>
-            <TotalText>R$ {formatMoney({ value: totalValue, hidden: hideMoney })}</TotalText>
-          </BalanceTotal>
-        </BalanceCard>
+          <TransactionsListHeader>
+            <Text variant="title">Últimas transações</Text>
+            <SeeMoreTransactionsButton onPress={() => navigation.navigate('transactions')}>
+              <Text variant="light-bold" color="text_light">
+                Ver mais
+              </Text>
+              <MaterialIcons name="navigate-next" color={theme.colors.text_light} size={14} />
+            </SeeMoreTransactionsButton>
+          </TransactionsListHeader>
+          <FlexContainer gap={24}>
+            {lastTransactions.map((item, index) => (
+              <TransactionListItem item={item} key={index} />
+            ))}
+          </FlexContainer>
+        </BottomSheet>
       </ScrollView>
-      <VersionTag>v1.0.6</VersionTag>
+      <MonthYearPicker
+        isOpen={monthYearPickerOpened}
+        onChange={(value) => handleMonthYearPickerChange(value)}
+        onClose={() => setMonthYearPickerOpened(false)}
+      />
     </Container>
   );
 };

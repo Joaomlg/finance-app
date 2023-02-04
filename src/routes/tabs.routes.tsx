@@ -14,6 +14,7 @@ const TabsRoutes: React.FC = () => {
       screenOptions={{
         tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
         tabBarItemStyle: { marginVertical: 5 },
+        headerShown: false,
       }}
     >
       <Screen
