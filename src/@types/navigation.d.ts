@@ -4,6 +4,7 @@ export declare global {
       home: undefined;
       connections: undefined;
       connect: undefined;
+      transactions: undefined;
     }
   }
 }
