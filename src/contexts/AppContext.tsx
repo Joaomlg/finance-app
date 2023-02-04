@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import LoadingModal from '../components/LoadingModal';
 import usePluggyService from '../hooks/pluggyService';
 import { Account, Investment, Item, Transaction } from '../services/pluggy';
-import { ItemsAsyncStorageKey } from '../utils/contants';
+import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../utils/contants';
+import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = [
   'Pagamento da fatura',
@@ -18,9 +20,12 @@ export type AppContextValue = {
   setHideValues: (value: boolean) => void;
   date: Moment;
   setDate: (value: Moment) => void;
+  lastUpdateDate: string;
   items: Item[];
   fetchItems: () => Promise<void>;
   fetchingItems: boolean;
+  updateItems: () => Promise<void>;
+  updatingItems: boolean;
   accounts: Account[];
   fetchAccounts: () => Promise<void>;
   fetchingAccounts: boolean;
@@ -41,15 +46,19 @@ const AppContext = createContext({} as AppContextValue);
 
 const now = moment();
 
+const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
+
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hideValues, setHideValues] = useState(false);
   const [date, setDate] = useState(now);
+  const [lastUpdateDate, setLastUpdateDate] = useState('');
 
   const [itemsId, setItemsId] = useState([] as string[]);
   const [loadingItemsId, setLoadingItemsId] = useState(false);
 
   const [items, setItems] = useState([] as Item[]);
   const [fetchingItems, setFetchingItems] = useState(false);
+  const [updatingItems, setUpdatingItems] = useState(false);
 
   const [accounts, setAccounts] = useState([] as Account[]);
   const [fetchingAccounts, setFetchingAccounts] = useState(false);
@@ -109,17 +118,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [transactions],
   );
 
-  const loadItemsId = useCallback(async () => {
-    setLoadingItemsId(true);
-
-    const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
-    const ids: string[] = serializedIds ? JSON.parse(serializedIds) : [];
-
-    setItemsId(ids);
-
-    setLoadingItemsId(false);
-  }, []);
-
   const fetchItems = useCallback(async () => {
     if (itemsId.length === 0) {
       return;
@@ -134,30 +132,55 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingItems(false);
   }, [pluggyService, itemsId]);
 
+  const updateItems = useCallback(async () => {
+    setUpdatingItems(true);
+
+    const itemList = await Promise.all(
+      itemsId.map(async (id) => {
+        let item = await pluggyService.updateItem(id);
+
+        while (item.status === 'UPDATING') {
+          await sleep(2000);
+          item = await pluggyService.fetchItem(id);
+        }
+
+        return item;
+      }),
+    );
+
+    const updateDate = now.format(lastUpdateDateFormat);
+    await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
+
+    setLastUpdateDate(updateDate);
+    setItems(itemList);
+
+    setUpdatingItems(false);
+  }, [pluggyService, itemsId]);
+
   const fetchAccounts = useCallback(async () => {
-    if (itemsId.length === 0) {
+    if (items.length === 0) {
       return;
     }
 
     setFetchingAccounts(true);
 
-    const result = await Promise.all(itemsId.map((id) => pluggyService.fetchAccounts(id)));
+    const result = await Promise.all(items.map(({ id }) => pluggyService.fetchAccounts(id)));
 
     const accountList = result.reduce((list, item) => [...list, ...item.results], [] as Account[]);
 
     setAccounts(accountList);
 
     setFetchingAccounts(false);
-  }, [pluggyService, itemsId]);
+  }, [pluggyService, items]);
 
   const fetchInvestments = useCallback(async () => {
-    if (itemsId.length === 0) {
+    if (items.length === 0) {
       return;
     }
 
     setFetchingInvestments(true);
 
-    const result = await Promise.all(itemsId.map((id) => pluggyService.fetchInvestments(id)));
+    const result = await Promise.all(items.map(({ id }) => pluggyService.fetchInvestments(id)));
 
     const investmentList = result.reduce(
       (list, item) => [...list, ...item.results],
@@ -167,7 +190,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setInvestments(investmentList);
 
     setFetchingInvestments(false);
-  }, [pluggyService, itemsId]);
+  }, [pluggyService, items]);
 
   const fetchTransactions = useCallback(async () => {
     if (accounts.length === 0) {
@@ -200,14 +223,43 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [pluggyService, date, accounts]);
 
   useEffect(() => {
+    const loadItemsId = async () => {
+      setLoadingItemsId(true);
+
+      const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
+      const ids: string[] = serializedIds ? JSON.parse(serializedIds) : [];
+
+      setItemsId(ids);
+
+      setLoadingItemsId(false);
+    };
+
     loadItemsId();
-  }, [loadItemsId]);
+  }, []);
 
   useEffect(() => {
-    fetchItems();
+    const fetchOrUpdateItems = async () => {
+      const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
+
+      const shouldUpdate = updateDate
+        ? now.isAfter(moment(updateDate, lastUpdateDateFormat), 'day')
+        : true;
+
+      if (shouldUpdate) {
+        await updateItems();
+      } else {
+        setLastUpdateDate(updateDate as string);
+        await fetchItems();
+      }
+    };
+
+    fetchOrUpdateItems();
+  }, [itemsId, fetchItems, updateItems]);
+
+  useEffect(() => {
     fetchAccounts();
     fetchInvestments();
-  }, [itemsId, fetchItems, fetchAccounts, fetchInvestments]);
+  }, [items, fetchAccounts, fetchInvestments]);
 
   useEffect(() => {
     fetchTransactions();
@@ -221,9 +273,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setHideValues,
         date,
         setDate,
+        lastUpdateDate,
         items,
         fetchItems,
         fetchingItems,
+        updateItems,
+        updatingItems,
         accounts,
         fetchAccounts,
         fetchingAccounts,
@@ -241,6 +296,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }}
     >
       {children}
+      {updatingItems && <LoadingModal text="Sincronizando conexões" />}
     </AppContext.Provider>
   );
 };
