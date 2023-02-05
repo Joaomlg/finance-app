@@ -1,11 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { PluggyConnect } from 'react-native-pluggy-connect';
+import { useTheme } from 'styled-components/native';
+import AppContext from '../../contexts/AppContext';
 import usePluggyService from '../../hooks/pluggyService';
 import { Item } from '../../services/pluggy';
-import { ItemsAsyncStorageKey } from '../../utils/contants';
 
 import { Container } from './styles';
 
@@ -13,37 +13,25 @@ const Connect: React.FC = () => {
   const [connectToken, setConnectToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const pluggyService = usePluggyService();
+  const { storeItem } = useContext(AppContext);
 
+  const pluggyService = usePluggyService();
   const navigation = useNavigation();
+  const theme = useTheme();
 
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
-    await saveConnection(item);
+
+    await storeItem(item);
+
     navigation.goBack();
   };
 
   const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
-    const { message, data } = error;
-
-    console.error(message);
+    const { data } = error;
 
     if (data) {
-      await saveConnection(data.item);
-    }
-  };
-
-  const saveConnection = async (item: Item) => {
-    try {
-      const previousItems: string[] = JSON.parse(
-        (await AsyncStorage.getItem(ItemsAsyncStorageKey)) || '[]',
-      );
-
-      const newUniqueItems = [...new Set([...previousItems, item.id])];
-
-      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
-    } catch (error) {
-      console.log(error);
+      await storeItem(data.item);
     }
   };
 
@@ -64,11 +52,11 @@ const Connect: React.FC = () => {
   return (
     <Container>
       {isLoading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
         <PluggyConnect
           connectToken={connectToken}
-          includeSandbox={true}
+          includeSandbox={__DEV__}
           countries={['BR']}
           connectorTypes={['PERSONAL_BANK', 'INVESTMENT']}
           onSuccess={handleOnSuccess}
