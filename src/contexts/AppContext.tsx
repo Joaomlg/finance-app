@@ -4,7 +4,11 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import LoadingModal from '../components/LoadingModal';
 import usePluggyService from '../hooks/pluggyService';
 import { Account, Investment, Item, Transaction } from '../services/pluggy';
-import { ItemsAsyncStorageKey, LastUpdateDateStorageKey } from '../utils/contants';
+import {
+  ItemsAsyncStorageKey,
+  LastUpdateDateFormat,
+  LastUpdateDateStorageKey,
+} from '../utils/contants';
 import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = [
@@ -45,8 +49,6 @@ export type AppContextValue = {
 const AppContext = createContext({} as AppContextValue);
 
 const now = moment();
-
-const lastUpdateDateFormat = 'DD/MM/YYYY HH:mm:ss';
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hideValues, setHideValues] = useState(false);
@@ -148,7 +150,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }),
     );
 
-    const updateDate = now.format(lastUpdateDateFormat);
+    const updateDate = now.format(LastUpdateDateFormat);
     await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
 
     setLastUpdateDate(updateDate);
@@ -242,7 +244,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
       const shouldUpdate = updateDate
-        ? now.isAfter(moment(updateDate, lastUpdateDateFormat), 'day')
+        ? now.isAfter(moment(updateDate, LastUpdateDateFormat), 'day')
         : true;
 
       if (shouldUpdate) {
