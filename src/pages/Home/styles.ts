@@ -1,12 +1,6 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
 import TextButton from '../../components/TextButton';
-
-export const Container = styled(SafeAreaView)`
-  flex: 1;
-  background-color: ${({ theme }) => theme.colors.primary};
-`;
 
 export const TopContainer = styled(FlexContainer).attrs({ gap: 12 })`
   padding: 24px;

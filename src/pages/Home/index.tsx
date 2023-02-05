@@ -8,6 +8,7 @@ import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
 import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
+import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
@@ -16,7 +17,6 @@ import {
   BalanceLine,
   BottomSheet,
   ConnectionsButton,
-  Container,
   Divider,
   HorizontalBarContainer,
   SeeMoreTransactionsButton,
@@ -87,7 +87,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <Container>
+    <ScreenContainer>
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -190,7 +190,7 @@ const Home: React.FC = () => {
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />
-    </Container>
+    </ScreenContainer>
   );
 };
 
