@@ -26,6 +26,7 @@ export type AppContextValue = {
   setDate: (value: Moment) => void;
   lastUpdateDate: string;
   items: Item[];
+  storeItem: (item: Item) => Promise<void>;
   fetchItems: () => Promise<void>;
   fetchingItems: boolean;
   updateItems: () => Promise<void>;
@@ -118,6 +119,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         0,
       ),
     [transactions],
+  );
+
+  const storeItem = useCallback(
+    async (item: Item) => {
+      const newUniqueItems = [...new Set([...itemsId, item.id])];
+      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
+      setItemsId(newUniqueItems);
+    },
+    [itemsId],
   );
 
   const fetchItems = useCallback(async () => {
@@ -277,6 +287,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setDate,
         lastUpdateDate,
         items,
+        storeItem,
         fetchItems,
         fetchingItems,
         updateItems,
