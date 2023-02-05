@@ -13,7 +13,7 @@ export const TitleButton = styled.TouchableOpacity`
   align-items: center;
 `;
 
-export const Actions = styled(FlexContainer).attrs({ direction: 'row', gap: 12 })`
+export const Actions = styled(FlexContainer).attrs({ direction: 'row', gap: 24 })`
   flex-grow: 1;
   justify-content: flex-end;
 `;
