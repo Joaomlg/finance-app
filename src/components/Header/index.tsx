@@ -17,6 +17,7 @@ export interface HeaderProps extends ViewProps {
   titleIcon?: keyof typeof MaterialIcons.glyphMap;
   onTitlePress?: () => void;
   actions?: Action[];
+  hideGoBackIcon?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -24,6 +25,7 @@ const Header: React.FC<HeaderProps> = ({
   titleIcon,
   onTitlePress,
   actions,
+  hideGoBackIcon,
   ...viewProps
 }) => {
   const theme = useTheme();
@@ -31,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <Container {...viewProps}>
-      {navigation.canGoBack() && (
+      {!hideGoBackIcon && navigation.canGoBack() && (
         <MaterialIcons
           name="navigate-before"
           color={theme.colors.secondary}

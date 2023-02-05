@@ -109,6 +109,7 @@ const Home: React.FC = () => {
                 onPress: () => setHideValues(!hideValues),
               },
             ]}
+            hideGoBackIcon={true}
           />
           <Text variant="light" color="textWhite">
             Atualizado em {lastUpdateDate}
