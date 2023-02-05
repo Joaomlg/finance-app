@@ -5,5 +5,5 @@ export const Container = styled(SafeAreaView)`
   flex: 1;
   align-content: center;
   justify-content: center;
-  background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
+  background-color: ${({ theme }) => theme.colors.backgroundWhite};
 `;

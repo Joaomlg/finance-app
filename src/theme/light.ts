@@ -3,7 +3,7 @@ import common from './common';
 export default {
   ...common,
   colors: {
-    boldbackgroundWhite: '#FFF',
+    backgroundWhite: '#FFF',
     primary: '#284D63',
     secondary: '#81BFC3',
     income: '#15803D',

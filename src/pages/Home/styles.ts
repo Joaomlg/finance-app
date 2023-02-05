@@ -7,7 +7,7 @@ export const TopContainer = styled(FlexContainer).attrs({ gap: 12 })`
 `;
 
 export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
-  background-color: ${({ theme }) => theme.colors.boldbackgroundWhite};
+  background-color: ${({ theme }) => theme.colors.backgroundWhite};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   padding: 24px;
