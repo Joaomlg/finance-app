@@ -45,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({
             <Text variant="heading" color="textWhite" transform="capitalize">
               {title}
             </Text>
-            <MaterialIcons name={titleIcon} color={theme.colors.secondary} size={32} />
+            <MaterialIcons name={titleIcon} color={theme.colors.secondary} size={28} />
           </>
         </TitleButton>
       ) : (
@@ -61,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
               key={index}
               name={action.icon}
               color={theme.colors.textWhite}
-              size={32}
+              size={28}
               onPress={action.onPress}
             />
           ))}

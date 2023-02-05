@@ -10,7 +10,7 @@ export const Container = styled.View`
 
 export const TitleButton = styled.TouchableOpacity`
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
 `;
 
 export const Actions = styled(FlexContainer).attrs({ direction: 'row', gap: 24 })`
