@@ -1,9 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { ViewProps } from 'react-native';
 import Text from '../Text';
 
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTheme } from 'styled-components/native';
 import { Actions, Container, TitleButton } from './styles';
 
@@ -28,12 +28,20 @@ const Header: React.FC<HeaderProps> = ({
   hideGoBackIcon,
   ...viewProps
 }) => {
+  const [canGoBack, setCanGoBack] = useState(false);
+
   const theme = useTheme();
   const navigation = useNavigation();
 
+  useFocusEffect(
+    useCallback(() => {
+      setCanGoBack(navigation.canGoBack());
+    }, [navigation]),
+  );
+
   return (
     <Container {...viewProps}>
-      {!hideGoBackIcon && navigation.canGoBack() && (
+      {!hideGoBackIcon && canGoBack && (
         <MaterialIcons
           name="navigate-before"
           color={theme.colors.secondary}
