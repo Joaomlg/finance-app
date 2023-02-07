@@ -10,7 +10,7 @@ import { Item } from '../../services/pluggy';
 import ConnectionCard from '../Connections/ConnectionCard';
 import { BottomSheet, StyledHeader } from './styles';
 
-const Connections2: React.FC = () => {
+const Connections: React.FC = () => {
   const { isLoading, items, accounts, hideValues, setHideValues, fetchItems } =
     useContext(AppContext);
 
@@ -59,4 +59,4 @@ const Connections2: React.FC = () => {
   );
 };
 
-export default Connections2;
+export default Connections;
