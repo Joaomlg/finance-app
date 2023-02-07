@@ -15,5 +15,6 @@ export default {
     text: '#465C4F',
     textLight: '#B4B4B4',
     textWhite: '#FFF',
+    overlay: '#0000004C',
   },
 };

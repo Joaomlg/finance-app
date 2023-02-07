@@ -4,12 +4,14 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
 import React, { useCallback, useState } from 'react';
 import { SafeAreaView } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider } from 'styled-components/native';
 import Authenticate from './src/components/Authentication';
 import { AppContextProvider } from './src/contexts/AppContext';
@@ -46,14 +48,18 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AppContextProvider>
         <HooksProvider>
-          <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-            <StatusBar style="light" backgroundColor={theme.colors.primary} />
-            {isAuthenticated ? (
-              <Routes />
-            ) : (
-              <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
-            )}
-          </SafeAreaView>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetModalProvider>
+              <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
+                <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                {isAuthenticated ? (
+                  <Routes />
+                ) : (
+                  <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
+                )}
+              </SafeAreaView>
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </HooksProvider>
       </AppContextProvider>
     </ThemeProvider>

@@ -3,7 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Connect from '../pages/Connect';
 import TabsRoutes from './tabs.routes';
 
-const { Screen, Navigator, Group } = createNativeStackNavigator();
+export type StackRouteParamList = {
+  tabs: undefined;
+  connect: { updateItemId?: string };
+};
+
+const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamList>();
 
 const StackRoutes: React.FC = () => {
   return (

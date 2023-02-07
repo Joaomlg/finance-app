@@ -27,6 +27,7 @@ export type AppContextValue = {
   lastUpdateDate: string;
   items: Item[];
   storeItem: (item: Item) => Promise<void>;
+  deleteItem: (item: Item) => Promise<void>;
   fetchItems: () => Promise<void>;
   fetchingItems: boolean;
   updateItems: () => Promise<void>;
@@ -128,6 +129,19 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setItemsId(newUniqueItems);
     },
     [itemsId],
+  );
+
+  const deleteItem = useCallback(
+    async (item: Item) => {
+      await pluggyService.deleteItem(item.id);
+
+      const newItemsId = itemsId.filter((itemId) => itemId !== item.id);
+
+      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
+
+      setItemsId(newItemsId);
+    },
+    [pluggyService, itemsId],
   );
 
   const fetchItems = useCallback(async () => {
@@ -288,6 +302,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         lastUpdateDate,
         items,
         storeItem,
+        deleteItem,
         fetchItems,
         fetchingItems,
         updateItems,
