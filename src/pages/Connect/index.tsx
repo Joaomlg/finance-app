@@ -1,22 +1,27 @@
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { PluggyConnect } from 'react-native-pluggy-connect';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../contexts/AppContext';
 import usePluggyService from '../../hooks/pluggyService';
+import { StackRouteParamList } from '../../routes/stack.routes';
 import { Item } from '../../services/pluggy';
 
 import { Container } from './styles';
 
-const Connect: React.FC = () => {
+const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> = ({
+  route,
+  navigation,
+}) => {
+  const updateItemId = route.params?.updateItemId;
+
   const [connectToken, setConnectToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const { storeItem } = useContext(AppContext);
 
   const pluggyService = usePluggyService();
-  const navigation = useNavigation();
   const theme = useTheme();
 
   const handleOnSuccess = async (data: { item: Item }) => {
@@ -41,13 +46,13 @@ const Connect: React.FC = () => {
 
   useEffect(() => {
     const createConnectToken = async () => {
-      const { accessToken } = await pluggyService.createConnectToken();
+      const { accessToken } = await pluggyService.createConnectToken(updateItemId);
       setConnectToken(accessToken);
       setIsLoading(false);
     };
 
     createConnectToken();
-  }, [pluggyService]);
+  }, [pluggyService, updateItemId]);
 
   return (
     <Container>
@@ -62,6 +67,7 @@ const Connect: React.FC = () => {
           onSuccess={handleOnSuccess}
           onError={handleOnError}
           onClose={handleOnClose}
+          updateItem={updateItemId}
         />
       )}
     </Container>
