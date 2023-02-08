@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import usePluggyService from '../hooks/pluggyService';
 import { Account, Investment, Item, Transaction } from '../services/pluggy';
@@ -124,22 +125,32 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const storeItem = useCallback(
     async (item: Item) => {
-      const newUniqueItems = [...new Set([...itemsId, item.id])];
-      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
-      setItemsId(newUniqueItems);
+      try {
+        const newUniqueItems = [...new Set([...itemsId, item.id])];
+
+        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
+
+        setItemsId(newUniqueItems);
+      } catch (error) {
+        Toast.show({ type: 'error', text1: 'Não foi possível armazenar a nova conexão!' });
+      }
     },
     [itemsId],
   );
 
   const deleteItem = useCallback(
     async (item: Item) => {
-      await pluggyService.deleteItem(item.id);
+      try {
+        await pluggyService.deleteItem(item.id);
 
-      const newItemsId = itemsId.filter((itemId) => itemId !== item.id);
+        const newItemsId = itemsId.filter((itemId) => itemId !== item.id);
 
-      await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
+        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
 
-      setItemsId(newItemsId);
+        setItemsId(newItemsId);
+      } catch (error) {
+        Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
+      }
     },
     [pluggyService, itemsId],
   );
@@ -151,9 +162,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     setFetchingItems(true);
 
-    const itemList = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
-
-    setItems(itemList);
+    try {
+      const itemList = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
+      setItems(itemList);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informação das conexões!' });
+    }
 
     setFetchingItems(false);
   }, [pluggyService, itemsId]);
@@ -161,26 +175,30 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const updateItems = useCallback(async () => {
     setUpdatingItems(true);
 
-    const itemList = await Promise.all(
-      itemsId.map(async (id) => {
-        let item = await pluggyService.updateItem(id);
+    try {
+      const itemList = await Promise.all(
+        itemsId.map(async (id) => {
+          let item = await pluggyService.updateItem(id);
 
-        while (item.status === 'UPDATING') {
-          await sleep(2000);
-          item = await pluggyService.fetchItem(id);
-        }
+          while (item.status === 'UPDATING') {
+            await sleep(2000);
+            item = await pluggyService.fetchItem(id);
+          }
 
-        return item;
-      }),
-    );
+          return item;
+        }),
+      );
+      setItems(itemList);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível sincronizar as conexões!' });
+    }
+
+    setUpdatingItems(false);
 
     const updateDate = now.format(LastUpdateDateFormat);
     await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
 
     setLastUpdateDate(updateDate);
-    setItems(itemList);
-
-    setUpdatingItems(false);
   }, [pluggyService, itemsId]);
 
   const fetchAccounts = useCallback(async () => {
@@ -190,11 +208,18 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     setFetchingAccounts(true);
 
-    const result = await Promise.all(items.map(({ id }) => pluggyService.fetchAccounts(id)));
+    try {
+      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchAccounts(id)));
 
-    const accountList = result.reduce((list, item) => [...list, ...item.results], [] as Account[]);
+      const accountList = result.reduce(
+        (list, item) => [...list, ...item.results],
+        [] as Account[],
+      );
 
-    setAccounts(accountList);
+      setAccounts(accountList);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das contas!' });
+    }
 
     setFetchingAccounts(false);
   }, [pluggyService, items]);
@@ -206,14 +231,21 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     setFetchingInvestments(true);
 
-    const result = await Promise.all(items.map(({ id }) => pluggyService.fetchInvestments(id)));
+    try {
+      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchInvestments(id)));
 
-    const investmentList = result.reduce(
-      (list, item) => [...list, ...item.results],
-      [] as Investment[],
-    );
+      const investmentList = result.reduce(
+        (list, item) => [...list, ...item.results],
+        [] as Investment[],
+      );
 
-    setInvestments(investmentList);
+      setInvestments(investmentList);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível obter informações sobre investimentos!',
+      });
+    }
 
     setFetchingInvestments(false);
   }, [pluggyService, items]);
@@ -223,27 +255,31 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    setFetchingTransactions(true);
-
     const startDate = moment(date).startOf('month');
     const endDate = moment(date).endOf('month');
 
-    const result = await Promise.all(
-      accounts.map(({ id }) =>
-        pluggyService.fetchTransactions(id, {
-          pageSize: 500,
-          from: startDate.format('YYYY-MM-DD'),
-          to: endDate.format('YYYY-MM-DD'),
-        }),
-      ),
-    );
+    setFetchingTransactions(true);
 
-    const transactionsList = result
-      .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
-      .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    try {
+      const result = await Promise.all(
+        accounts.map(({ id }) =>
+          pluggyService.fetchTransactions(id, {
+            pageSize: 500,
+            from: startDate.format('YYYY-MM-DD'),
+            to: endDate.format('YYYY-MM-DD'),
+          }),
+        ),
+      );
 
-    setTransactions(transactionsList);
+      const transactionsList = result
+        .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
+        .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      setTransactions(transactionsList);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter as transações!' });
+    }
 
     setFetchingTransactions(false);
   }, [pluggyService, date, accounts]);

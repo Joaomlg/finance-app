@@ -12,6 +12,7 @@ import 'moment/locale/pt';
 import React, { useCallback, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import Authenticate from './src/components/Authentication';
 import { AppContextProvider } from './src/contexts/AppContext';
@@ -57,6 +58,7 @@ export default function App() {
                 ) : (
                   <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
                 )}
+                <Toast config={{}} />
               </SafeAreaView>
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
