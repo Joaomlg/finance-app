@@ -3,9 +3,11 @@ export declare global {
     interface RootParamList {
       home: undefined;
       connections: undefined;
-      connect: {
-        updateItemId?: string;
-      };
+      connect:
+        | {
+            updateItemId?: string;
+          }
+        | undefined;
       transactions: undefined;
     }
   }
