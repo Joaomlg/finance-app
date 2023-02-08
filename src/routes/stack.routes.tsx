@@ -16,7 +16,7 @@ const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamL
 
 const StackRoutes: React.FC = () => {
   return (
-    <Navigator>
+    <Navigator initialRouteName="home">
       <Group screenOptions={{ headerShown: false }}>
         <Screen name="home" component={Home} />
         <Screen name="connections" component={Connections} />
