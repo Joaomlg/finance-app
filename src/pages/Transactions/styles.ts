@@ -18,11 +18,12 @@ export const TransactionList = styled(
   FlatList as new (props: FlatListProps<Transaction>) => FlatList<Transaction>,
 ).attrs(({ theme }) => ({
   contentContainerStyle: {
-    flex: 1,
     padding: 24,
     backgroundColor: theme.colors.backgroundWhite,
   },
-}))``;
+}))`
+  flex: 1;
+`;
 
 export const ListSeparatorContainer = styled.View`
   flex-direction: row;
