@@ -31,7 +31,10 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ text }) => {
     <Modal visible animationType="slide">
       <Container>
         <Animated.View style={{ transform: [{ scale: anim.current }] }}>
-          <Image source={require('../../assets/icon.png')} style={{ height: 100, width: 100 }} />
+          <Image
+            source={require('../../assets/adaptive-icon.png')}
+            style={{ height: 180, width: 180 }}
+          />
         </Animated.View>
         {text && (
           <StatusText variant="title" color="textWhite">
