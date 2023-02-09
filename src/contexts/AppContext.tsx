@@ -12,12 +12,7 @@ import {
 } from '../utils/contants';
 import { sleep } from '../utils/time';
 
-const NUBANK_IGNORED_TRANSACTIONS = [
-  'Pagamento da fatura',
-  'Pagamento recebido',
-  'Dinheiro guardado',
-  'Dinheiro resgatado',
-];
+const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
 
 export type AppContextValue = {
   isLoading: boolean;
@@ -262,13 +257,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const result = await Promise.all(
-        accounts.map(({ id }) =>
-          pluggyService.fetchTransactions(id, {
-            pageSize: 500,
-            from: startDate.format('YYYY-MM-DD'),
-            to: endDate.format('YYYY-MM-DD'),
-          }),
-        ),
+        accounts
+          .filter((item) => item.type !== 'CREDIT')
+          .map(({ id }) =>
+            pluggyService.fetchTransactions(id, {
+              pageSize: 500,
+              from: startDate.format('YYYY-MM-DD'),
+              to: endDate.format('YYYY-MM-DD'),
+            }),
+          ),
       );
 
       const transactionsList = result
