@@ -12,6 +12,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
+import { formatMonthYearDate } from '../../utils/date';
 import {
   BalanceFillLine,
   BalanceLine,
@@ -100,7 +101,7 @@ const Home: React.FC = () => {
       >
         <TopContainer>
           <Header
-            title={date.format('MMMM')}
+            title={formatMonthYearDate(date)}
             titleIcon="expand-more"
             onTitlePress={() => setMonthYearPickerOpened(true)}
             actions={[

@@ -8,6 +8,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../services/pluggy';
+import { formatMonthYearDate } from '../../utils/date';
 import {
   ListHeaderContainer,
   ListSeparatorContainer,
@@ -84,7 +85,7 @@ const Transactions: React.FC = () => {
   return (
     <ScreenContainer>
       <StyledHeader
-        title={date.format('MMMM')}
+        title={formatMonthYearDate(date)}
         actions={[
           {
             icon: hideValues ? 'visibility-off' : 'visibility',
