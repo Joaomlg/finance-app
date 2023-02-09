@@ -17,7 +17,7 @@ import {
   TransactionList,
 } from './styles';
 
-const Transactions2: React.FC = () => {
+const Transactions: React.FC = () => {
   const {
     isLoading,
     hideValues,
@@ -109,4 +109,4 @@ const Transactions2: React.FC = () => {
   );
 };
 
-export default Transactions2;
+export default Transactions;

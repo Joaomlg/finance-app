@@ -17,7 +17,11 @@ export const ListHeaderContainer = styled(FlexContainer).attrs({ gap: 4 })`
 export const TransactionList = styled(
   FlatList as new (props: FlatListProps<Transaction>) => FlatList<Transaction>,
 ).attrs(({ theme }) => ({
-  contentContainerStyle: { padding: 24, backgroundColor: theme.colors.backgroundWhite },
+  contentContainerStyle: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: theme.colors.backgroundWhite,
+  },
 }))``;
 
 export const ListSeparatorContainer = styled.View`
