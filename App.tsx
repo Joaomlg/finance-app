@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
-import Authenticate from './src/components/Authentication';
+import AuthenticationProvider from './src/components/Authentication';
 import { AppContextProvider } from './src/contexts/AppContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
@@ -25,8 +25,6 @@ moment.locale('pt-BR');
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [isAuthenticated, setAuthenticated] = useState(false);
-
   const [fontsLoaded] = useFonts({
     Inter_300Light,
     Inter_400Regular,
@@ -47,23 +45,21 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppContextProvider>
-        <HooksProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <BottomSheetModalProvider>
-              <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-                <StatusBar style="light" backgroundColor={theme.colors.primary} />
-                {isAuthenticated ? (
+      <AuthenticationProvider>
+        <AppContextProvider>
+          <HooksProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <BottomSheetModalProvider>
+                <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
+                  <StatusBar style="light" backgroundColor={theme.colors.primary} />
                   <Routes />
-                ) : (
-                  <Authenticate onAuthenticationChange={(value) => setAuthenticated(value)} />
-                )}
-                <Toast config={{}} />
-              </SafeAreaView>
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
-        </HooksProvider>
-      </AppContextProvider>
+                  <Toast />
+                </SafeAreaView>
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </HooksProvider>
+        </AppContextProvider>
+      </AuthenticationProvider>
     </ThemeProvider>
   );
 }

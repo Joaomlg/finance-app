@@ -1,25 +1,18 @@
 import * as LocalAuthentication from 'expo-local-authentication';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AuthButton, AuthButtonContainer, AuthButtonText, Container, SpashImage } from './styles';
 
 export type AuthenticateProps = {
-  onAuthenticationChange?: (result: boolean) => void;
+  children: React.ReactNode;
 };
 
-const Authenticate: React.FC<AuthenticateProps> = ({ onAuthenticationChange }) => {
-  const handleAuthenticationChange = useCallback(
-    (value: boolean) => {
-      if (onAuthenticationChange) {
-        onAuthenticationChange(value);
-      }
-    },
-    [onAuthenticationChange],
-  );
+const AuthenticationProvider: React.FC<AuthenticateProps> = ({ children }) => {
+  const [isAuthenticated, setAuthenticated] = useState(false);
 
   const authenticationRoutine = useCallback(async () => {
     const isAuthenticated = __DEV__ || (await authenticate());
-    handleAuthenticationChange(isAuthenticated);
-  }, [handleAuthenticationChange]);
+    setAuthenticated(isAuthenticated);
+  }, []);
 
   const authenticate = async () => {
     const authTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
@@ -43,7 +36,9 @@ const Authenticate: React.FC<AuthenticateProps> = ({ onAuthenticationChange }) =
     authenticationRoutine();
   }, [authenticationRoutine]);
 
-  return (
+  return isAuthenticated ? (
+    <>{children}</>
+  ) : (
     <Container>
       <SpashImage source={require('../../assets/splash.png')} />
       <AuthButtonContainer>
@@ -55,4 +50,4 @@ const Authenticate: React.FC<AuthenticateProps> = ({ onAuthenticationChange }) =
   );
 };
 
-export default Authenticate;
+export default AuthenticationProvider;
