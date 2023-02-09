@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { PluggyConnect } from 'react-native-pluggy-connect';
+import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../contexts/AppContext';
 import usePluggyService from '../../hooks/pluggyService';
@@ -46,13 +47,18 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
 
   useEffect(() => {
     const createConnectToken = async () => {
-      const { accessToken } = await pluggyService.createConnectToken(updateItemId);
-      setConnectToken(accessToken);
+      try {
+        const { accessToken } = await pluggyService.createConnectToken(updateItemId);
+        setConnectToken(accessToken);
+      } catch (error) {
+        Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });
+        navigation.goBack();
+      }
       setIsLoading(false);
     };
 
     createConnectToken();
-  }, [pluggyService, updateItemId]);
+  }, [pluggyService, updateItemId, navigation]);
 
   return (
     <Container>
