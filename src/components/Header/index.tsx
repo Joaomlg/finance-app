@@ -10,6 +10,7 @@ import { Actions, Container, TitleButton } from './styles';
 type Action = {
   icon: keyof typeof MaterialIcons.glyphMap;
   onPress?: () => void;
+  hidden?: boolean;
 };
 
 export interface HeaderProps extends ViewProps {
@@ -66,15 +67,17 @@ const Header: React.FC<HeaderProps> = ({
 
       {actions && (
         <Actions>
-          {actions.map((action, index) => (
-            <MaterialIcons
-              key={index}
-              name={action.icon}
-              color={theme.colors.textWhite}
-              size={28}
-              onPress={action.onPress}
-            />
-          ))}
+          {actions
+            .filter((action) => !action.hidden)
+            .map((action, index) => (
+              <MaterialIcons
+                key={index}
+                name={action.icon}
+                color={theme.colors.textWhite}
+                size={28}
+                onPress={action.onPress}
+              />
+            ))}
         </Actions>
       )}
     </Container>

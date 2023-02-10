@@ -9,6 +9,7 @@ import { ActionButton, Card, Content, Header, MonthButton, Overlay } from './sty
 
 type MonthYearPickerProps = {
   isOpen: boolean;
+  selectedDate: Moment;
   onChange?: (value: Moment) => void;
   onClose?: () => void;
 };
@@ -18,20 +19,23 @@ const now = moment();
 const currentMonthNumber = parseInt(now.format('M'));
 const currentYearNumber = parseInt(now.format('YYYY'));
 
-const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ isOpen, onChange, onClose }) => {
+const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
+  isOpen,
+  selectedDate,
+  onChange,
+  onClose,
+}) => {
   const [displayedYear, setDisplayedYear] = useState(currentYearNumber);
-  const [selectedMonth, setSelectedMonth] = useState(currentMonthNumber);
-  const [selectedYear, setSelectedYear] = useState(currentYearNumber);
 
   const theme = useTheme();
+
+  const selectedMonth = parseInt(selectedDate.format('M'));
+  const selectedYear = parseInt(selectedDate.format('YYYY'));
 
   const prevYear = () => setDisplayedYear(displayedYear - 1);
   const nextYear = () => setDisplayedYear(displayedYear + 1);
 
   const handleMonthOnPress = (month: number) => {
-    setSelectedMonth(month);
-    setSelectedYear(displayedYear);
-
     if (onChange) {
       const date = moment({ day: 1, month: month - 1, year: displayedYear });
       onChange(date);

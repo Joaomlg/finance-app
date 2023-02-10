@@ -1,7 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
-import { Alert, RefreshControl, ScrollView } from 'react-native';
+import {
+  Alert,
+  LayoutAnimation,
+  LayoutChangeEvent,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  UIManager,
+} from 'react-native';
 import { useTheme } from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
 import Header from '../../components/Header';
@@ -12,8 +20,9 @@ import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
-import { formatMonthYearDate } from '../../utils/date';
+import { checkCurrentMonth, formatMonthYearDate, NOW } from '../../utils/date';
 import {
+  BalanceContainer,
   BalanceFillLine,
   BalanceLine,
   BottomSheet,
@@ -22,13 +31,21 @@ import {
   HorizontalBarContainer,
   SeeMoreTransactionsButton,
   TopContainer,
+  TransactionListContainer,
   TransactionsListHeader,
 } from './styles';
 
-const LAST_TRANSACTIONS_COUNT = 3;
+const TRANSACTION_LIST_MIN_CAPACITY = 3;
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
+  const [transactionListCapacity, setTransactionListCapacity] = useState(0);
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -50,16 +67,36 @@ const Home: React.FC = () => {
     totalExpenses,
   } = useContext(AppContext);
 
+  const isCurrentMonth = checkCurrentMonth(date);
+
   const incomesBarGrow = totalIncomes >= totalExpenses ? 1 : totalIncomes / totalExpenses;
   const expensesBarGrow = totalExpenses >= totalIncomes ? 1 : totalExpenses / totalIncomes;
 
-  const lastTransactions = useMemo(
-    () => transactions.slice(0, LAST_TRANSACTIONS_COUNT),
-    [transactions],
-  );
+  const lastTransactions = useMemo(() => {
+    const amount = Math.max(transactionListCapacity, TRANSACTION_LIST_MIN_CAPACITY);
+    return transactions.slice(0, amount);
+  }, [transactions, transactionListCapacity]);
+
+  const onTransactionListLayout = (event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    const listCapacity = Math.round(height / (40 + 24));
+    setTransactionListCapacity(listCapacity);
+  };
+
+  const animatedChangeDate = (value: Moment) => {
+    const isNextValueCurrentMonth = checkCurrentMonth(value);
+
+    if (isNextValueCurrentMonth) {
+      setTransactionListCapacity(TRANSACTION_LIST_MIN_CAPACITY);
+    }
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    setDate(value);
+  };
 
   const handleMonthYearPickerChange = (value: Moment) => {
-    setDate(value);
+    animatedChangeDate(value);
     setMonthYearPickerOpened(false);
   };
 
@@ -97,7 +134,7 @@ const Home: React.FC = () => {
             colors={[theme.colors.primary]}
           />
         }
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, overflow: 'hidden' }}
       >
         <TopContainer>
           <Header
@@ -106,47 +143,56 @@ const Home: React.FC = () => {
             onTitlePress={() => setMonthYearPickerOpened(true)}
             actions={[
               {
+                icon: 'undo',
+                onPress: () => animatedChangeDate(NOW),
+                hidden: isCurrentMonth,
+              },
+              {
                 icon: hideValues ? 'visibility-off' : 'visibility',
                 onPress: () => setHideValues(!hideValues),
               },
             ]}
             hideGoBackIcon={true}
           />
-          <Text variant="light" color="textWhite">
-            Atualizado em {lastUpdateDate}
-          </Text>
-          <BalanceLine>
-            <Text color="textWhite">Saldo das contas</Text>
-            <BalanceFillLine />
-            <Money value={totalBalance} color="textWhite" />
-          </BalanceLine>
-          <BalanceLine>
-            <Text color="textWhite">Fatura dos cartões</Text>
-            <BalanceFillLine />
-            <Money value={-1 * totalInvoice} color="textWhite" />
-          </BalanceLine>
-          <BalanceLine>
-            <Text color="textWhite">Investimentos</Text>
-            <BalanceFillLine />
-            <Money value={totalInvestment} color="textWhite" />
-          </BalanceLine>
-          <BalanceLine>
-            <Text variant="title" color="textWhite">
-              Total
-            </Text>
-            <BalanceFillLine />
-            <Money
-              value={totalBalance + totalInvestment - totalInvoice}
-              variant="title"
-              color="textWhite"
-            />
-          </BalanceLine>
-          <ConnectionsButton
-            text="Ver minhas conexões"
-            color="secondary"
-            icon="account-balance"
-            onPress={() => navigation.navigate('connections')}
-          />
+          {isCurrentMonth && (
+            <BalanceContainer>
+              <Text variant="light" color="textWhite">
+                Atualizado em {lastUpdateDate}
+              </Text>
+              <BalanceLine>
+                <Text color="textWhite">Saldo das contas</Text>
+                <BalanceFillLine />
+                <Money value={totalBalance} color="textWhite" />
+              </BalanceLine>
+              <BalanceLine>
+                <Text color="textWhite">Fatura dos cartões</Text>
+                <BalanceFillLine />
+                <Money value={-1 * totalInvoice} color="textWhite" />
+              </BalanceLine>
+              <BalanceLine>
+                <Text color="textWhite">Investimentos</Text>
+                <BalanceFillLine />
+                <Money value={totalInvestment} color="textWhite" />
+              </BalanceLine>
+              <BalanceLine>
+                <Text variant="title" color="textWhite">
+                  Total
+                </Text>
+                <BalanceFillLine />
+                <Money
+                  value={totalBalance + totalInvestment - totalInvoice}
+                  variant="title"
+                  color="textWhite"
+                />
+              </BalanceLine>
+              <ConnectionsButton
+                text="Ver minhas conexões"
+                color="secondary"
+                icon="account-balance"
+                onPress={() => navigation.navigate('connections')}
+              />
+            </BalanceContainer>
+          )}
         </TopContainer>
         <BottomSheet>
           <FlexContainer gap={16}>
@@ -180,15 +226,16 @@ const Home: React.FC = () => {
               onPress={() => navigation.navigate('transactions')}
             />
           </TransactionsListHeader>
-          <FlexContainer gap={24}>
+          <TransactionListContainer onLayout={onTransactionListLayout}>
             {lastTransactions.map((item, index) => (
               <TransactionListItem item={item} key={index} />
             ))}
-          </FlexContainer>
+          </TransactionListContainer>
         </BottomSheet>
       </ScrollView>
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
+        selectedDate={date}
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />

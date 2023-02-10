@@ -14,10 +14,13 @@ export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
   flex-grow: 1;
 `;
 
+export const BalanceContainer = styled(FlexContainer).attrs({ gap: 12 })`
+  margin-top: 8px;
+`;
+
 export const BalanceLine = styled.View`
   flex-direction: row;
   align-items: baseline;
-  margin-bottom: 12px;
 `;
 
 export const BalanceFillLine = styled.View`
@@ -49,4 +52,8 @@ export const TransactionsListHeader = styled.View`
 
 export const SeeMoreTransactionsButton = styled(TextButton)`
   height: 100%;
+`;
+
+export const TransactionListContainer = styled(FlexContainer).attrs({ gap: 24 })`
+  flex: 1;
 `;

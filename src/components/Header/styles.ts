@@ -4,7 +4,6 @@ import FlexContainer from '../FlexContainer';
 export const Container = styled.View`
   flex-direction: row;
   align-items: center;
-  padding-bottom: 8px;
   background-color: ${({ theme }) => theme.colors.primary};
 `;
 
