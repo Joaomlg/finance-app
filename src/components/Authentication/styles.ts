@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export const Container = styled.SafeAreaView`
   flex: 1;
@@ -10,17 +9,11 @@ export const SpashImage = styled.Image`
   width: 100%;
 `;
 
-export const AuthButtonContainer = styled.View`
+export const AuthButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.9 })`
   position: absolute;
-  bottom: 100px;
+  bottom: 50px;
   align-self: center;
-`;
-
-export const AuthButton = styled(MaterialIcons.Button)`
-  padding: 12px;
-`;
-
-export const AuthButtonText = styled.Text`
-  font-weight: bold;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.white};
+  padding: 24px;
+  border-radius: 48px;
 `;

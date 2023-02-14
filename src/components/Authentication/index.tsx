@@ -1,6 +1,7 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 import React, { useCallback, useEffect, useState } from 'react';
-import { AuthButton, AuthButtonContainer, AuthButtonText, Container, SpashImage } from './styles';
+import Text from '../Text';
+import { AuthButton, Container, SpashImage } from './styles';
 
 export type AuthenticateProps = {
   children: React.ReactNode;
@@ -41,11 +42,9 @@ const AuthenticationProvider: React.FC<AuthenticateProps> = ({ children }) => {
   ) : (
     <Container>
       <SpashImage source={require('../../assets/splash.png')} />
-      <AuthButtonContainer>
-        <AuthButton name="lock" onPress={authenticationRoutine}>
-          <AuthButtonText>Usar senha do telefone</AuthButtonText>
-        </AuthButton>
-      </AuthButtonContainer>
+      <AuthButton onPress={authenticationRoutine}>
+        <Text variant="title">Usar senha do telefone</Text>
+      </AuthButton>
     </Container>
   );
 };

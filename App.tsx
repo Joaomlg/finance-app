@@ -9,7 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
-import React, { useCallback, useState } from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
@@ -33,9 +33,9 @@ export default function App() {
 
   const theme = light;
 
-  const onLayoutRootView = useCallback(async () => {
+  useEffect(() => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
@@ -50,7 +50,7 @@ export default function App() {
           <HooksProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <BottomSheetModalProvider>
-                <SafeAreaView onLayout={onLayoutRootView} style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }}>
                   <StatusBar style="light" backgroundColor={theme.colors.primary} />
                   <Routes />
                   <Toast />
