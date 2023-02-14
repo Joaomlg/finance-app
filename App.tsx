@@ -10,7 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
 import React, { useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
@@ -18,6 +18,7 @@ import AuthenticationProvider from './src/components/Authentication';
 import { AppContextProvider } from './src/contexts/AppContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
+import dark from './src/theme/dark';
 import light from './src/theme/light';
 
 moment.locale('pt-BR');
@@ -31,7 +32,9 @@ export default function App() {
     Inter_700Bold,
   });
 
-  const theme = light;
+  const colorScheme = useColorScheme();
+
+  const theme = colorScheme === 'dark' ? dark : light;
 
   useEffect(() => {
     if (fontsLoaded) {
