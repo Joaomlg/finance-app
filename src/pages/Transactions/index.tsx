@@ -1,22 +1,11 @@
-import moment from 'moment';
-import React, { useCallback, useContext, useRef } from 'react';
-import { ListRenderItemInfo, RefreshControl } from 'react-native';
-import { useTheme } from 'styled-components/native';
-import Divider from '../../components/Divider';
-import Money from '../../components/Money';
+import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
-import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../services/pluggy';
 import { formatMonthYearDate } from '../../utils/date';
-import {
-  ListHeaderContainer,
-  ListSeparatorContainer,
-  ListSeparatorDate,
-  StyledHeader,
-  StyledTransactionListItem,
-  TransactionList,
-} from './styles';
+import { StyledHeader } from './styles';
+import TransactionList from './TransactionList';
+import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
 
 const Transactions: React.FC = () => {
   const {
@@ -26,60 +15,49 @@ const Transactions: React.FC = () => {
     transactions,
     fetchTransactions,
     date,
+    incomeTransactions,
     totalIncomes,
+    expenseTransactions,
     totalExpenses,
   } = useContext(AppContext);
 
-  const theme = useTheme();
+  const renderScene = useCallback(
+    ({ route }: { route: TransactionTabsRoute }) => {
+      let data: Transaction[];
+      let balance: number;
 
-  const ItemDividerPreviousDateRef = useRef(moment(0));
+      switch (route.key) {
+        case 'incomes':
+          data = incomeTransactions;
+          balance = totalIncomes;
+          break;
+        case 'expenses':
+          data = expenseTransactions;
+          balance = totalExpenses;
+          break;
+        default:
+          data = transactions;
+          balance = totalIncomes - totalExpenses;
+      }
 
-  const renderHeaderComponent = useCallback(() => {
-    return (
-      <ListHeaderContainer>
-        <Text variant="light" color="textLight">
-          {transactions.length} transações
-        </Text>
-        <Money variant="heading" value={totalIncomes - totalExpenses} />
-      </ListHeaderContainer>
-    );
-  }, [transactions, totalIncomes, totalExpenses]);
-
-  const renderListItemSeparator = useCallback((transaction: Transaction, index: number) => {
-    const date = moment(transaction.date).startOf('day');
-
-    const component =
-      index === 0 || date.isBefore(ItemDividerPreviousDateRef.current, 'day') ? (
-        <ListSeparatorContainer>
-          <ListSeparatorDate>
-            <Text variant="title" color="textLight">
-              {date.format('DD')}
-            </Text>
-            <Text variant="light" color="textLight">
-              {date.format('MMM')}
-            </Text>
-          </ListSeparatorDate>
-          <Divider />
-        </ListSeparatorContainer>
-      ) : (
-        <></>
-      );
-
-    ItemDividerPreviousDateRef.current = date;
-
-    return component;
-  }, []);
-
-  const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<Transaction>) => {
       return (
-        <>
-          {renderListItemSeparator(item, index)}
-          <StyledTransactionListItem key={index} item={item} />
-        </>
+        <TransactionList
+          isLoading={isLoading}
+          onRefresh={fetchTransactions}
+          transactions={data}
+          reducedValue={balance}
+        />
       );
     },
-    [renderListItemSeparator],
+    [
+      expenseTransactions,
+      fetchTransactions,
+      incomeTransactions,
+      isLoading,
+      totalExpenses,
+      totalIncomes,
+      transactions,
+    ],
   );
 
   return (
@@ -93,19 +71,7 @@ const Transactions: React.FC = () => {
           },
         ]}
       />
-      <TransactionList
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={fetchTransactions}
-            colors={[theme.colors.primary]}
-          />
-        }
-        data={transactions}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={renderHeaderComponent}
-      />
+      <TransactionTabs renderScene={renderScene} />
     </ScreenContainer>
   );
 };

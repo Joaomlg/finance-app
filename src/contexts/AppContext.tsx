@@ -40,7 +40,9 @@ export type AppContextValue = {
   totalBalance: number;
   totalInvoice: number;
   totalInvestment: number;
+  incomeTransactions: Transaction[];
   totalIncomes: number;
+  expenseTransactions: Transaction[];
   totalExpenses: number;
 };
 
@@ -99,23 +101,26 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [investments],
   );
 
-  const totalIncomes = useMemo(
-    () =>
-      transactions.reduce(
-        (total, transaction) =>
-          transaction.type === 'CREDIT' ? total + Math.abs(transaction.amount) : total,
-        0,
-      ),
+  const incomeTransactions = useMemo(
+    () => transactions.filter(({ type }) => type === 'CREDIT'),
     [transactions],
   );
+
+  const totalIncomes = useMemo(
+    () =>
+      incomeTransactions.reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
+    [incomeTransactions],
+  );
+
+  const expenseTransactions = useMemo(
+    () => transactions.filter(({ type }) => type === 'DEBIT'),
+    [transactions],
+  );
+
   const totalExpenses = useMemo(
     () =>
-      transactions.reduce(
-        (total, transaction) =>
-          transaction.type === 'DEBIT' ? total + Math.abs(transaction.amount) : total,
-        0,
-      ),
-    [transactions],
+      expenseTransactions.reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
+    [expenseTransactions],
   );
 
   const storeItem = useCallback(
@@ -352,7 +357,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         totalBalance,
         totalInvoice,
         totalInvestment,
+        incomeTransactions,
         totalIncomes,
+        expenseTransactions,
         totalExpenses,
       }}
     >
