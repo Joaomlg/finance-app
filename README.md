@@ -1,9 +1,9 @@
-<h1 align="center" style="display: flex; align-items: center; justify-content: center">
-  <img height="50px" src="src/assets/adaptive-icon.png"></img>
+<h1 align="center">
+  <div><img height="164" src="src/assets/adaptive-icon.png"></img><div>
   Finans
 </h1>
 
-<p align="center">An open finance mobile app built using React Native.</p>
+<p align="center">An Open Finance mobile app built using React Native and Expo.</p>
 
 ## About
 
@@ -14,7 +14,7 @@
 You can see the layout of this project in [Figma](https://www.figma.com/file/OMrKC7nSHrZgWkkyxPCTud/finance-app).
 
 <h4 align="center">
-  <img src=".github/assets/design.png" width="800px"></img>
+  <img src=".github/assets/design.png" width="600px"></img>
 </h4>
 
 ## 🛠 Tools
