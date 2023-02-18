@@ -71,6 +71,8 @@ const Home: React.FC = () => {
 
   const incomesBarGrow = totalIncomes >= totalExpenses ? 1 : totalIncomes / totalExpenses;
   const expensesBarGrow = totalExpenses >= totalIncomes ? 1 : totalExpenses / totalIncomes;
+  const expensesSurplusGrow =
+    totalIncomes >= totalExpenses ? 0 : (totalExpenses - totalIncomes) / totalExpenses;
 
   const lastTransactions = useMemo(() => {
     const amount = Math.max(transactionListCapacity, TRANSACTION_LIST_MIN_CAPACITY);
@@ -210,7 +212,11 @@ const Home: React.FC = () => {
             <FlexContainer gap={12}>
               <Text variant="default-bold">Saídas</Text>
               <HorizontalBarContainer>
-                <HorizontalBar color="expense" grow={expensesBarGrow} />
+                <HorizontalBar
+                  color="expense"
+                  grow={expensesBarGrow}
+                  surplusGrow={expensesSurplusGrow}
+                />
                 <Money value={totalExpenses} />
               </HorizontalBarContainer>
             </FlexContainer>

@@ -1,26 +1,39 @@
 import React, { useContext } from 'react';
-import { View, ViewProps } from 'react-native';
+import { ViewProps } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../contexts/AppContext';
 import light from '../../theme/light';
+import { BarContainer, Bar } from './styles';
 
 export interface HorizontalBarProps extends ViewProps {
   color: keyof typeof light.colors;
   grow?: number;
+  surplusGrow?: number;
 }
 
-const HorizontalBar: React.FC<HorizontalBarProps> = ({ grow, color, style, ...viewProps }) => {
+const HorizontalBar: React.FC<HorizontalBarProps> = ({
+  grow,
+  color,
+  surplusGrow,
+  ...viewProps
+}) => {
   const { hideValues } = useContext(AppContext);
 
   const theme = useTheme();
 
-  const backgroundColor = hideValues ? theme.colors.lightGray : theme.colors[color];
+  const barColor = hideValues ? theme.colors.lightGray : theme.colors[color];
 
-  const flexGrow = hideValues ? 1 : grow || 1;
+  const containerGrow = hideValues ? 1 : grow || 1;
 
-  const barStyle = { backgroundColor, height: 12, borderRadius: 12, flexGrow };
+  const surplusBarGrow = hideValues || !surplusGrow ? 0 : surplusGrow;
+  const mainBarGrow = 1 - surplusBarGrow;
 
-  return <View style={[style, barStyle]} {...viewProps} />;
+  return (
+    <BarContainer flexGrow={containerGrow} {...viewProps}>
+      <Bar backgroundColor={barColor} flexGrow={mainBarGrow} />
+      <Bar backgroundColor={theme.colors.error} flexGrow={surplusBarGrow} />
+    </BarContainer>
+  );
 };
 
 export default HorizontalBar;
