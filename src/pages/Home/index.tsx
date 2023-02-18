@@ -55,6 +55,7 @@ const Home: React.FC = () => {
     hideValues,
     date,
     setDate,
+    minimumDateWithData,
     lastUpdateDate,
     setHideValues,
     updateItems,
@@ -242,6 +243,7 @@ const Home: React.FC = () => {
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
         selectedDate={date}
+        minimumDate={minimumDateWithData}
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />

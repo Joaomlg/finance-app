@@ -20,6 +20,7 @@ export type AppContextValue = {
   setHideValues: (value: boolean) => void;
   date: Moment;
   setDate: (value: Moment) => void;
+  minimumDateWithData: Moment;
   lastUpdateDate: string;
   items: Item[];
   storeItem: (item: Item) => Promise<void>;
@@ -122,6 +123,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       expenseTransactions.reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
     [expenseTransactions],
   );
+
+  const minimumDateWithData = useMemo(() => {
+    const firstItemCreatedAt = items.reduce((minDate, item) => {
+      const createdAt = moment(new Date(item.createdAt));
+      return createdAt.isBefore(minDate) ? createdAt : minDate;
+    }, now.clone());
+
+    return firstItemCreatedAt.subtract(1, 'year');
+  }, [items]);
 
   const storeItem = useCallback(
     async (item: Item) => {
@@ -337,6 +347,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setHideValues,
         date,
         setDate,
+        minimumDateWithData,
         lastUpdateDate,
         items,
         storeItem,

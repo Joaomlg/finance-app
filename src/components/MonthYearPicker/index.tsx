@@ -10,6 +10,7 @@ import { ActionButton, Card, Content, Header, MonthButton, Overlay } from './sty
 type MonthYearPickerProps = {
   isOpen: boolean;
   selectedDate: Moment;
+  minimumDate: Moment;
   onChange?: (value: Moment) => void;
   onClose?: () => void;
 };
@@ -22,6 +23,7 @@ const currentYearNumber = parseInt(now.format('YYYY'));
 const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
   isOpen,
   selectedDate,
+  minimumDate,
   onChange,
   onClose,
 }) => {
@@ -31,6 +33,9 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
   const selectedMonth = parseInt(selectedDate.format('M'));
   const selectedYear = parseInt(selectedDate.format('YYYY'));
+
+  const minimumDateMonth = parseInt(minimumDate.format('M'));
+  const minimumDateYear = parseInt(minimumDate.format('YYYY'));
 
   const prevYear = () => setDisplayedYear(displayedYear - 1);
   const nextYear = () => setDisplayedYear(displayedYear + 1);
@@ -53,7 +58,8 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
       const currentMonthIndex = i + 1;
 
       const isDisabled =
-        displayedYear >= currentYearNumber && currentMonthIndex > currentMonthNumber;
+        (displayedYear >= currentYearNumber && currentMonthIndex > currentMonthNumber) ||
+        (displayedYear <= minimumDateYear && currentMonthIndex < minimumDateMonth);
 
       const isSelected = displayedYear === selectedYear && currentMonthIndex === selectedMonth;
 
@@ -93,7 +99,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
           }}
         >
           <Header>
-            <ActionButton onPress={prevYear}>
+            <ActionButton onPress={prevYear} disabled={displayedYear <= minimumDateYear}>
               <MaterialIcons name="navigate-before" size={32} color={theme.colors.secondary} />
             </ActionButton>
             <Text variant="heading" color="primary">
