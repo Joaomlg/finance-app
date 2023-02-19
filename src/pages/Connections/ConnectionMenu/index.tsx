@@ -1,6 +1,9 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import React, { useMemo } from 'react';
-import { useTheme } from 'styled-components/native';
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+} from '@gorhom/bottom-sheet';
+import React, { useCallback, useMemo } from 'react';
 import Divider from '../../../components/Divider';
 import Text from '../../../components/Text';
 import { Container, MenuIcon, MenuItem } from './styles';
@@ -15,16 +18,23 @@ const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetModal, Connectio
   { onPress },
   ref,
 ) => {
-  const theme = useTheme();
-
   const snapPoints = useMemo(() => [200], []);
 
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.3}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
   return (
-    <BottomSheetModal
-      ref={ref}
-      snapPoints={snapPoints}
-      containerStyle={{ backgroundColor: theme.colors.overlay }}
-    >
+    <BottomSheetModal ref={ref} snapPoints={snapPoints} backdropComponent={renderBackdrop}>
       <Container>
         <MenuItem onPress={() => onPress('update')}>
           <>
