@@ -27,7 +27,7 @@ export type AppContextValue = {
   deleteItem: (item: Item) => Promise<void>;
   fetchItems: () => Promise<void>;
   fetchingItems: boolean;
-  updateItems: () => Promise<void>;
+  updateItems: () => Promise<boolean>;
   updatingItems: boolean;
   accounts: Account[];
   fetchAccounts: () => Promise<void>;
@@ -185,6 +185,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const updateItems = useCallback(async () => {
     setUpdatingItems(true);
 
+    let success = true;
+
     try {
       const itemList = await Promise.all(
         itemsId.map(async (id) => {
@@ -198,17 +200,21 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           return item;
         }),
       );
+
       setItems(itemList);
+
+      const updateDate = now.format(LastUpdateDateFormat);
+      await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
+
+      setLastUpdateDate(updateDate);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível sincronizar as conexões!' });
+      success = false;
     }
 
     setUpdatingItems(false);
 
-    const updateDate = now.format(LastUpdateDateFormat);
-    await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
-
-    setLastUpdateDate(updateDate);
+    return success;
   }, [pluggyService, itemsId]);
 
   const fetchAccounts = useCallback(async () => {
@@ -315,13 +321,17 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const fetchOrUpdateItems = async () => {
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
-      const shouldUpdate = updateDate
-        ? now.isAfter(moment(updateDate, LastUpdateDateFormat), 'day')
-        : true;
+      const shouldUpdate = true;
+
+      let updatedSuccess = true;
 
       if (shouldUpdate) {
-        await updateItems();
-      } else {
+        updatedSuccess = await updateItems();
+      }
+
+      const shouldFetchItems = !shouldUpdate || !updatedSuccess;
+
+      if (shouldFetchItems) {
         setLastUpdateDate(updateDate as string);
         await fetchItems();
       }
