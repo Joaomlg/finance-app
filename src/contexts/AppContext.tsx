@@ -321,7 +321,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const fetchOrUpdateItems = async () => {
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
-      const shouldUpdate = true;
+      const shouldUpdate = updateDate
+        ? now.isAfter(moment(updateDate, LastUpdateDateFormat), 'day')
+        : true;
 
       let updatedSuccess = true;
 
