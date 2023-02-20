@@ -34,6 +34,7 @@ import {
   TopContainer,
   TransactionListContainer,
   SectionHeader,
+  BalanceWithTreding,
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
@@ -208,15 +209,17 @@ const Home: React.FC = () => {
               <Text variant="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
             </SectionHeader>
-            <Text>
-              Saldo: <Money value={balance} variant="default-bold" />{' '}
+            <BalanceWithTreding>
+              <Text>
+                Saldo: <Money value={balance} variant="default-bold" />
+              </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
-                  <MaterialIcons name="trending-up" color={theme.colors.income} size={14} />
+                  <MaterialIcons name="trending-up" color={theme.colors.income} size={16} />
                 ) : (
-                  <MaterialIcons name="trending-down" color={theme.colors.error} size={14} />
+                  <MaterialIcons name="trending-down" color={theme.colors.error} size={16} />
                 ))}
-            </Text>
+            </BalanceWithTreding>
             <FlexContainer gap={12}>
               <Text variant="default-bold">Entradas</Text>
               <HorizontalBarContainer>

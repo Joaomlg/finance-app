@@ -50,6 +50,10 @@ export const SectionHeader = styled.View`
   align-items: center;
 `;
 
+export const BalanceWithTreding = styled(FlexContainer).attrs({ direction: 'row', gap: 4 })`
+  align-items: center;
+`;
+
 export const SeeMoreButton = styled(TextButton).attrs({
   color: 'textLight',
   icon: 'navigate-next',
