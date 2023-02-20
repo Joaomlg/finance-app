@@ -12,6 +12,7 @@ import { checkCurrentYear } from '../../utils/date';
 import {
   Button,
   HorizontalBarContainer,
+  MonthTrendContainer,
   StyledDivider,
   StyledFlatList,
   StyledHeader,
@@ -87,15 +88,17 @@ const History: React.FC = () => {
 
       return (
         <FlexContainer gap={12}>
-          <Text variant="heading-regular" transform="capitalize">
-            {dateText}{' '}
+          <MonthTrendContainer>
+            <Text variant="heading-regular" transform="capitalize">
+              {dateText}
+            </Text>
             {showTrendingIcon &&
               (balance > 0 ? (
                 <MaterialIcons name="trending-up" color={theme.colors.income} size={24} />
               ) : (
                 <MaterialIcons name="trending-down" color={theme.colors.error} size={24} />
               ))}
-          </Text>
+          </MonthTrendContainer>
           <Text>
             Saldo: <Money value={balance} variant="default-bold" />
           </Text>
