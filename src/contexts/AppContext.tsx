@@ -62,7 +62,7 @@ export type AppContextValue = {
 const AppContext = createContext({} as AppContextValue);
 
 const now = moment();
-const currentMonth = now.startOf('month');
+const currentMonth = moment(now).startOf('month');
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hideValues, setHideValues] = useState(false);
