@@ -339,7 +339,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const dates = range(itemsPerPage)
         .map((i) => currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'))
         .filter((date) => date.isSameOrAfter(minimumDateWithData, 'month'));
-      console.log(minimumDateWithData, dates);
+
       const results = await Promise.all(dates.map((item) => fetchMonthTransactions(item)));
 
       const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
