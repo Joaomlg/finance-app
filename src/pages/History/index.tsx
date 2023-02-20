@@ -104,7 +104,7 @@ const History: React.FC = () => {
           </Text>
           <HorizontalBarContainer>
             <StyledHorizontalBar color="income" grow={incomesBarGrow} />
-            <Money value={incomes} variant="default-bold" color="income" />
+            <Money value={incomes} variant="default-bold" color={hideValues ? 'text' : 'income'} />
           </HorizontalBarContainer>
           <HorizontalBarContainer>
             <StyledHorizontalBar
@@ -115,7 +115,7 @@ const History: React.FC = () => {
             <Money
               value={expenses}
               variant="default-bold"
-              color={balance < 0 ? 'error' : 'expense'}
+              color={hideValues ? 'text' : balance < 0 ? 'error' : 'expense'}
             />
           </HorizontalBarContainer>
         </FlexContainer>
