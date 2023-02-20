@@ -360,7 +360,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       setFetchingMonthlyBalances(false);
     },
-    [accounts, fetchMonthTransactions],
+    [accounts, fetchMonthTransactions, minimumDateWithData],
   );
 
   useEffect(() => {
