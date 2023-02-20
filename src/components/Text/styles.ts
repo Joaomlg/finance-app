@@ -18,6 +18,11 @@ export const Heading = styled(Base)`
   font-size: ${({ theme }) => theme.text.heading};
 `;
 
+export const HeadingRegular = styled(Base)`
+  font-family: ${({ theme }) => theme.font.regular};
+  font-size: ${({ theme }) => theme.text.heading};
+`;
+
 export const Title = styled(Base)`
   font-family: ${({ theme }) => theme.font.bold};
   font-size: ${({ theme }) => theme.text.title};

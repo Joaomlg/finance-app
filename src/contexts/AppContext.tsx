@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import usePluggyService from '../hooks/pluggyService';
 import { Account, Investment, Item, Transaction } from '../services/pluggy';
+import { range } from '../utils/array';
 import {
   ItemsAsyncStorageKey,
   LastUpdateDateFormat,
@@ -13,6 +14,12 @@ import {
 import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
+
+export type MonthlyBalance = {
+  date: Moment;
+  incomes: number;
+  expenses: number;
+};
 
 export type AppContextValue = {
   isLoading: boolean;
@@ -38,6 +45,11 @@ export type AppContextValue = {
   transactions: Transaction[];
   fetchTransactions: () => Promise<void>;
   fetchingTransactions: boolean;
+  monthlyBalances: MonthlyBalance[];
+  fetchMonthlyBalancesPage: (itemsPerPage: number, currentPage: number) => Promise<void>;
+  fetchingMonthlyBalances: boolean;
+  currentMonthlyBalancesPage: number;
+  setCurrentMonthlyBalancesPage: (value: number) => void;
   totalBalance: number;
   totalInvoice: number;
   totalInvestment: number;
@@ -50,6 +62,7 @@ export type AppContextValue = {
 const AppContext = createContext({} as AppContextValue);
 
 const now = moment();
+const currentMonth = now.startOf('month');
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hideValues, setHideValues] = useState(false);
@@ -72,6 +85,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
 
+  const [monthlyBalances, setMonthlyBalances] = useState([] as MonthlyBalance[]);
+  const [fetchingMonthlyBalances, setFetchingMonthlyBalances] = useState(false);
+  const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
+
   const pluggyService = usePluggyService();
 
   const isLoading =
@@ -79,7 +96,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     fetchingItems ||
     fetchingAccounts ||
     fetchingInvestments ||
-    fetchingTransactions;
+    fetchingTransactions ||
+    fetchingMonthlyBalances;
 
   const totalBalance = useMemo(
     () =>
@@ -266,17 +284,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingInvestments(false);
   }, [pluggyService, items]);
 
-  const fetchTransactions = useCallback(async () => {
-    if (accounts.length === 0) {
-      return;
-    }
+  const fetchMonthTransactions = useCallback(
+    async (monthDate: Moment) => {
+      const startDate = moment(monthDate).startOf('month');
+      const endDate = moment(monthDate).endOf('month');
 
-    const startDate = moment(date).startOf('month');
-    const endDate = moment(date).endOf('month');
-
-    setFetchingTransactions(true);
-
-    try {
       const result = await Promise.all(
         accounts
           .filter((item) => item.type !== 'CREDIT')
@@ -294,13 +306,62 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+      return transactionsList;
+    },
+    [pluggyService, accounts],
+  );
+
+  const fetchTransactions = useCallback(async () => {
+    if (accounts.length === 0) {
+      return;
+    }
+
+    setFetchingTransactions(true);
+
+    try {
+      const transactionsList = await fetchMonthTransactions(date);
       setTransactions(transactionsList);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível obter as transações!' });
     }
 
     setFetchingTransactions(false);
-  }, [pluggyService, date, accounts]);
+  }, [fetchMonthTransactions, date, accounts]);
+
+  const fetchMonthlyBalancesPage = useCallback(
+    async (itemsPerPage: number, currentPage: number) => {
+      if (accounts.length === 0) {
+        return;
+      }
+
+      setFetchingMonthlyBalances(true);
+
+      const dates = range(itemsPerPage)
+        .map((i) => currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'))
+        .filter((date) => date.isSameOrAfter(minimumDateWithData, 'month'));
+      console.log(minimumDateWithData, dates);
+      const results = await Promise.all(dates.map((item) => fetchMonthTransactions(item)));
+
+      const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
+        const incomes = transactions
+          .filter((transaction) => transaction.type === 'CREDIT')
+          .reduce((total, transaction) => total + transaction.amount, 0);
+
+        const expenses = transactions
+          .filter((transaction) => transaction.type === 'DEBIT')
+          .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+
+        return { date: dates[index], incomes, expenses };
+      });
+
+      setMonthlyBalances((current) =>
+        currentPage === 0 ? newBalances : [...current, ...newBalances],
+      );
+
+      setFetchingMonthlyBalances(false);
+    },
+    [accounts, fetchMonthTransactions],
+  );
 
   useEffect(() => {
     const loadItemsId = async () => {
@@ -351,6 +412,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     fetchTransactions();
   }, [accounts, fetchTransactions]);
 
+  useEffect(() => {
+    setMonthlyBalances([]);
+    setCurrentMonthlyBalancesPage(0);
+  }, [accounts]);
+
   return (
     <AppContext.Provider
       value={{
@@ -377,6 +443,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         transactions,
         fetchTransactions,
         fetchingTransactions,
+        monthlyBalances,
+        fetchMonthlyBalancesPage,
+        fetchingMonthlyBalances,
+        currentMonthlyBalancesPage,
+        setCurrentMonthlyBalancesPage,
         totalBalance,
         totalInvoice,
         totalInvestment,

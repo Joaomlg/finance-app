@@ -2,12 +2,22 @@ import React from 'react';
 import { TextProps as RNTextProps, TextStyle } from 'react-native';
 import { useTheme } from 'styled-components';
 import light from '../../theme/light';
-import { Default, DefaultBold, ExtraLight, Heading, Light, LightBold, Title } from './styles';
+import {
+  Default,
+  DefaultBold,
+  ExtraLight,
+  Heading,
+  HeadingRegular,
+  Light,
+  LightBold,
+  Title,
+} from './styles';
 
 const TextVariants = [
   'default',
   'default-bold',
   'heading',
+  'heading-regular',
   'title',
   'light',
   'light-bold',
@@ -35,6 +45,8 @@ const Text: React.FC<TextProps> = ({ variant, color, style, transform, ...rnProp
       return <DefaultBold {...props} />;
     case 'heading':
       return <Heading {...props} />;
+    case 'heading-regular':
+      return <HeadingRegular {...props} />;
     case 'title':
       return <Title {...props} />;
     case 'light':

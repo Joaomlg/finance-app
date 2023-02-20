@@ -9,6 +9,7 @@ export declare global {
           }
         | undefined;
       transactions: undefined;
+      history: undefined;
     }
   }
 }

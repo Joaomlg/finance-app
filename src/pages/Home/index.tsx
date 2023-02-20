@@ -30,10 +30,10 @@ import {
   ConnectionsButton,
   Divider,
   HorizontalBarContainer,
-  SeeMoreTransactionsButton,
+  SeeMoreButton,
   TopContainer,
   TransactionListContainer,
-  TransactionsListHeader,
+  SectionHeader,
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
@@ -204,7 +204,10 @@ const Home: React.FC = () => {
         </TopContainer>
         <BottomSheet>
           <FlexContainer gap={16}>
-            <Text variant="title">Resumo do mês</Text>
+            <SectionHeader>
+              <Text variant="title">Resumo do mês</Text>
+              <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
+            </SectionHeader>
             <Text>
               Saldo: <Money value={balance} variant="default-bold" />{' '}
               {showTrendingIcon &&
@@ -234,16 +237,10 @@ const Home: React.FC = () => {
             </FlexContainer>
           </FlexContainer>
           <Divider />
-          <TransactionsListHeader>
+          <SectionHeader>
             <Text variant="title">Últimas transações</Text>
-            <SeeMoreTransactionsButton
-              text="Ver mais"
-              color="textLight"
-              icon="navigate-next"
-              iconGap={0}
-              onPress={() => navigation.navigate('transactions')}
-            />
-          </TransactionsListHeader>
+            <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
+          </SectionHeader>
           <TransactionListContainer onLayout={onTransactionListLayout}>
             {lastTransactions.map((item, index) => (
               <TransactionListItem item={item} key={index} />

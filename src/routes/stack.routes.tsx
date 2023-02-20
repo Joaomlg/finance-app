@@ -1,8 +1,9 @@
-import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 import Connect from '../pages/Connect';
-import Home from '../pages/Home';
 import Connections from '../pages/Connections';
+import History from '../pages/History';
+import Home from '../pages/Home';
 import Transactions from '../pages/Transactions';
 
 export type StackRouteParamList = {
@@ -10,6 +11,7 @@ export type StackRouteParamList = {
   connections: undefined;
   connect: { updateItemId?: string };
   transactions: undefined;
+  history: undefined;
 };
 
 const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamList>();
@@ -22,6 +24,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="connections" component={Connections} />
         <Screen name="connect" component={Connect} />
         <Screen name="transactions" component={Transactions} />
+        <Screen name="history" component={History} />
       </Group>
     </Navigator>
   );
