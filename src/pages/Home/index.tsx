@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
@@ -69,6 +70,10 @@ const Home: React.FC = () => {
   } = useContext(AppContext);
 
   const isCurrentMonth = checkCurrentMonth(date);
+
+  const balance = totalIncomes - totalExpenses;
+
+  const showTrendingIcon = !hideValues && balance !== 0;
 
   const incomesBarGrow = totalIncomes >= totalExpenses ? 1 : totalIncomes / totalExpenses;
   const expensesBarGrow = totalExpenses >= totalIncomes ? 1 : totalExpenses / totalIncomes;
@@ -201,7 +206,13 @@ const Home: React.FC = () => {
           <FlexContainer gap={16}>
             <Text variant="title">Resumo do mês</Text>
             <Text>
-              Saldo: <Money value={totalIncomes - totalExpenses} variant="default-bold" />
+              Saldo: <Money value={balance} variant="default-bold" />{' '}
+              {showTrendingIcon &&
+                (balance > 0 ? (
+                  <MaterialIcons name="trending-up" color={theme.colors.income} size={14} />
+                ) : (
+                  <MaterialIcons name="trending-down" color={theme.colors.error} size={14} />
+                ))}
             </Text>
             <FlexContainer gap={12}>
               <Text variant="default-bold">Entradas</Text>
