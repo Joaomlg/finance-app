@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import FlexContainer from '../../components/FlexContainer';
@@ -24,6 +24,8 @@ import {
 const ITEMS_PER_PAGE = 4;
 
 const History: React.FC = () => {
+  const [isLoadingMore, setLoadingMore] = useState(false);
+
   const {
     isLoading,
     hideValues,
@@ -76,6 +78,12 @@ const History: React.FC = () => {
     },
     [navigation, setDate],
   );
+
+  const handleLoadMore = useCallback(async () => {
+    setLoadingMore(true);
+    await fetchPage(currentMonthlyBalancesPage);
+    setLoadingMore(false);
+  }, [currentMonthlyBalancesPage, fetchPage]);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<MonthlyBalance>) => {
@@ -140,7 +148,7 @@ const History: React.FC = () => {
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 && canLoadMore ? (
-        <Button onPress={() => fetchPage(currentMonthlyBalancesPage)}>
+        <Button onPress={handleLoadMore}>
           {isLoading ? (
             <ActivityIndicator size={24} color={theme.colors.textWhite} />
           ) : (
@@ -150,14 +158,7 @@ const History: React.FC = () => {
           )}
         </Button>
       ) : null,
-    [
-      canLoadMore,
-      currentMonthlyBalancesPage,
-      fetchPage,
-      isLoading,
-      monthlyBalances.length,
-      theme.colors.textWhite,
-    ],
+    [canLoadMore, handleLoadMore, isLoading, monthlyBalances, theme],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -178,7 +179,7 @@ const History: React.FC = () => {
       <StyledFlatList
         refreshControl={
           <RefreshControl
-            refreshing={isLoading || false}
+            refreshing={isLoading && !isLoadingMore}
             onRefresh={handleRefresh}
             colors={[theme.colors.primary]}
           />
