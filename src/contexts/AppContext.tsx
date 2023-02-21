@@ -201,6 +201,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [pluggyService, itemsId]);
 
   const updateItems = useCallback(async () => {
+    if (itemsId.length === 0) {
+      return;
+    }
+
     setUpdatingItems(true);
 
     let success = true;
