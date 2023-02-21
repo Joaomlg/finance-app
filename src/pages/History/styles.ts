@@ -22,9 +22,17 @@ export const StyledFlatList = styled(
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
 `;
 
+export const ItemHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 export const MonthTrendContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 8 })`
   align-items: center;
 `;
+
+export const TouchableIconContainer = styled.TouchableOpacity``;
 
 export const HorizontalBarContainer = styled.View`
   flex-direction: row;

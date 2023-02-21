@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Moment } from 'moment';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
@@ -7,23 +7,19 @@ import FlexContainer from '../../components/FlexContainer';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
-import AppContext from '../../contexts/AppContext';
+import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
 import {
   Button,
   HorizontalBarContainer,
+  ItemHeader,
   MonthTrendContainer,
   StyledDivider,
   StyledFlatList,
   StyledHeader,
   StyledHorizontalBar,
+  TouchableIconContainer,
 } from './styles';
-
-export type MonthBalance = {
-  date: Moment;
-  incomes: number;
-  expenses: number;
-};
 
 const ITEMS_PER_PAGE = 4;
 
@@ -37,9 +33,11 @@ const History: React.FC = () => {
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
     minimumDateWithData,
+    setDate,
   } = useContext(AppContext);
 
   const theme = useTheme();
+  const navigation = useNavigation();
 
   const maxAmount = useMemo(() => {
     return monthlyBalances.reduce(
@@ -71,8 +69,16 @@ const History: React.FC = () => {
     }
   }, [currentMonthlyBalancesPage, fetchPage]);
 
+  const handleItemPress = useCallback(
+    (item: MonthlyBalance) => {
+      navigation.navigate('transactions');
+      setDate(item.date);
+    },
+    [navigation, setDate],
+  );
+
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<MonthBalance>) => {
+    ({ item }: ListRenderItemInfo<MonthlyBalance>) => {
       const { date, incomes, expenses } = item;
 
       const dateText = checkCurrentYear(date) ? date.format('MMMM') : date.format('MMMM YYYY');
@@ -88,17 +94,22 @@ const History: React.FC = () => {
 
       return (
         <FlexContainer gap={12}>
-          <MonthTrendContainer>
-            <Text variant="heading-regular" transform="capitalize">
-              {dateText}
-            </Text>
-            {showTrendingIcon &&
-              (balance > 0 ? (
-                <MaterialIcons name="trending-up" color={theme.colors.income} size={24} />
-              ) : (
-                <MaterialIcons name="trending-down" color={theme.colors.error} size={24} />
-              ))}
-          </MonthTrendContainer>
+          <ItemHeader>
+            <MonthTrendContainer>
+              <Text variant="heading-regular" transform="capitalize">
+                {dateText}
+              </Text>
+              {showTrendingIcon &&
+                (balance > 0 ? (
+                  <MaterialIcons name="trending-up" color={theme.colors.income} size={24} />
+                ) : (
+                  <MaterialIcons name="trending-down" color={theme.colors.error} size={24} />
+                ))}
+            </MonthTrendContainer>
+            <TouchableIconContainer onPress={() => handleItemPress(item)}>
+              <MaterialIcons name="navigate-next" color={theme.colors.primary} size={28} />
+            </TouchableIconContainer>
+          </ItemHeader>
           <Text>
             Saldo: <Money value={balance} variant="default-bold" />
           </Text>
@@ -121,7 +132,7 @@ const History: React.FC = () => {
         </FlexContainer>
       );
     },
-    [hideValues, theme, maxAmount],
+    [hideValues, theme, maxAmount, handleItemPress],
   );
 
   const renderItemSeparator = useCallback(() => <StyledDivider />, []);
