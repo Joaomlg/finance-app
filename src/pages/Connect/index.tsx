@@ -1,13 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import { PluggyConnect } from 'react-native-pluggy-connect';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import AppContext from '../../contexts/AppContext';
-import usePluggyService from '../../hooks/pluggyService';
+import BelvoWidget from '../../components/BelvoWidget';
+import useBelvo from '../../hooks/useBelvo';
 import { StackRouteParamList } from '../../routes/stack.routes';
-import { Item } from '../../services/pluggy';
 
 import { Container } from './styles';
 
@@ -17,28 +15,20 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
 }) => {
   const updateItemId = route.params?.updateItemId;
 
-  const [connectToken, setConnectToken] = useState('');
+  const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { storeItem } = useContext(AppContext);
-
-  const pluggyService = usePluggyService();
+  const belvoClient = useBelvo();
   const theme = useTheme();
 
-  const handleOnSuccess = async (data: { item: Item }) => {
-    const { item } = data;
-
-    await storeItem(item);
-
+  const handleOnSuccess = async () => {
+    Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
     navigation.goBack();
   };
 
-  const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
-    const { data } = error;
-
-    if (data) {
-      await storeItem(data.item);
-    }
+  const handleOnError = async () => {
+    Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });
+    navigation.goBack();
   };
 
   const handleOnClose = () => {
@@ -46,34 +36,42 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   };
 
   useEffect(() => {
-    const createConnectToken = async () => {
+    const createWidgetToken = async () => {
       try {
-        const { accessToken } = await pluggyService.createConnectToken(updateItemId);
-        setConnectToken(accessToken);
+        const { access: token } = await belvoClient.widgetToken.create();
+        setWidgetToken(token);
       } catch (error) {
-        Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });
+        Toast.show({
+          type: 'error',
+          text1: 'Não foi possível autenticar no serviço!',
+          text2: 'Tente novamente em breve.',
+        });
         navigation.goBack();
       }
       setIsLoading(false);
     };
 
-    createConnectToken();
-  }, [pluggyService, updateItemId, navigation]);
+    createWidgetToken();
+  }, [belvoClient, updateItemId, navigation]);
 
   return (
     <Container>
       {isLoading ? (
         <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
-        <PluggyConnect
-          connectToken={connectToken}
-          includeSandbox={__DEV__}
-          countries={['BR']}
-          connectorTypes={['PERSONAL_BANK', 'INVESTMENT']}
+        <BelvoWidget
+          token={widgetToken}
+          options={{
+            locale: 'pt',
+            country_codes: ['BR'],
+            external_id: undefined,
+            show_close_dialog: false,
+            show_abandon_survey: false,
+            social_proof: false,
+          }}
           onSuccess={handleOnSuccess}
           onError={handleOnError}
           onClose={handleOnClose}
-          updateItem={updateItemId}
         />
       )}
     </Container>
