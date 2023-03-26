@@ -1,4 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
+import base64 from 'react-native-base64';
+import { PageResponse } from './types';
 
 type Parameters = {
   [key: string]: number | number[] | string | string[] | boolean | undefined;
@@ -18,14 +20,13 @@ class APISession {
     this._keyId = secretKeyId;
     this._keyPassword = secretKeyPassword;
 
+    const authHeader = 'Basic ' + base64.encode(`${secretKeyId}:${secretKeyPassword}`);
+
     this.session = axios.create({
       baseURL: url,
       headers: {
         'Content-Type': 'application/json',
-      },
-      auth: {
-        username: secretKeyId,
-        password: secretKeyPassword,
+        Authorization: authHeader,
       },
     });
   }
@@ -40,7 +41,7 @@ class APISession {
   async *getAll<T>(url: string, params: Parameters = {}): AsyncGenerator<T> {
     const {
       data: { results, next },
-    } = await this.session.get(url, { params });
+    } = await this.session.get<PageResponse<T>>(url, { params });
 
     for (const item of results) {
       yield item;
@@ -88,7 +89,7 @@ class APISession {
    * @returns {object}
    */
   async get<T>(url: string, id: string): Promise<T> {
-    const response = await this.session.get(`${url}${id}/`);
+    const response = await this.session.get<T>(`${url}${id}/`);
     return response.data;
   }
 
@@ -101,7 +102,7 @@ class APISession {
    * @throws {RequestError}
    */
   async post<T>(url: string, payload?: object): Promise<T> {
-    const response = await this.session.post(url, payload);
+    const response = await this.session.post<T>(url, payload);
     return response.data;
   }
 
@@ -114,7 +115,7 @@ class APISession {
    * @throws {RequestError}
    */
   async patch<T>(url: string, payload: object): Promise<T> {
-    const response = await this.session.patch(url, payload);
+    const response = await this.session.patch<T>(url, payload);
     return response.data;
   }
 
@@ -128,7 +129,7 @@ class APISession {
    */
   async put<T>(url: string, id: string, payload: object): Promise<T> {
     const composedUrl = `${url}${id}/`;
-    const response = await this.session.put(composedUrl, payload);
+    const response = await this.session.put<T>(composedUrl, payload);
     return response.data;
   }
 
