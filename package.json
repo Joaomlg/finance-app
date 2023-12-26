@@ -4,6 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 4 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
     "build:preview": "eas build --profile preview",
     "update:preview": "eas update --channel staging",
     "android": "expo start --android",
