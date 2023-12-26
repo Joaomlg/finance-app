@@ -202,7 +202,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const updateItems = useCallback(async () => {
     if (itemsId.length === 0) {
-      return;
+      return true;
     }
 
     setUpdatingItems(true);
