@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import BelvoWidget from '../../components/BelvoWidget';
-import useBelvo from '../../hooks/useBelvo';
-import { StackRouteParamList } from '../../routes/stack.routes';
+import BelvoWidget from '../../../components/BelvoWidget';
+import useBelvo from '../../../hooks/useBelvo';
+import { StackRouteParamList } from '../../../routes/stack.routes';
 
 import { Container } from './styles';
 
