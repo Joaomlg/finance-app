@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import Connect from '../pages/Connect';
+import Connect from '../pages/BelvoConnect';
 import Connections from '../pages/Connections';
 import History from '../pages/History';
 import Home from '../pages/Home';
