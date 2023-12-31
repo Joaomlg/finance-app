@@ -53,6 +53,7 @@ export const BelvoWidget: React.FC<BelvoWidgetProps> = ({
 }) => {
   const belvoWidgetURL = `https://widget.belvo.io/?access_token=${token}&${buildPayload(options)}`;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleBelvoEvent = (event: any) => {
     console.log({ event });
     const webviewEvent = new URL(event.url);

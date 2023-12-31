@@ -4,9 +4,11 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import usePluggyService from '../hooks/pluggyService';
-import { Account, Investment, Item, Transaction } from '../services/pluggy';
+import { Account, Connection, Investment, Transaction } from '../models';
+import Provider from '../models/provider';
 import { range } from '../utils/array';
 import {
+  ConnectionsAsyncStorageKey,
   ItemsAsyncStorageKey,
   LastUpdateDateFormat,
   LastUpdateDateStorageKey,
@@ -14,6 +16,11 @@ import {
 import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
+
+export type ConnectionId = {
+  provider: Provider;
+  connectionId: string;
+};
 
 export type MonthlyBalance = {
   date: Moment;
@@ -29,13 +36,13 @@ export type AppContextValue = {
   setDate: (value: Moment) => void;
   minimumDateWithData: Moment;
   lastUpdateDate: string;
-  items: Item[];
-  storeItem: (item: Item) => Promise<void>;
-  deleteItem: (item: Item) => Promise<void>;
-  fetchItems: () => Promise<void>;
-  fetchingItems: boolean;
-  updateItems: () => Promise<boolean>;
-  updatingItems: boolean;
+  connections: Connection[];
+  storeConnection: (id: string) => Promise<void>;
+  deleteConnection: (id: string) => Promise<void>;
+  fetchConnections: () => Promise<void>;
+  fetchingConnections: boolean;
+  updateConnections: () => Promise<boolean>;
+  updatingConnections: boolean;
   accounts: Account[];
   fetchAccounts: () => Promise<void>;
   fetchingAccounts: boolean;
@@ -69,12 +76,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [date, setDate] = useState(now);
   const [lastUpdateDate, setLastUpdateDate] = useState('');
 
-  const [itemsId, setItemsId] = useState([] as string[]);
-  const [loadingItemsId, setLoadingItemsId] = useState(false);
+  const [connectionsId, setConnectionsId] = useState([] as ConnectionId[]);
+  const [loadingConnectionsId, setLoadingConnectionsId] = useState(false);
 
-  const [items, setItems] = useState([] as Item[]);
-  const [fetchingItems, setFetchingItems] = useState(false);
-  const [updatingItems, setUpdatingItems] = useState(false);
+  const [connections, setConnections] = useState([] as Connection[]);
+  const [fetchingConnections, setFetchingConnections] = useState(false);
+  const [updatingConnections, setUpdatingConnections] = useState(false);
 
   const [accounts, setAccounts] = useState([] as Account[]);
   const [fetchingAccounts, setFetchingAccounts] = useState(false);
@@ -92,8 +99,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const pluggyService = usePluggyService();
 
   const isLoading =
-    loadingItemsId ||
-    fetchingItems ||
+    loadingConnectionsId ||
+    fetchingConnections ||
     fetchingAccounts ||
     fetchingInvestments ||
     fetchingTransactions ||
@@ -143,87 +150,98 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const minimumDateWithData = useMemo(() => {
-    const firstItemCreatedAt = items.reduce((minDate, item) => {
+    const firstConnectionCreatedAt = connections.reduce((minDate, item) => {
       const createdAt = moment(new Date(item.createdAt));
       return createdAt.isBefore(minDate) ? createdAt : minDate;
     }, now.clone());
 
-    return firstItemCreatedAt.subtract(1, 'year');
-  }, [items]);
+    return firstConnectionCreatedAt.subtract(1, 'year');
+  }, [connections]);
 
-  const storeItem = useCallback(
-    async (item: Item) => {
+  const storeConnection = useCallback(
+    async (id: string) => {
       try {
-        const newUniqueItems = [...new Set([...itemsId, item.id])];
+        const alreadyExists = connectionsId.find(({ connectionId }) => connectionId === id);
 
-        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
+        if (alreadyExists !== undefined) {
+          return;
+        }
 
-        setItemsId(newUniqueItems);
+        const newConnectionsId: ConnectionId[] = [
+          ...connectionsId,
+          { connectionId: id, provider: 'PLUGGY' },
+        ];
+
+        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsId));
+
+        setConnectionsId(newConnectionsId);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível armazenar a nova conexão!' });
       }
     },
-    [itemsId],
+    [connectionsId],
   );
 
-  const deleteItem = useCallback(
-    async (item: Item) => {
+  const deleteConnection = useCallback(
+    async (id: string) => {
       try {
-        await pluggyService.deleteItem(item.id);
+        await pluggyService.deleteConnection(id);
 
-        const newItemsId = itemsId.filter((itemId) => itemId !== item.id);
+        const newConnectionsId = connectionsId.filter(({ connectionId }) => connectionId !== id);
 
-        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
+        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsId));
 
-        setItemsId(newItemsId);
+        setConnectionsId(newConnectionsId);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
       }
     },
-    [pluggyService, itemsId],
+    [pluggyService, connectionsId],
   );
 
-  const fetchItems = useCallback(async () => {
-    if (itemsId.length === 0) {
+  const fetchConnections = useCallback(async () => {
+    if (connectionsId.length === 0) {
       return;
     }
 
-    setFetchingItems(true);
+    setFetchingConnections(true);
 
     try {
-      const itemList = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
-      setItems(itemList);
+      const itemList = await Promise.all(
+        connectionsId.map(({ connectionId }) => pluggyService.fetchConnection(connectionId)),
+      );
+      setConnections(itemList);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível obter informação das conexões!' });
     }
 
-    setFetchingItems(false);
-  }, [pluggyService, itemsId]);
+    setFetchingConnections(false);
+  }, [connectionsId, pluggyService]);
 
-  const updateItems = useCallback(async () => {
-    if (itemsId.length === 0) {
+  const updateConnections = useCallback(async () => {
+    if (connectionsId.length === 0) {
       return true;
     }
 
-    setUpdatingItems(true);
+    setUpdatingConnections(true);
 
     let success = true;
 
     try {
       const itemList = await Promise.all(
-        itemsId.map(async (id) => {
-          let item = await pluggyService.updateItem(id);
+        connectionsId.map(async ({ connectionId }) => {
+          let item = await pluggyService.updateConnection(connectionId);
 
           while (item.status === 'UPDATING') {
             await sleep(2000);
-            item = await pluggyService.fetchItem(id);
+            item = await pluggyService.fetchConnection(connectionId);
           }
 
           return item;
         }),
       );
 
-      setItems(itemList);
+      setConnections(itemList);
 
       const updateDate = now.format(LastUpdateDateFormat);
       await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
@@ -234,25 +252,24 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       success = false;
     }
 
-    setUpdatingItems(false);
+    setUpdatingConnections(false);
 
     return success;
-  }, [pluggyService, itemsId]);
+  }, [connectionsId, pluggyService]);
 
   const fetchAccounts = useCallback(async () => {
-    if (items.length === 0) {
+    if (connections.length === 0) {
       return;
     }
 
     setFetchingAccounts(true);
 
     try {
-      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchAccounts(id)));
-
-      const accountList = result.reduce(
-        (list, item) => [...list, ...item.results],
-        [] as Account[],
+      const result = await Promise.all(
+        connections.map(({ id }) => pluggyService.fetchAccounts(id)),
       );
+
+      const accountList = result.reduce((list, item) => [...list, ...item], [] as Account[]);
 
       setAccounts(accountList);
     } catch (error) {
@@ -260,22 +277,21 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingAccounts(false);
-  }, [pluggyService, items]);
+  }, [connections, pluggyService]);
 
   const fetchInvestments = useCallback(async () => {
-    if (items.length === 0) {
+    if (connections.length === 0) {
       return;
     }
 
     setFetchingInvestments(true);
 
     try {
-      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchInvestments(id)));
-
-      const investmentList = result.reduce(
-        (list, item) => [...list, ...item.results],
-        [] as Investment[],
+      const result = await Promise.all(
+        connections.map(({ id }) => pluggyService.fetchInvestments(id)),
       );
+
+      const investmentList = result.reduce((list, item) => [...list, ...item], [] as Investment[]);
 
       setInvestments(investmentList);
     } catch (error) {
@@ -286,7 +302,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingInvestments(false);
-  }, [pluggyService, items]);
+  }, [connections, pluggyService]);
 
   const fetchMonthTransactions = useCallback(
     async (monthDate: Moment) => {
@@ -298,7 +314,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           .filter((item) => item.type !== 'CREDIT')
           .map(({ id }) =>
             pluggyService.fetchTransactions(id, {
-              pageSize: 500,
               from: startDate.format('YYYY-MM-DD'),
               to: endDate.format('YYYY-MM-DD'),
             }),
@@ -306,13 +321,13 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       );
 
       const transactionsList = result
-        .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
+        .reduce((list, item) => [...list, ...item], [] as Transaction[])
         .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       return transactionsList;
     },
-    [pluggyService, accounts],
+    [accounts, pluggyService],
   );
 
   const fetchTransactions = useCallback(async () => {
@@ -368,22 +383,43 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   useEffect(() => {
-    const loadItemsId = async () => {
-      setLoadingItemsId(true);
+    const loadConnectionsId = async () => {
+      setLoadingConnectionsId(true);
 
       const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
       const ids: string[] = serializedIds ? JSON.parse(serializedIds) : [];
 
-      setItemsId(ids);
+      const serializedConnectionsId = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
+      let connectionsId: ConnectionId[] = serializedConnectionsId
+        ? JSON.parse(serializedConnectionsId)
+        : [];
 
-      setLoadingItemsId(false);
+      if (ids !== undefined) {
+        connectionsId = [
+          ...connectionsId,
+          ...ids.map(
+            (id) =>
+              ({
+                provider: 'PLUGGY',
+                connectionId: id,
+              } as ConnectionId),
+          ),
+        ] as ConnectionId[];
+
+        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(connectionsId));
+        await AsyncStorage.removeItem(ItemsAsyncStorageKey);
+      }
+
+      setConnectionsId(connectionsId);
+
+      setLoadingConnectionsId(false);
     };
 
-    loadItemsId();
+    loadConnectionsId();
   }, []);
 
   useEffect(() => {
-    const fetchOrUpdateItems = async () => {
+    const fetchOrUpdateConnections = async () => {
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
       const shouldUpdate = updateDate
@@ -393,24 +429,24 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       let updatedSuccess = true;
 
       if (shouldUpdate) {
-        updatedSuccess = await updateItems();
+        updatedSuccess = await updateConnections();
       }
 
-      const shouldFetchItems = !shouldUpdate || !updatedSuccess;
+      const shouldFetchConnections = !shouldUpdate || !updatedSuccess;
 
-      if (shouldFetchItems) {
+      if (shouldFetchConnections) {
         setLastUpdateDate(updateDate as string);
-        await fetchItems();
+        await fetchConnections();
       }
     };
 
-    fetchOrUpdateItems();
-  }, [itemsId, fetchItems, updateItems]);
+    fetchOrUpdateConnections();
+  }, [fetchConnections, updateConnections]);
 
   useEffect(() => {
     fetchAccounts();
     fetchInvestments();
-  }, [items, fetchAccounts, fetchInvestments]);
+  }, [connections, fetchAccounts, fetchInvestments]);
 
   useEffect(() => {
     fetchTransactions();
@@ -431,13 +467,13 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setDate,
         minimumDateWithData,
         lastUpdateDate,
-        items,
-        storeItem,
-        deleteItem,
-        fetchItems,
-        fetchingItems,
-        updateItems,
-        updatingItems,
+        connections,
+        storeConnection,
+        deleteConnection,
+        fetchConnections,
+        fetchingConnections,
+        updateConnections,
+        updatingConnections,
         accounts,
         fetchAccounts,
         fetchingAccounts,
@@ -462,7 +498,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }}
     >
       {children}
-      {updatingItems && <LoadingModal text="Sincronizando conexões" />}
+      {updatingConnections && <LoadingModal text="Sincronizando conexões" />}
     </AppContext.Provider>
   );
 };

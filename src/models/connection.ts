@@ -16,7 +16,7 @@ export type Connector = {
 export type Connection = {
   id: string;
   createdAt: Date;
-  updatedAt: Date;
+  lastUpdatedAt: Date;
   status: ConnectionStatus;
   provider: Provider;
   connector: Connector;

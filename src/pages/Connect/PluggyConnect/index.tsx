@@ -20,7 +20,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   const [connectToken, setConnectToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { storeItem } = useContext(AppContext);
+  const { storeConnection } = useContext(AppContext);
 
   const pluggyService = usePluggyService();
   const theme = useTheme();
@@ -28,7 +28,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
 
-    await storeItem(item);
+    await storeConnection(item.id);
 
     navigation.goBack();
   };
@@ -37,7 +37,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
     const { data } = error;
 
     if (data) {
-      await storeItem(data.item);
+      await storeConnection(data.item.id);
     }
   };
 
@@ -48,7 +48,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   useEffect(() => {
     const createConnectToken = async () => {
       try {
-        const { accessToken } = await pluggyService.createConnectToken(updateItemId);
+        const accessToken = await pluggyService.createAccessToken(updateItemId);
         setConnectToken(accessToken);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });

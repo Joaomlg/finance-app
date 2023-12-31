@@ -12,7 +12,7 @@ import FlexContainer from '../../../components/FlexContainer';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
 import AppContext from '../../../contexts/AppContext';
-import { Account, AccountSubType, Item, ItemStatus } from '../../../services/pluggy';
+import { Account, AccountSubType, Connection, ConnectionStatus } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 import ConnectionMenu, { Option } from '../ConnectionMenu';
 
@@ -33,7 +33,7 @@ const accountName: Record<AccountSubType, string> = {
   CREDIT_CARD: 'Cartão de crédito',
 };
 
-const itemStatusMessage: Record<ItemStatus, string> = {
+const itemStatusMessage: Record<ConnectionStatus, string> = {
   UPDATED: '',
   UPDATING: '',
   LOGIN_ERROR: 'Atualize as credenciais da conexão.',
@@ -42,19 +42,19 @@ const itemStatusMessage: Record<ItemStatus, string> = {
 };
 
 export interface ConnectionCardProps extends ViewProps {
-  item: Item;
+  item: Connection;
   accounts: Account[];
 }
 
 const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...viewProps }) => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const { deleteItem } = useContext(AppContext);
+  const { deleteConnection } = useContext(AppContext);
 
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const itemAccounts = accounts.filter((account) => account.itemId === item.id);
+  const itemAccounts = accounts.filter((account) => account.connectionId === item.id);
 
   const lastUpdateDate = item.lastUpdatedAt
     ? moment(item.lastUpdatedAt).format(LastUpdateDateFormat)
@@ -79,7 +79,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
         {
           text: 'Apagar',
           onPress: async () => {
-            await deleteItem(item);
+            await deleteConnection(item.id);
           },
         },
       ],

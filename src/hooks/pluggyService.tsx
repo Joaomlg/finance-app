@@ -1,16 +1,18 @@
 import { CLIENT_ID, CLIENT_SECRET } from 'react-native-dotenv';
 import React, { createContext, useContext } from 'react';
-import { PluggyClient } from '../services/pluggy';
+import { PluggyClient, PluggyService } from '../services/pluggy';
 
 type PluggyServiceContextProps = {
-  pluggyClient: PluggyClient;
+  pluggyService: PluggyService;
 };
 
 const defaultValues: PluggyServiceContextProps = {
-  pluggyClient: new PluggyClient({
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
-  }),
+  pluggyService: new PluggyService(
+    new PluggyClient({
+      clientId: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
+    }),
+  ),
 };
 
 const PluggyServiceContext = createContext(defaultValues);
@@ -22,9 +24,8 @@ const PluggyServiceContextProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 const usePluggyService = () => {
-  const { pluggyClient } = useContext(PluggyServiceContext);
-
-  return pluggyClient;
+  const { pluggyService } = useContext(PluggyServiceContext);
+  return pluggyService;
 };
 
 export { PluggyServiceContextProvider };

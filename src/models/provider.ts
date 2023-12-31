@@ -1,6 +1,3 @@
-enum Provider {
-  PLUGGY = 'pluggy',
-  BELVO = 'belvo',
-}
+type Provider = 'PLUGGY' | 'BELVO';
 
 export default Provider;

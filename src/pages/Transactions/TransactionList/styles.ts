@@ -2,7 +2,7 @@ import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
 import FlexContainer from '../../../components/FlexContainer';
 import TransactionListItem from '../../../components/TransactionListItem';
-import { Transaction } from '../../../services/pluggy';
+import { Transaction } from '../../../models';
 
 export const StyledFlatList = styled(
   FlatList as new (props: FlatListProps<Transaction>) => FlatList<Transaction>,
