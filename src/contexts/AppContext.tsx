@@ -389,15 +389,16 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const loadConnectionsId = async () => {
       setLoadingConnectionsId(true);
 
-      const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
-      const ids: string[] = serializedIds ? JSON.parse(serializedIds) : [];
-
       const serializedConnectionsId = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
       let connectionsId: ConnectionId[] = serializedConnectionsId
         ? JSON.parse(serializedConnectionsId)
         : [];
 
-      if (ids !== undefined) {
+      // This is necessary to be compatible with previous versions
+      const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
+      if (serializedIds) {
+        const ids: string[] = JSON.parse(serializedIds);
+
         connectionsId = [
           ...connectionsId,
           ...ids.map(
