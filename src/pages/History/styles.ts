@@ -1,10 +1,10 @@
 import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
-import { MonthBalance } from '.';
 import Divider from '../../components/Divider';
 import FlexContainer from '../../components/FlexContainer';
 import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
+import { MonthlyBalance } from '../../contexts/AppContext';
 
 export const StyledHeader = styled(Header)`
   padding: 24px;
@@ -12,7 +12,7 @@ export const StyledHeader = styled(Header)`
 `;
 
 export const StyledFlatList = styled(
-  FlatList as new (props: FlatListProps<MonthBalance>) => FlatList<MonthBalance>,
+  FlatList as new (props: FlatListProps<MonthlyBalance>) => FlatList<MonthlyBalance>,
 ).attrs({
   contentContainerStyle: {
     padding: 24,
