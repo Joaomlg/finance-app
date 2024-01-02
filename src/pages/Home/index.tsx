@@ -245,8 +245,8 @@ const Home: React.FC = () => {
             <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
           </SectionHeader>
           <TransactionListContainer onLayout={onTransactionListLayout}>
-            {lastTransactions.map((item, index) => (
-              <TransactionListItem item={item} key={index} />
+            {lastTransactions.map((transaction, index) => (
+              <TransactionListItem item={transaction} key={index} />
             ))}
           </TransactionListContainer>
         </BottomSheet>

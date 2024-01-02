@@ -5,7 +5,7 @@ export declare global {
       connections: undefined;
       connect:
         | {
-            updateItemId?: string;
+            updateConnectionId?: string;
           }
         | undefined;
       transactions: undefined;

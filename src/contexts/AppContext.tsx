@@ -150,8 +150,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const minimumDateWithData = useMemo(() => {
-    const firstConnectionCreatedAt = connections.reduce((minDate, item) => {
-      const createdAt = moment(new Date(item.createdAt));
+    const firstConnectionCreatedAt = connections.reduce((minDate, connection) => {
+      const createdAt = moment(new Date(connection.createdAt));
       return createdAt.isBefore(minDate) ? createdAt : minDate;
     }, now.clone());
 
@@ -207,10 +207,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingConnections(true);
 
     try {
-      const itemList = await Promise.all(
+      const connectionList = await Promise.all(
         connectionsId.map(({ connectionId }) => pluggyService.fetchConnection(connectionId)),
       );
-      setConnections(itemList);
+      setConnections(connectionList);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível obter informação das conexões!' });
     }
@@ -228,20 +228,20 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     let success = true;
 
     try {
-      const itemList = await Promise.all(
+      const connectionList = await Promise.all(
         connectionsId.map(async ({ connectionId }) => {
-          let item = await pluggyService.updateConnection(connectionId);
+          let connection = await pluggyService.updateConnection(connectionId);
 
-          while (item.status === 'UPDATING') {
+          while (connection.status === 'UPDATING') {
             await sleep(2000);
-            item = await pluggyService.fetchConnection(connectionId);
+            connection = await pluggyService.fetchConnection(connectionId);
           }
 
-          return item;
+          return connection;
         }),
       );
 
-      setConnections(itemList);
+      setConnections(connectionList);
 
       const updateDate = now.format(LastUpdateDateFormat);
       await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
@@ -269,7 +269,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         connections.map(({ id }) => pluggyService.fetchAccounts(id)),
       );
 
-      const accountList = result.reduce((list, item) => [...list, ...item], [] as Account[]);
+      const accountList = result.reduce((list, account) => [...list, ...account], [] as Account[]);
 
       setAccounts(accountList);
     } catch (error) {
@@ -291,7 +291,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         connections.map(({ id }) => pluggyService.fetchInvestments(id)),
       );
 
-      const investmentList = result.reduce((list, item) => [...list, ...item], [] as Investment[]);
+      const investmentList = result.reduce(
+        (list, investment) => [...list, ...investment],
+        [] as Investment[],
+      );
 
       setInvestments(investmentList);
     } catch (error) {
@@ -311,7 +314,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       const result = await Promise.all(
         accounts
-          .filter((item) => item.type !== 'CREDIT')
+          .filter(({ type }) => type !== 'CREDIT')
           .map(({ id }) =>
             pluggyService.fetchTransactions(id, {
               from: startDate.format('YYYY-MM-DD'),
@@ -321,8 +324,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       );
 
       const transactionsList = result
-        .reduce((list, item) => [...list, ...item], [] as Transaction[])
-        .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
+        .reduce((list, transaction) => [...list, ...transaction], [] as Transaction[])
+        .filter(({ description }) => !NUBANK_IGNORED_TRANSACTIONS.includes(description))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       return transactionsList;
@@ -359,7 +362,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         .map((i) => currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'))
         .filter((date) => date.isSameOrAfter(minimumDateWithData, 'month'));
 
-      const results = await Promise.all(dates.map((item) => fetchMonthTransactions(item)));
+      const results = await Promise.all(dates.map((date) => fetchMonthTransactions(date)));
 
       const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
         const incomes = transactions

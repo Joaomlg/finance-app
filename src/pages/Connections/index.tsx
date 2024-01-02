@@ -6,9 +6,9 @@ import FlexContainer from '../../components/FlexContainer';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
+import { Connection } from '../../models';
 import ConnectionCard from '../Connections/ConnectionCard';
 import { BottomSheet, StyledHeader } from './styles';
-import { Connection } from '../../models';
 
 const Connections: React.FC = () => {
   const { isLoading, connections, accounts, hideValues, setHideValues, fetchConnections } =
@@ -17,10 +17,14 @@ const Connections: React.FC = () => {
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const renderItem = useCallback(
-    (item: Connection) => {
-      const itemAccounts = accounts.filter((account) => account.connectionId === item.id);
-      return <ConnectionCard key={item.id} item={item} accounts={itemAccounts} />;
+  const renderConnection = useCallback(
+    (connection: Connection) => {
+      const connectionAccounts = accounts.filter(
+        (account) => account.connectionId === connection.id,
+      );
+      return (
+        <ConnectionCard key={connection.id} connection={connection} accounts={connectionAccounts} />
+      );
     },
     [accounts],
   );
@@ -52,7 +56,9 @@ const Connections: React.FC = () => {
           <Text variant="light" color="textLight">
             {connections.length} Conexões
           </Text>
-          <FlexContainer gap={24}>{connections.map((item) => renderItem(item))}</FlexContainer>
+          <FlexContainer gap={24}>
+            {connections.map((connection) => renderConnection(connection))}
+          </FlexContainer>
         </BottomSheet>
       </ScrollView>
     </ScreenContainer>

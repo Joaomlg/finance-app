@@ -24,7 +24,7 @@ import {
   CardErrorMessage,
   CardHeader,
   CardHeaderContent,
-  ListItemAvatar,
+  ConnectionAvatar,
 } from './styles';
 
 const accountName: Record<AccountSubType, string> = {
@@ -33,7 +33,7 @@ const accountName: Record<AccountSubType, string> = {
   CREDIT_CARD: 'Cartão de crédito',
 };
 
-const itemStatusMessage: Record<ConnectionStatus, string> = {
+const ConnectionStatusMessage: Record<ConnectionStatus, string> = {
   UPDATED: '',
   UPDATING: '',
   LOGIN_ERROR: 'Atualize as credenciais da conexão.',
@@ -42,11 +42,11 @@ const itemStatusMessage: Record<ConnectionStatus, string> = {
 };
 
 export interface ConnectionCardProps extends ViewProps {
-  item: Connection;
+  connection: Connection;
   accounts: Account[];
 }
 
-const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...viewProps }) => {
+const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, ...viewProps }) => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const { deleteConnection } = useContext(AppContext);
@@ -54,23 +54,21 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const itemAccounts = accounts.filter((account) => account.connectionId === item.id);
-
-  const lastUpdateDate = item.lastUpdatedAt
-    ? moment(item.lastUpdatedAt).format(LastUpdateDateFormat)
+  const lastUpdateDate = connection.lastUpdatedAt
+    ? moment(connection.lastUpdatedAt).format(LastUpdateDateFormat)
     : 'nunca';
 
-  const hasError = item.status !== 'UPDATED' && item.status !== 'UPDATING';
+  const hasError = connection.status !== 'UPDATED' && connection.status !== 'UPDATING';
 
   const handleCardOptionPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const handleUpdateItem = () => {
-    navigation.navigate('connect', { updateItemId: item.id });
+  const handleUpdateConnection = () => {
+    navigation.navigate('connect', { updateConnectionId: connection.id });
   };
 
-  const handleDeleteItem = async () => {
+  const handleDeleteConnection = async () => {
     Alert.alert(
       'Apagar conexão?',
       'Tem certeza que deseja apagar a conexão?',
@@ -79,7 +77,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
         {
           text: 'Apagar',
           onPress: async () => {
-            await deleteConnection(item.id);
+            await deleteConnection(connection.id);
           },
         },
       ],
@@ -91,11 +89,11 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
     bottomSheetModalRef.current?.dismiss();
 
     if (option === 'update') {
-      return handleUpdateItem();
+      return handleUpdateConnection();
     }
 
     if (option === 'delete') {
-      return handleDeleteItem();
+      return handleDeleteConnection();
     }
   };
 
@@ -110,18 +108,18 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
                 Não foi possível sincronizar os dados!
               </Text>
               <Text variant="light" color="textWhite">
-                {itemStatusMessage[item.status]}
+                {ConnectionStatusMessage[connection.status]}
               </Text>
             </CardErrorMessage>
           </CardErrorContainer>
         )}
         <CardContent>
           <CardHeader>
-            <ListItemAvatar color={'#' + item.connector.primaryColor}>
-              <SvgWithCssUri height="100%" width="100%" uri={item.connector.imageUrl} />
-            </ListItemAvatar>
+            <ConnectionAvatar color={'#' + connection.connector.primaryColor}>
+              <SvgWithCssUri height="100%" width="100%" uri={connection.connector.imageUrl} />
+            </ConnectionAvatar>
             <CardHeaderContent>
-              <Text>{item.connector.name}</Text>
+              <Text>{connection.connector.name}</Text>
               <Text variant="extra-light" color="textLight">
                 Sincronizado em: {lastUpdateDate}
               </Text>
@@ -137,7 +135,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ item, accounts, ...view
           </CardHeader>
           <Divider />
           <FlexContainer gap={16}>
-            {itemAccounts.map((account, index) => (
+            {accounts.map((account, index) => (
               <AccountLine key={index}>
                 <Text>{accountName[account.subtype]}</Text>
                 <Money

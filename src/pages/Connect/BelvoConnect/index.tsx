@@ -13,7 +13,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   route,
   navigation,
 }) => {
-  const updateItemId = route.params?.updateItemId;
+  const updateConnectionId = route.params?.updateConnectionId;
 
   const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +52,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
     };
 
     createWidgetToken();
-  }, [belvoClient, updateItemId, navigation]);
+  }, [belvoClient, updateConnectionId, navigation]);
 
   return (
     <Container>

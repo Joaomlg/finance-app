@@ -9,7 +9,7 @@ import Transactions from '../pages/Transactions';
 export type StackRouteParamList = {
   home: undefined;
   connections: undefined;
-  connect: { updateItemId?: string };
+  connect: { updateConnectionId?: string };
   transactions: undefined;
   history: undefined;
 };

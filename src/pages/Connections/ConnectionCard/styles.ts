@@ -28,7 +28,7 @@ export const CardHeader = styled.View`
   align-items: center;
 `;
 
-export const ListItemAvatar = styled.View<{ color: string }>`
+export const ConnectionAvatar = styled.View<{ color: string }>`
   border-style: solid;
   border-width: 1px;
   border-color: ${(props) => props.color};
