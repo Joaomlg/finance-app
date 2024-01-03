@@ -1,3 +1,5 @@
+import Provider from './provider';
+
 export type TransactionType = 'DEBIT' | 'CREDIT';
 
 export type Transaction = {
@@ -8,4 +10,5 @@ export type Transaction = {
   category?: string;
   date: Date;
   accountId: string;
+  provider: Provider;
 };

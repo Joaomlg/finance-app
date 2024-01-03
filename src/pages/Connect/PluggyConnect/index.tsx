@@ -28,7 +28,9 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
 
-    await storeConnection(item.id);
+    const forceUpdate = updateConnectionId !== undefined;
+
+    await storeConnection(item.id, 'PLUGGY', forceUpdate);
 
     navigation.goBack();
   };
@@ -37,7 +39,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
     const { data } = error;
 
     if (data) {
-      await storeConnection(data.item.id);
+      await storeConnection(data.item.id, 'PLUGGY');
     }
   };
 

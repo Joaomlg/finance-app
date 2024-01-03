@@ -13,13 +13,15 @@ import {
   LastUpdateDateFormat,
   LastUpdateDateStorageKey,
 } from '../utils/contants';
+import { cloneObject } from '../utils/object';
 import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
 
-export type ConnectionId = {
+export type ConnectionContext = {
+  id: string;
+  connectionId?: string;
   provider: Provider;
-  connectionId: string;
 };
 
 export type MonthlyBalance = {
@@ -37,7 +39,7 @@ export type AppContextValue = {
   minimumDateWithData: Moment;
   lastUpdateDate: string;
   connections: Connection[];
-  storeConnection: (id: string) => Promise<void>;
+  storeConnection: (id: string, provider: Provider, forceUpdate?: boolean) => Promise<void>;
   deleteConnection: (id: string) => Promise<void>;
   fetchConnections: () => Promise<void>;
   fetchingConnections: boolean;
@@ -76,7 +78,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [date, setDate] = useState(now);
   const [lastUpdateDate, setLastUpdateDate] = useState('');
 
-  const [connectionsId, setConnectionsId] = useState([] as ConnectionId[]);
+  const [connectionsContext, setConnectionsContext] = useState([] as ConnectionContext[]);
   const [loadingConnectionsId, setLoadingConnectionsId] = useState(false);
 
   const [connections, setConnections] = useState([] as Connection[]);
@@ -158,49 +160,81 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return firstConnectionCreatedAt.subtract(1, 'year');
   }, [connections]);
 
+  const getProviderService = useCallback(
+    (provider: Provider) => {
+      switch (provider) {
+        case 'PLUGGY':
+          return pluggyService;
+        default:
+          throw new Error(`Unknown provider: ${provider}`);
+      }
+    },
+    [pluggyService],
+  );
+
   const storeConnection = useCallback(
-    async (id: string) => {
+    async (id: string, provider: Provider, forceUpdate = false) => {
       try {
-        const alreadyExists = connectionsId.find(({ connectionId }) => connectionId === id);
+        const alreadyExists = connectionsContext.find(
+          (item) => item.id === id && item.provider === provider,
+        );
 
         if (alreadyExists !== undefined) {
+          if (forceUpdate) {
+            const newConnectionsContext = cloneObject(connectionsContext);
+            setConnectionsContext(newConnectionsContext);
+          }
           return;
         }
 
-        const newConnectionsId: ConnectionId[] = [
-          ...connectionsId,
-          { connectionId: id, provider: 'PLUGGY' },
+        const newConnectionsContext: ConnectionContext[] = [
+          ...connectionsContext,
+          { id, provider },
         ];
 
-        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsId));
+        await AsyncStorage.setItem(
+          ConnectionsAsyncStorageKey,
+          JSON.stringify(newConnectionsContext),
+        );
 
-        setConnectionsId(newConnectionsId);
+        setConnectionsContext(newConnectionsContext);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível armazenar a nova conexão!' });
       }
     },
-    [connectionsId],
+    [connectionsContext],
   );
 
   const deleteConnection = useCallback(
     async (id: string) => {
       try {
-        await pluggyService.deleteConnection(id);
+        const connectionContext = connectionsContext.find((item) => item.id === id);
 
-        const newConnectionsId = connectionsId.filter(({ connectionId }) => connectionId !== id);
+        if (connectionContext === undefined) {
+          throw new Error('Connection not found!');
+        }
 
-        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsId));
+        const providerService = getProviderService(connectionContext.provider);
 
-        setConnectionsId(newConnectionsId);
+        await providerService.deleteConnection(id);
+
+        const newConnectionsContext = connectionsContext.filter((item) => item.id !== id);
+
+        await AsyncStorage.setItem(
+          ConnectionsAsyncStorageKey,
+          JSON.stringify(newConnectionsContext),
+        );
+
+        setConnectionsContext(newConnectionsContext);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
       }
     },
-    [pluggyService, connectionsId],
+    [connectionsContext, getProviderService],
   );
 
   const fetchConnections = useCallback(async () => {
-    if (connectionsId.length === 0) {
+    if (connectionsContext.length === 0) {
       return;
     }
 
@@ -208,7 +242,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const connectionList = await Promise.all(
-        connectionsId.map(({ connectionId }) => pluggyService.fetchConnection(connectionId)),
+        connectionsContext.map(({ id, provider }) => {
+          const providerService = getProviderService(provider);
+          return providerService.fetchConnection(id);
+        }),
       );
       setConnections(connectionList);
     } catch (error) {
@@ -216,10 +253,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingConnections(false);
-  }, [connectionsId, pluggyService]);
+  }, [connectionsContext, getProviderService]);
 
   const updateConnections = useCallback(async () => {
-    if (connectionsId.length === 0) {
+    if (connectionsContext.length === 0) {
       return true;
     }
 
@@ -229,12 +266,14 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const connectionList = await Promise.all(
-        connectionsId.map(async ({ connectionId }) => {
-          let connection = await pluggyService.updateConnection(connectionId);
+        connectionsContext.map(async ({ id, provider }) => {
+          const providerService = getProviderService(provider);
+
+          let connection = await providerService.updateConnection(id);
 
           while (connection.status === 'UPDATING') {
             await sleep(2000);
-            connection = await pluggyService.fetchConnection(connectionId);
+            connection = await providerService.fetchConnection(id);
           }
 
           return connection;
@@ -255,7 +294,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setUpdatingConnections(false);
 
     return success;
-  }, [connectionsId, pluggyService]);
+  }, [connectionsContext, getProviderService]);
 
   const fetchAccounts = useCallback(async () => {
     if (connections.length === 0) {
@@ -266,7 +305,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const result = await Promise.all(
-        connections.map(({ id }) => pluggyService.fetchAccounts(id)),
+        connections.map(({ id, provider }) => {
+          const providerService = getProviderService(provider);
+          return providerService.fetchAccounts(id);
+        }),
       );
 
       const accountList = result.reduce((list, account) => [...list, ...account], [] as Account[]);
@@ -277,7 +319,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingAccounts(false);
-  }, [connections, pluggyService]);
+  }, [connections, getProviderService]);
 
   const fetchInvestments = useCallback(async () => {
     if (connections.length === 0) {
@@ -288,7 +330,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const result = await Promise.all(
-        connections.map(({ id }) => pluggyService.fetchInvestments(id)),
+        connections.map(({ id, provider }) => {
+          const providerService = getProviderService(provider);
+          return providerService.fetchInvestments(id);
+        }),
       );
 
       const investmentList = result.reduce(
@@ -305,7 +350,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingInvestments(false);
-  }, [connections, pluggyService]);
+  }, [connections, getProviderService]);
 
   const fetchMonthTransactions = useCallback(
     async (monthDate: Moment) => {
@@ -315,12 +360,13 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const result = await Promise.all(
         accounts
           .filter(({ type }) => type !== 'CREDIT')
-          .map(({ id }) =>
-            pluggyService.fetchTransactions(id, {
+          .map(({ id, provider }) => {
+            const providerService = getProviderService(provider);
+            return providerService.fetchTransactions(id, {
               from: startDate.format('YYYY-MM-DD'),
               to: endDate.format('YYYY-MM-DD'),
-            }),
-          ),
+            });
+          }),
       );
 
       const transactionsList = result
@@ -330,7 +376,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       return transactionsList;
     },
-    [accounts, pluggyService],
+    [accounts, getProviderService],
   );
 
   const fetchTransactions = useCallback(async () => {
@@ -386,12 +432,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   useEffect(() => {
-    const loadConnectionsId = async () => {
+    const loadConnectionsContext = async () => {
       setLoadingConnectionsId(true);
 
-      const serializedConnectionsId = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
-      let connectionsId: ConnectionId[] = serializedConnectionsId
-        ? JSON.parse(serializedConnectionsId)
+      const serializedConnectionsContext = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
+      let connectionsContext: ConnectionContext[] = serializedConnectionsContext
+        ? JSON.parse(serializedConnectionsContext)
         : [];
 
       // This is necessary to be compatible with previous versions
@@ -399,27 +445,27 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (serializedIds) {
         const ids: string[] = JSON.parse(serializedIds);
 
-        connectionsId = [
-          ...connectionsId,
+        connectionsContext = [
+          ...connectionsContext,
           ...ids.map(
             (id) =>
               ({
+                id,
                 provider: 'PLUGGY',
-                connectionId: id,
-              } as ConnectionId),
+              } as ConnectionContext),
           ),
-        ] as ConnectionId[];
+        ] as ConnectionContext[];
 
-        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(connectionsId));
+        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(connectionsContext));
         await AsyncStorage.removeItem(ItemsAsyncStorageKey);
       }
 
-      setConnectionsId(connectionsId);
+      setConnectionsContext(connectionsContext);
 
       setLoadingConnectionsId(false);
     };
 
-    loadConnectionsId();
+    loadConnectionsContext();
   }, []);
 
   useEffect(() => {
@@ -445,7 +491,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
 
     fetchOrUpdateConnections();
-  }, [fetchConnections, updateConnections]);
+  }, [connectionsContext, fetchConnections, updateConnections]);
 
   useEffect(() => {
     fetchAccounts();

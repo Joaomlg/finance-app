@@ -40,6 +40,7 @@ export class PluggyService implements IProviderService {
           subtype: account.subtype,
           balance: account.balance,
           connectionId,
+          provider: 'PLUGGY',
         } as Account),
     );
   };
@@ -51,6 +52,7 @@ export class PluggyService implements IProviderService {
         ({
           id: investment.id,
           balance: investment.balance,
+          provider: 'PLUGGY',
         } as Investment),
     );
   };
@@ -71,6 +73,7 @@ export class PluggyService implements IProviderService {
           category: transaction.category,
           date: transaction.date,
           accountId,
+          provider: 'PLUGGY',
         } as Transaction),
     );
   };

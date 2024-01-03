@@ -18,6 +18,6 @@ export type Connection = {
   createdAt: Date;
   lastUpdatedAt: Date;
   status: ConnectionStatus;
-  provider: Provider;
   connector: Connector;
+  provider: Provider;
 };
