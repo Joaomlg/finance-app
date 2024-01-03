@@ -1,4 +1,4 @@
-import { CLIENT_ID, CLIENT_SECRET } from 'react-native-dotenv';
+import { PLUGGY_CLIENT_ID, PLUGGY_CLIENT_SECRET } from 'react-native-dotenv';
 import React, { createContext, useContext } from 'react';
 import { PluggyClient, PluggyService } from '../services/pluggy';
 
@@ -9,8 +9,8 @@ type PluggyServiceContextProps = {
 const defaultValues: PluggyServiceContextProps = {
   pluggyService: new PluggyService(
     new PluggyClient({
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
+      clientId: PLUGGY_CLIENT_ID,
+      clientSecret: PLUGGY_CLIENT_SECRET,
     }),
   ),
 };

@@ -1,4 +1,4 @@
-import { CLIENT_ID, CLIENT_SECRET } from 'react-native-dotenv';
+import { BELVO_CLIENT_ID, BELVO_CLIENT_SECRET } from 'react-native-dotenv';
 import React, { createContext, useContext } from 'react';
 import { Client } from '../services/belvo';
 
@@ -7,7 +7,7 @@ type BelvoContextProps = {
 };
 
 const defaultValues: BelvoContextProps = {
-  client: new Client(CLIENT_ID, CLIENT_SECRET, __DEV__ ? 'sandbox' : 'development'),
+  client: new Client(BELVO_CLIENT_ID, BELVO_CLIENT_SECRET, __DEV__ ? 'sandbox' : 'development'),
 };
 
 const BelvoContext = createContext(defaultValues);
