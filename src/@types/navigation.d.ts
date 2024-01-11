@@ -8,6 +8,7 @@ export declare global {
             updateItemId?: string;
           }
         | undefined;
+      manualConnect: undefined;
       transactions: undefined;
       history: undefined;
     }
