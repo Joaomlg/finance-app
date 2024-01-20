@@ -10,6 +10,7 @@ import { Actions, Container, TitleButton } from './styles';
 type Action = {
   icon: keyof typeof MaterialIcons.glyphMap;
   onPress?: () => void;
+  onLongPress?: () => void;
   hidden?: boolean;
 };
 
@@ -76,6 +77,7 @@ const Header: React.FC<HeaderProps> = ({
                 color={theme.colors.textWhite}
                 size={28}
                 onPress={action.onPress}
+                onLongPress={action.onLongPress}
               />
             ))}
         </Actions>

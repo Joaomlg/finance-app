@@ -49,7 +49,11 @@ const Connections: React.FC = () => {
               icon: hideValues ? 'visibility-off' : 'visibility',
               onPress: () => setHideValues(!hideValues),
             },
-            { icon: 'add-circle-outline', onPress: () => navigation.navigate('connect') },
+            {
+              icon: 'add-circle-outline',
+              onPress: () => navigation.navigate('connect'),
+              onLongPress: () => navigation.navigate('manualConnect'),
+            },
           ]}
         ></StyledHeader>
         <BottomSheet>
