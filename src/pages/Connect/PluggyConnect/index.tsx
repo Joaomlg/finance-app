@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import { PluggyConnect } from 'react-native-pluggy-connect';
+import { PluggyConnect as PluggyConnectWidget } from 'react-native-pluggy-connect';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../../contexts/AppContext';
@@ -11,7 +11,7 @@ import { Item } from '../../../services/pluggy';
 
 import { Container } from './styles';
 
-const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> = ({
+const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/pluggy'>> = ({
   route,
   navigation,
 }) => {
@@ -67,7 +67,7 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
       {isLoading ? (
         <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
-        <PluggyConnect
+        <PluggyConnectWidget
           connectToken={connectToken}
           includeSandbox={__DEV__}
           countries={['BR']}
@@ -82,4 +82,4 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   );
 };
 
-export default Connect;
+export default PluggyConnect;

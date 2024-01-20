@@ -9,7 +9,7 @@ import { StackRouteParamList } from '../../../routes/stack.routes';
 
 import { Container } from './styles';
 
-const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> = ({
+const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/belvo'>> = ({
   route,
   navigation,
 }) => {
@@ -78,4 +78,4 @@ const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> 
   );
 };
 
-export default Connect;
+export default BelvoConnect;

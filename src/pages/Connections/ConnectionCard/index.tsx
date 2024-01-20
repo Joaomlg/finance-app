@@ -7,6 +7,7 @@ import { Alert, ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SvgWithCssUri } from 'react-native-svg';
 import { useTheme } from 'styled-components/native';
+import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
 import FlexContainer from '../../../components/FlexContainer';
 import Money from '../../../components/Money';
@@ -18,7 +19,6 @@ import ConnectionMenu, { Option } from '../ConnectionMenu';
 
 import {
   AccountLine,
-  Card,
   CardContent,
   CardErrorContainer,
   CardErrorMessage,
@@ -65,7 +65,10 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
   }, []);
 
   const handleUpdateConnection = () => {
-    navigation.navigate('connect', { updateConnectionId: connection.id });
+    const provider = connection.provider.toLowerCase();
+    const uri = `connect/${provider}`;
+    // @ts-expect-error Initially, the route to connect using a provider is `connect/<provider>`
+    navigation.navigate(uri, { updateConnectionId: connection.id });
   };
 
   const handleDeleteConnection = async () => {
