@@ -5,7 +5,7 @@ import { PluggyConnect as PluggyConnectWidget } from 'react-native-pluggy-connec
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../../contexts/AppContext';
-import usePluggyService from '../../../hooks/pluggyService';
+import usePluggyService from '../../../hooks/usePluggyService';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 import { Item } from '../../../services/pluggy';
 

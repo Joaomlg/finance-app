@@ -3,7 +3,7 @@ import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
-import usePluggyService from '../hooks/pluggyService';
+import usePluggyService from '../hooks/usePluggyService';
 import { Account, Connection, Investment, Transaction } from '../models';
 import Provider from '../models/provider';
 import { range } from '../utils/array';
@@ -15,7 +15,7 @@ import {
 } from '../utils/contants';
 import { cloneObject } from '../utils/object';
 import { sleep } from '../utils/time';
-import useBelvo from '../hooks/useBelvo';
+import useBelvoService from '../hooks/useBelvoService';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
 
@@ -100,7 +100,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
 
   const pluggyService = usePluggyService();
-  const belvoService = useBelvo();
+  const belvoService = useBelvoService();
 
   const isLoading =
     loadingConnectionsId ||

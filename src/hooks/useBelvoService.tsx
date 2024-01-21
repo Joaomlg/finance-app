@@ -14,15 +14,15 @@ const defaultValues: BelvoContextProps = {
 
 const BelvoContext = createContext(defaultValues);
 
-const BelvoContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const BelvoServiceContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <BelvoContext.Provider value={defaultValues}>{children}</BelvoContext.Provider>;
 };
 
-const useBelvo = () => {
+const useBelvoService = () => {
   const { belvoService } = useContext(BelvoContext);
   return belvoService;
 };
 
-export { BelvoContextProvider };
+export { BelvoServiceContextProvider };
 
-export default useBelvo;
+export default useBelvoService;

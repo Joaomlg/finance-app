@@ -4,7 +4,7 @@ import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
 import BelvoWidget, { BelvoWidgetSuccess } from '../../../components/BelvoWidget';
-import useBelvo from '../../../hooks/useBelvo';
+import useBelvoService from '../../../hooks/useBelvoService';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 
 import { Container } from './styles';
@@ -21,7 +21,7 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
 
   const { storeConnection } = useContext(AppContext);
 
-  const belvoService = useBelvo();
+  const belvoService = useBelvoService();
   const theme = useTheme();
 
   const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
