@@ -16,22 +16,23 @@ export class PluggyService implements IProviderService {
     return accessToken;
   };
 
-  fetchConnection = async (connectionId: string) => {
+  fetchConnectionById = async (connectionId: string) => {
     const item = await this.client.fetchItem(connectionId);
-    return this.itemToConnector(item);
+    return this.itemToConnection(item);
   };
 
-  updateConnection = async (connectionId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateConnectionById = async (connectionId: string, lastUpdateDate: string) => {
     const item = await this.client.updateItem(connectionId);
-    return this.itemToConnector(item);
+    return this.itemToConnection(item);
   };
 
-  deleteConnection = async (connectionId: string) => {
+  deleteConnectionById = async (connectionId: string) => {
     await this.client.deleteItem(connectionId);
   };
 
-  fetchAccounts = async (connectionId: string) => {
-    const accounts = await this.client.fetchAccounts(connectionId);
+  fetchAccounts = async (connection: Connection) => {
+    const accounts = await this.client.fetchAccounts(connection.id);
     return accounts.results.map(
       (account) =>
         ({
@@ -39,14 +40,14 @@ export class PluggyService implements IProviderService {
           type: account.type,
           subtype: account.subtype,
           balance: account.balance,
-          connectionId,
+          connectionId: connection.id,
           provider: 'PLUGGY',
         } as Account),
     );
   };
 
-  fetchInvestments = async (connectionId: string) => {
-    const investments = await this.client.fetchInvestments(connectionId);
+  fetchInvestments = async (connection: Connection) => {
+    const investments = await this.client.fetchInvestments(connection.id);
     return investments.results.map(
       (investment) =>
         ({
@@ -57,8 +58,8 @@ export class PluggyService implements IProviderService {
     );
   };
 
-  fetchTransactions = async (accountId: string, filters: { from: string; to: string }) => {
-    const transactions = await this.client.fetchTransactions(accountId, {
+  fetchTransactions = async (account: Account, filters: { from: string; to: string }) => {
+    const transactions = await this.client.fetchTransactions(account.id, {
       pageSize: DEFAULT_PAGE_SIZE,
       from: filters.from,
       to: filters.to,
@@ -72,16 +73,20 @@ export class PluggyService implements IProviderService {
           amount: transaction.amount,
           category: transaction.category,
           date: transaction.date,
-          accountId,
+          accountId: account.id,
           provider: 'PLUGGY',
         } as Transaction),
     );
   };
 
-  private itemToConnector = async (item: Item) => {
+  private itemToConnection = (item: Item) => {
     return {
       id: item.id,
-      connector: item.connector,
+      connector: {
+        name: item.connector.name,
+        imageUrl: item.connector.imageUrl,
+        primaryColor: item.connector.primaryColor,
+      },
       status: item.status,
       createdAt: item.createdAt,
       lastUpdatedAt: item.lastUpdatedAt,

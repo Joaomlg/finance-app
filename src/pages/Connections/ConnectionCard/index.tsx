@@ -17,6 +17,7 @@ import { Account, AccountSubType, Connection, ConnectionStatus } from '../../../
 import { LastUpdateDateFormat } from '../../../utils/contants';
 import ConnectionMenu, { Option } from '../ConnectionMenu';
 
+import { textCompare } from '../../../utils/text';
 import {
   AccountLine,
   CardContent,
@@ -138,15 +139,19 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
           </CardHeader>
           <Divider />
           <FlexContainer gap={16}>
-            {accounts.map((account, index) => (
-              <AccountLine key={index}>
-                <Text>{accountName[account.subtype]}</Text>
-                <Money
-                  variant="default-bold"
-                  value={account.subtype === 'CREDIT_CARD' ? -1 * account.balance : account.balance}
-                />
-              </AccountLine>
-            ))}
+            {accounts
+              .sort((a, b) => textCompare(a.subtype, b.subtype))
+              .map((account, index) => (
+                <AccountLine key={index}>
+                  <Text>{accountName[account.subtype]}</Text>
+                  <Money
+                    variant="default-bold"
+                    value={
+                      account.subtype === 'CREDIT_CARD' ? -1 * account.balance : account.balance
+                    }
+                  />
+                </AccountLine>
+              ))}
           </FlexContainer>
         </CardContent>
       </Card>

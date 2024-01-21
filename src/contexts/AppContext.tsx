@@ -15,6 +15,7 @@ import {
 } from '../utils/contants';
 import { cloneObject } from '../utils/object';
 import { sleep } from '../utils/time';
+import useBelvo from '../hooks/useBelvo';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
 
@@ -99,6 +100,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
 
   const pluggyService = usePluggyService();
+  const belvoService = useBelvo();
 
   const isLoading =
     loadingConnectionsId ||
@@ -165,11 +167,13 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       switch (provider) {
         case 'PLUGGY':
           return pluggyService;
+        case 'BELVO':
+          return belvoService;
         default:
           throw new Error(`Unknown provider: ${provider}`);
       }
     },
-    [pluggyService],
+    [belvoService, pluggyService],
   );
 
   const storeConnection = useCallback(
@@ -216,7 +220,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
         const providerService = getProviderService(connectionContext.provider);
 
-        await providerService.deleteConnection(id);
+        await providerService.deleteConnectionById(id);
 
         const newConnectionsContext = connectionsContext.filter((item) => item.id !== id);
 
@@ -244,7 +248,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const connectionList = await Promise.all(
         connectionsContext.map(({ id, provider }) => {
           const providerService = getProviderService(provider);
-          return providerService.fetchConnection(id);
+          return providerService.fetchConnectionById(id);
         }),
       );
       setConnections(connectionList);
@@ -262,6 +266,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     setUpdatingConnections(true);
 
+    const commonLastUpdateDate = moment(lastUpdateDate, LastUpdateDateFormat).toISOString();
+
     let success = true;
 
     try {
@@ -269,11 +275,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         connectionsContext.map(async ({ id, provider }) => {
           const providerService = getProviderService(provider);
 
-          let connection = await providerService.updateConnection(id);
+          let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
 
           while (connection.status === 'UPDATING') {
             await sleep(2000);
-            connection = await providerService.fetchConnection(id);
+            connection = await providerService.fetchConnectionById(id);
           }
 
           return connection;
@@ -294,7 +300,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setUpdatingConnections(false);
 
     return success;
-  }, [connectionsContext, getProviderService]);
+  }, [connectionsContext, getProviderService, lastUpdateDate]);
 
   const fetchAccounts = useCallback(async () => {
     if (connections.length === 0) {
@@ -305,9 +311,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const result = await Promise.all(
-        connections.map(({ id, provider }) => {
-          const providerService = getProviderService(provider);
-          return providerService.fetchAccounts(id);
+        connections.map((connection) => {
+          const providerService = getProviderService(connection.provider);
+          return providerService.fetchAccounts(connection);
         }),
       );
 
@@ -330,9 +336,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const result = await Promise.all(
-        connections.map(({ id, provider }) => {
-          const providerService = getProviderService(provider);
-          return providerService.fetchInvestments(id);
+        connections.map((connection) => {
+          const providerService = getProviderService(connection.provider);
+          return providerService.fetchInvestments(connection);
         }),
       );
 
@@ -360,9 +366,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const result = await Promise.all(
         accounts
           .filter(({ type }) => type !== 'CREDIT')
-          .map(({ id, provider }) => {
-            const providerService = getProviderService(provider);
-            return providerService.fetchTransactions(id, {
+          .map((account) => {
+            const providerService = getProviderService(account.provider);
+            return providerService.fetchTransactions(account, {
               from: startDate.format('YYYY-MM-DD'),
               to: endDate.format('YYYY-MM-DD'),
             });

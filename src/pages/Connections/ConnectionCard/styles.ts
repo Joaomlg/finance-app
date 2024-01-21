@@ -29,6 +29,7 @@ export const ConnectionAvatar = styled.View<{ color: string }>`
   margin-right: 12px;
   height: 32px;
   width: 32px;
+  overflow: hidden;
 `;
 
 export const CardHeaderContent = styled.View`

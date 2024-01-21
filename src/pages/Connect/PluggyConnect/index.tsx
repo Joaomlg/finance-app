@@ -32,7 +32,9 @@ const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'conne
 
     await storeConnection(item.id, 'PLUGGY', forceUpdate);
 
-    navigation.goBack();
+    Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
+
+    navigation.pop(2);
   };
 
   const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
@@ -44,7 +46,7 @@ const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'conne
   };
 
   const handleOnClose = () => {
-    navigation.goBack();
+    navigation.pop(2);
   };
 
   useEffect(() => {

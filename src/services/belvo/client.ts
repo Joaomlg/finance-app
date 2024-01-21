@@ -6,7 +6,7 @@ import TransactionResource from './resources/transactions';
 import WidgetTokenResource from './resources/widgetToken';
 import { Environment, urlResolver } from './utils';
 
-export class Client {
+export class BelvoClient {
   private session: APISession;
 
   public institutions: InstitutionResource;

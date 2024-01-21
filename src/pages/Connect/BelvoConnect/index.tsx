@@ -1,13 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import BelvoWidget from '../../../components/BelvoWidget';
+import BelvoWidget, { BelvoWidgetSuccess } from '../../../components/BelvoWidget';
 import useBelvo from '../../../hooks/useBelvo';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 
 import { Container } from './styles';
+import AppContext from '../../../contexts/AppContext';
 
 const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/belvo'>> = ({
   route,
@@ -18,27 +19,34 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
   const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const belvoClient = useBelvo();
+  const { storeConnection } = useContext(AppContext);
+
+  const belvoService = useBelvo();
   const theme = useTheme();
 
-  const handleOnSuccess = async () => {
+  const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
+    const forceUpdate = updateConnectionId !== undefined;
+
+    await storeConnection(link, 'BELVO', forceUpdate);
+
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
-    navigation.goBack();
+
+    navigation.pop(2);
   };
 
   const handleOnError = async () => {
     Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });
-    navigation.goBack();
+    navigation.pop(2);
   };
 
   const handleOnClose = () => {
-    navigation.goBack();
+    navigation.pop(2);
   };
 
   useEffect(() => {
     const createWidgetToken = async () => {
       try {
-        const { access: token } = await belvoClient.widgetToken.create();
+        const token = await belvoService.createAccessToken(updateConnectionId);
         setWidgetToken(token);
       } catch (error) {
         Toast.show({
@@ -52,7 +60,7 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
     };
 
     createWidgetToken();
-  }, [belvoClient, updateConnectionId, navigation]);
+  }, [belvoService, updateConnectionId, navigation]);
 
   return (
     <Container>
