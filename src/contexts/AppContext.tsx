@@ -3,6 +3,7 @@ import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
+import useBelvoService from '../hooks/useBelvoService';
 import usePluggyService from '../hooks/usePluggyService';
 import { Account, Connection, Investment, Transaction } from '../models';
 import Provider from '../models/provider';
@@ -15,14 +16,13 @@ import {
 } from '../utils/contants';
 import { cloneObject } from '../utils/object';
 import { sleep } from '../utils/time';
-import useBelvoService from '../hooks/useBelvoService';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
 
 export type ConnectionContext = {
   id: string;
-  connectionId?: string;
   provider: Provider;
+  syncDisabled?: boolean;
 };
 
 export type MonthlyBalance = {
@@ -39,6 +39,8 @@ export type AppContextValue = {
   setDate: (value: Moment) => void;
   minimumDateWithData: Moment;
   lastUpdateDate: string;
+  isConnectionSyncDisabled: (id: string) => boolean;
+  toogleConnectionSyncDisabled: (id: string) => Promise<void>;
   connections: Connection[];
   storeConnection: (id: string, provider: Provider, forceUpdate?: boolean) => Promise<void>;
   deleteConnection: (id: string) => Promise<void>;
@@ -237,6 +239,29 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [connectionsContext, getProviderService],
   );
 
+  const isConnectionSyncDisabled = useCallback(
+    (id: string) => {
+      const connection = connectionsContext.find((item) => item.id === id);
+      return connection?.syncDisabled === true;
+    },
+    [connectionsContext],
+  );
+
+  const toogleConnectionSyncDisabled = useCallback(
+    async (id: string) => {
+      const newConnectionsContext = connectionsContext.map((item) =>
+        item.id === id
+          ? ({ ...item, syncDisabled: !item.syncDisabled } as ConnectionContext)
+          : item,
+      );
+
+      await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsContext));
+
+      setConnectionsContext(newConnectionsContext);
+    },
+    [connectionsContext],
+  );
+
   const fetchConnections = useCallback(async () => {
     if (connectionsContext.length === 0) {
       return;
@@ -272,18 +297,20 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const connectionList = await Promise.all(
-        connectionsContext.map(async ({ id, provider }) => {
-          const providerService = getProviderService(provider);
+        connectionsContext
+          .filter(({ syncDisabled }) => !syncDisabled)
+          .map(async ({ id, provider }) => {
+            const providerService = getProviderService(provider);
 
-          let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
+            let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
 
-          while (connection.status === 'UPDATING') {
-            await sleep(2000);
-            connection = await providerService.fetchConnectionById(id);
-          }
+            while (connection.status === 'UPDATING') {
+              await sleep(2000);
+              connection = await providerService.fetchConnectionById(id);
+            }
 
-          return connection;
-        }),
+            return connection;
+          }),
       );
 
       setConnections(connectionList);
@@ -523,6 +550,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setDate,
         minimumDateWithData,
         lastUpdateDate,
+        isConnectionSyncDisabled,
+        toogleConnectionSyncDisabled,
         connections,
         storeConnection,
         deleteConnection,

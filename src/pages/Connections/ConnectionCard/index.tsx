@@ -1,9 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import React, { useCallback, useContext, useRef } from 'react';
-import { Alert, ViewProps } from 'react-native';
+import React from 'react';
+import { ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SvgWithCssUri } from 'react-native-svg';
 import { useTheme } from 'styled-components/native';
@@ -12,12 +11,10 @@ import Divider from '../../../components/Divider';
 import FlexContainer from '../../../components/FlexContainer';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
-import AppContext from '../../../contexts/AppContext';
-import { Account, AccountSubType, Connection, ConnectionStatus } from '../../../models';
+import { Account, Connection, ConnectionStatus } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
-import ConnectionMenu, { Option } from '../ConnectionMenu';
 
-import { textCompare } from '../../../utils/text';
+import { accountName, textCompare } from '../../../utils/text';
 import {
   AccountLine,
   CardContent,
@@ -27,12 +24,6 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from './styles';
-
-const accountName: Record<AccountSubType, string> = {
-  CHECKING_ACCOUNT: 'Conta corrente',
-  SAVINGS_ACCOUNT: 'Conta poupança',
-  CREDIT_CARD: 'Cartão de crédito',
-};
 
 const ConnectionStatusMessage: Record<ConnectionStatus, string> = {
   UPDATED: '',
@@ -48,10 +39,6 @@ export interface ConnectionCardProps extends ViewProps {
 }
 
 const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, ...viewProps }) => {
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  const { deleteConnection } = useContext(AppContext);
-
   const theme = useTheme();
   const navigation = useNavigation();
 
@@ -61,49 +48,12 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
 
   const hasError = connection.status !== 'UPDATED' && connection.status !== 'UPDATING';
 
-  const handleCardOptionPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleUpdateConnection = () => {
-    const provider = connection.provider.toLowerCase();
-    const uri = `connect/${provider}`;
-    // @ts-expect-error Initially, the route to connect using a provider is `connect/<provider>`
-    navigation.navigate(uri, { updateConnectionId: connection.id });
-  };
-
-  const handleDeleteConnection = async () => {
-    Alert.alert(
-      'Apagar conexão?',
-      'Tem certeza que deseja apagar a conexão?',
-      [
-        { text: 'Cancelar', onPress: () => {} },
-        {
-          text: 'Apagar',
-          onPress: async () => {
-            await deleteConnection(connection.id);
-          },
-        },
-      ],
-      { cancelable: true },
-    );
-  };
-
-  const handleMenuOptionPress = (option: Option) => {
-    bottomSheetModalRef.current?.dismiss();
-
-    if (option === 'update') {
-      return handleUpdateConnection();
-    }
-
-    if (option === 'delete') {
-      return handleDeleteConnection();
-    }
-  };
-
   return (
     <>
-      <Card {...viewProps}>
+      <Card
+        {...viewProps}
+        onPress={() => navigation.navigate('connection-detail', { connectionId: connection.id })}
+      >
         {hasError && (
           <CardErrorContainer>
             <MaterialIcons name="error" size={24} color={theme.colors.textWhite} />
@@ -129,12 +79,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
               </Text>
             </CardHeaderContent>
             <TouchableOpacity>
-              <MaterialIcons
-                name="more-vert"
-                size={24}
-                color={theme.colors.primary}
-                onPress={handleCardOptionPress}
-              />
+              <MaterialIcons name="navigate-next" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </CardHeader>
           <Divider />
@@ -155,7 +100,6 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
           </FlexContainer>
         </CardContent>
       </Card>
-      <ConnectionMenu onPress={handleMenuOptionPress} ref={bottomSheetModalRef} />
     </>
   );
 };

@@ -3,6 +3,7 @@ export declare global {
     interface RootParamList {
       home: undefined;
       connections: undefined;
+      'connection-detail': { connectionId: string };
       connect: undefined;
       'connect/pluggy':
         | {
