@@ -1,13 +1,6 @@
 import styled from 'styled-components/native';
 import FlexContainer from '../../../components/FlexContainer';
 
-export const Card = styled.View`
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.lightGray};
-  border-radius: 24px;
-  overflow: hidden;
-`;
-
 export const CardErrorContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -28,14 +21,15 @@ export const CardHeader = styled.View`
   align-items: center;
 `;
 
-export const ListItemAvatar = styled.View<{ color: string }>`
+export const ConnectionAvatar = styled.View<{ color: string; size?: number }>`
   border-style: solid;
   border-width: 1px;
   border-color: ${(props) => props.color};
   border-radius: 100px;
   margin-right: 12px;
-  height: 32px;
-  width: 32px;
+  height: ${(props) => (props.size ? `${props.size}px` : '32px')};
+  width: ${(props) => (props.size ? `${props.size}px` : '32px')};
+  overflow: hidden;
 `;
 
 export const CardHeaderContent = styled.View`

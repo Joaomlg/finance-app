@@ -1,82 +1,27 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { PluggyConnect } from 'react-native-pluggy-connect';
-import Toast from 'react-native-toast-message';
-import { useTheme } from 'styled-components/native';
-import AppContext from '../../contexts/AppContext';
-import usePluggyService from '../../hooks/pluggyService';
-import { StackRouteParamList } from '../../routes/stack.routes';
-import { Item } from '../../services/pluggy';
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import BelvoLogo from '../../assets/icon/belvo_logo.svg';
+import PluggyLogo from '../../assets/icon/pluggy_logo.svg';
+import ScreenContainer from '../../components/ScreenContainer';
+import Text from '../../components/Text';
+import { BottomSheet, CustomCard, StyledHeader } from './styles';
 
-import { Container } from './styles';
-
-const Connect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect'>> = ({
-  route,
-  navigation,
-}) => {
-  const updateItemId = route.params?.updateItemId;
-
-  const [connectToken, setConnectToken] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
-  const { storeItem } = useContext(AppContext);
-
-  const pluggyService = usePluggyService();
-  const theme = useTheme();
-
-  const handleOnSuccess = async (data: { item: Item }) => {
-    const { item } = data;
-
-    await storeItem(item);
-
-    navigation.goBack();
-  };
-
-  const handleOnError = async (error: { message: string; data?: { item: Item } }) => {
-    const { data } = error;
-
-    if (data) {
-      await storeItem(data.item);
-    }
-  };
-
-  const handleOnClose = () => {
-    navigation.goBack();
-  };
-
-  useEffect(() => {
-    const createConnectToken = async () => {
-      try {
-        const { accessToken } = await pluggyService.createConnectToken(updateItemId);
-        setConnectToken(accessToken);
-      } catch (error) {
-        Toast.show({ type: 'error', text1: 'Ocorreu um erro inesperado!' });
-        navigation.goBack();
-      }
-      setIsLoading(false);
-    };
-
-    createConnectToken();
-  }, [pluggyService, updateItemId, navigation]);
+const Connect: React.FC = () => {
+  const navigation = useNavigation();
 
   return (
-    <Container>
-      {isLoading ? (
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      ) : (
-        <PluggyConnect
-          connectToken={connectToken}
-          includeSandbox={__DEV__}
-          countries={['BR']}
-          connectorTypes={['PERSONAL_BANK', 'INVESTMENT']}
-          onSuccess={handleOnSuccess}
-          onError={handleOnError}
-          onClose={handleOnClose}
-          updateItem={updateItemId}
-        />
-      )}
-    </Container>
+    <ScreenContainer>
+      <StyledHeader title="Connectar"></StyledHeader>
+      <BottomSheet>
+        <Text variant="title">Selecione um provedor</Text>
+        <CustomCard onPress={() => navigation.navigate('connect/pluggy')}>
+          <PluggyLogo height={36} width={130} />
+        </CustomCard>
+        <CustomCard onPress={() => navigation.navigate('connect/belvo')}>
+          <BelvoLogo height={36} width={100} />
+        </CustomCard>
+      </BottomSheet>
+    </ScreenContainer>
   );
 };
 

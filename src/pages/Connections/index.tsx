@@ -6,21 +6,25 @@ import FlexContainer from '../../components/FlexContainer';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
-import { Item } from '../../services/pluggy';
+import { Connection } from '../../models';
 import ConnectionCard from '../Connections/ConnectionCard';
 import { BottomSheet, StyledHeader } from './styles';
 
 const Connections: React.FC = () => {
-  const { isLoading, items, accounts, hideValues, setHideValues, fetchItems } =
+  const { isLoading, connections, accounts, hideValues, setHideValues, fetchConnections } =
     useContext(AppContext);
 
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const renderItem = useCallback(
-    (item: Item) => {
-      const itemAccounts = accounts.filter((account) => account.itemId === item.id);
-      return <ConnectionCard key={item.id} item={item} accounts={itemAccounts} />;
+  const renderConnection = useCallback(
+    (connection: Connection) => {
+      const connectionAccounts = accounts.filter(
+        (account) => account.connectionId === connection.id,
+      );
+      return (
+        <ConnectionCard key={connection.id} connection={connection} accounts={connectionAccounts} />
+      );
     },
     [accounts],
   );
@@ -31,7 +35,7 @@ const Connections: React.FC = () => {
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
-            onRefresh={fetchItems}
+            onRefresh={fetchConnections}
             colors={[theme.colors.primary]}
           />
         }
@@ -54,9 +58,11 @@ const Connections: React.FC = () => {
         ></StyledHeader>
         <BottomSheet>
           <Text variant="light" color="textLight">
-            {items.length} Conexões
+            {connections.length} Conexões
           </Text>
-          <FlexContainer gap={24}>{items.map((item) => renderItem(item))}</FlexContainer>
+          <FlexContainer gap={24}>
+            {connections.map((connection) => renderConnection(connection))}
+          </FlexContainer>
         </BottomSheet>
       </ScrollView>
     </ScreenContainer>

@@ -60,8 +60,8 @@ const Home: React.FC = () => {
     minimumDateWithData,
     lastUpdateDate,
     setHideValues,
-    updateItems,
-    fetchItems,
+    updateConnections,
+    fetchConnections,
     transactions,
     totalBalance,
     totalInvestment,
@@ -117,13 +117,13 @@ const Home: React.FC = () => {
         {
           text: 'Atualizar',
           onPress: async () => {
-            await fetchItems();
+            await fetchConnections();
           },
         },
         {
           text: 'Sincronizar',
           onPress: async () => {
-            await updateItems();
+            await updateConnections();
           },
         },
       ],
@@ -245,8 +245,8 @@ const Home: React.FC = () => {
             <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
           </SectionHeader>
           <TransactionListContainer onLayout={onTransactionListLayout}>
-            {lastTransactions.map((item, index) => (
-              <TransactionListItem item={item} key={index} />
+            {lastTransactions.map((transaction, index) => (
+              <TransactionListItem item={transaction} key={index} />
             ))}
           </TransactionListContainer>
         </BottomSheet>

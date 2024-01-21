@@ -1,10 +1,10 @@
 {
   "name": "finance-app",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 4 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
+    "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 8 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
     "build:preview": "eas build --profile preview",
     "update:preview": "eas update --channel staging",
     "android": "expo start --android",
@@ -32,6 +32,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.6",
+    "react-native-base64": "^0.2.1",
     "react-native-dotenv": "^3.4.6",
     "react-native-gesture-handler": "~2.12.0",
     "react-native-pager-view": "6.2.0",
@@ -40,16 +41,19 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
+    "react-native-svg-transformer": "^1.3.0",
     "react-native-tab-view": "^3.4.0",
     "react-native-toast-message": "^2.1.5",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "@expo/metro-config": "~0.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
     "@types/react": "~18.2.14",
     "@types/react-native": "~0.70.6",
+    "@types/react-native-base64": "^0.2.0",
     "@types/react-native-dotenv": "^0.2.0",
     "@types/styled-components-react-native": "^5.2.0",
     "@typescript-eslint/eslint-plugin": "^6.16.0",

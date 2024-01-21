@@ -5,7 +5,8 @@ import { useTheme } from 'styled-components/native';
 import Divider from '../../../components/Divider';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
-import { Transaction } from '../../../services/pluggy';
+import { Transaction } from '../../../models';
+
 import {
   ListHeaderContainer,
   ListSeparatorContainer,

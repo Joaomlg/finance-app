@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ViewProps } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import { Transaction } from '../../services/pluggy';
+import { Transaction } from '../../models';
 import Money from '../Money';
 import Text from '../Text';
 

@@ -3,17 +3,27 @@ import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
-import usePluggyService from '../hooks/pluggyService';
-import { Account, Investment, Item, Transaction } from '../services/pluggy';
+import useBelvoService from '../hooks/useBelvoService';
+import usePluggyService from '../hooks/usePluggyService';
+import { Account, Connection, Investment, Transaction } from '../models';
+import Provider from '../models/provider';
 import { range } from '../utils/array';
 import {
+  ConnectionsAsyncStorageKey,
   ItemsAsyncStorageKey,
   LastUpdateDateFormat,
   LastUpdateDateStorageKey,
 } from '../utils/contants';
+import { cloneObject } from '../utils/object';
 import { sleep } from '../utils/time';
 
 const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
+
+export type ConnectionContext = {
+  id: string;
+  provider: Provider;
+  syncDisabled?: boolean;
+};
 
 export type MonthlyBalance = {
   date: Moment;
@@ -29,13 +39,15 @@ export type AppContextValue = {
   setDate: (value: Moment) => void;
   minimumDateWithData: Moment;
   lastUpdateDate: string;
-  items: Item[];
-  storeItem: (item: Item) => Promise<void>;
-  deleteItem: (item: Item) => Promise<void>;
-  fetchItems: () => Promise<void>;
-  fetchingItems: boolean;
-  updateItems: () => Promise<boolean>;
-  updatingItems: boolean;
+  isConnectionSyncDisabled: (id: string) => boolean;
+  toogleConnectionSyncDisabled: (id: string) => Promise<void>;
+  connections: Connection[];
+  storeConnection: (id: string, provider: Provider, forceUpdate?: boolean) => Promise<void>;
+  deleteConnection: (id: string) => Promise<void>;
+  fetchConnections: () => Promise<void>;
+  fetchingConnections: boolean;
+  updateConnections: () => Promise<boolean>;
+  updatingConnections: boolean;
   accounts: Account[];
   fetchAccounts: () => Promise<void>;
   fetchingAccounts: boolean;
@@ -69,12 +81,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [date, setDate] = useState(now);
   const [lastUpdateDate, setLastUpdateDate] = useState('');
 
-  const [itemsId, setItemsId] = useState([] as string[]);
-  const [loadingItemsId, setLoadingItemsId] = useState(false);
+  const [connectionsContext, setConnectionsContext] = useState([] as ConnectionContext[]);
+  const [loadingConnectionsId, setLoadingConnectionsId] = useState(false);
 
-  const [items, setItems] = useState([] as Item[]);
-  const [fetchingItems, setFetchingItems] = useState(false);
-  const [updatingItems, setUpdatingItems] = useState(false);
+  const [connections, setConnections] = useState([] as Connection[]);
+  const [fetchingConnections, setFetchingConnections] = useState(false);
+  const [updatingConnections, setUpdatingConnections] = useState(false);
 
   const [accounts, setAccounts] = useState([] as Account[]);
   const [fetchingAccounts, setFetchingAccounts] = useState(false);
@@ -90,10 +102,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
 
   const pluggyService = usePluggyService();
+  const belvoService = useBelvoService();
 
   const isLoading =
-    loadingItemsId ||
-    fetchingItems ||
+    loadingConnectionsId ||
+    fetchingConnections ||
     fetchingAccounts ||
     fetchingInvestments ||
     fetchingTransactions ||
@@ -143,87 +156,164 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const minimumDateWithData = useMemo(() => {
-    const firstItemCreatedAt = items.reduce((minDate, item) => {
-      const createdAt = moment(new Date(item.createdAt));
+    const firstConnectionCreatedAt = connections.reduce((minDate, connection) => {
+      const createdAt = moment(new Date(connection.createdAt));
       return createdAt.isBefore(minDate) ? createdAt : minDate;
     }, now.clone());
 
-    return firstItemCreatedAt.subtract(1, 'year');
-  }, [items]);
+    return firstConnectionCreatedAt.subtract(1, 'year');
+  }, [connections]);
 
-  const storeItem = useCallback(
-    async (item: Item) => {
+  const getProviderService = useCallback(
+    (provider: Provider) => {
+      switch (provider) {
+        case 'PLUGGY':
+          return pluggyService;
+        case 'BELVO':
+          return belvoService;
+        default:
+          throw new Error(`Unknown provider: ${provider}`);
+      }
+    },
+    [belvoService, pluggyService],
+  );
+
+  const storeConnection = useCallback(
+    async (id: string, provider: Provider, forceUpdate = false) => {
       try {
-        const newUniqueItems = [...new Set([...itemsId, item.id])];
+        const alreadyExists = connectionsContext.find(
+          (item) => item.id === id && item.provider === provider,
+        );
 
-        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newUniqueItems));
+        if (alreadyExists !== undefined) {
+          if (forceUpdate) {
+            const newConnectionsContext = cloneObject(connectionsContext);
+            setConnectionsContext(newConnectionsContext);
+          }
+          return;
+        }
 
-        setItemsId(newUniqueItems);
+        const newConnectionsContext: ConnectionContext[] = [
+          ...connectionsContext,
+          { id, provider },
+        ];
+
+        await AsyncStorage.setItem(
+          ConnectionsAsyncStorageKey,
+          JSON.stringify(newConnectionsContext),
+        );
+
+        setConnectionsContext(newConnectionsContext);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível armazenar a nova conexão!' });
       }
     },
-    [itemsId],
+    [connectionsContext],
   );
 
-  const deleteItem = useCallback(
-    async (item: Item) => {
+  const deleteConnection = useCallback(
+    async (id: string) => {
       try {
-        await pluggyService.deleteItem(item.id);
+        const connectionContext = connectionsContext.find((item) => item.id === id);
 
-        const newItemsId = itemsId.filter((itemId) => itemId !== item.id);
+        if (connectionContext === undefined) {
+          throw new Error('Connection not found!');
+        }
 
-        await AsyncStorage.setItem(ItemsAsyncStorageKey, JSON.stringify(newItemsId));
+        const providerService = getProviderService(connectionContext.provider);
 
-        setItemsId(newItemsId);
+        await providerService.deleteConnectionById(id);
+
+        const newConnectionsContext = connectionsContext.filter((item) => item.id !== id);
+
+        await AsyncStorage.setItem(
+          ConnectionsAsyncStorageKey,
+          JSON.stringify(newConnectionsContext),
+        );
+
+        setConnectionsContext(newConnectionsContext);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
       }
     },
-    [pluggyService, itemsId],
+    [connectionsContext, getProviderService],
   );
 
-  const fetchItems = useCallback(async () => {
-    if (itemsId.length === 0) {
+  const isConnectionSyncDisabled = useCallback(
+    (id: string) => {
+      const connection = connectionsContext.find((item) => item.id === id);
+      return connection?.syncDisabled === true;
+    },
+    [connectionsContext],
+  );
+
+  const toogleConnectionSyncDisabled = useCallback(
+    async (id: string) => {
+      const newConnectionsContext = connectionsContext.map((item) =>
+        item.id === id
+          ? ({ ...item, syncDisabled: !item.syncDisabled } as ConnectionContext)
+          : item,
+      );
+
+      await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsContext));
+
+      setConnectionsContext(newConnectionsContext);
+    },
+    [connectionsContext],
+  );
+
+  const fetchConnections = useCallback(async () => {
+    if (connectionsContext.length === 0) {
       return;
     }
 
-    setFetchingItems(true);
+    setFetchingConnections(true);
 
     try {
-      const itemList = await Promise.all(itemsId.map((id) => pluggyService.fetchItem(id)));
-      setItems(itemList);
+      const connectionList = await Promise.all(
+        connectionsContext.map(({ id, provider }) => {
+          const providerService = getProviderService(provider);
+          return providerService.fetchConnectionById(id);
+        }),
+      );
+      setConnections(connectionList);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível obter informação das conexões!' });
     }
 
-    setFetchingItems(false);
-  }, [pluggyService, itemsId]);
+    setFetchingConnections(false);
+  }, [connectionsContext, getProviderService]);
 
-  const updateItems = useCallback(async () => {
-    if (itemsId.length === 0) {
+  const updateConnections = useCallback(async () => {
+    if (connectionsContext.length === 0) {
       return true;
     }
 
-    setUpdatingItems(true);
+    setUpdatingConnections(true);
+
+    const commonLastUpdateDate = moment(lastUpdateDate, LastUpdateDateFormat).toISOString();
 
     let success = true;
 
     try {
-      const itemList = await Promise.all(
-        itemsId.map(async (id) => {
-          let item = await pluggyService.updateItem(id);
+      const connectionList = await Promise.all(
+        connectionsContext
+          .filter(({ syncDisabled }) => !syncDisabled)
+          .map(async ({ id, provider }) => {
+            const providerService = getProviderService(provider);
 
-          while (item.status === 'UPDATING') {
-            await sleep(2000);
-            item = await pluggyService.fetchItem(id);
-          }
+            let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
 
-          return item;
-        }),
+            while (connection.status === 'UPDATING') {
+              await sleep(2000);
+              connection = await providerService.fetchConnectionById(id);
+            }
+
+            return connection;
+          }),
       );
 
-      setItems(itemList);
+      setConnections(connectionList);
 
       const updateDate = now.format(LastUpdateDateFormat);
       await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
@@ -234,25 +324,27 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       success = false;
     }
 
-    setUpdatingItems(false);
+    setUpdatingConnections(false);
 
     return success;
-  }, [pluggyService, itemsId]);
+  }, [connectionsContext, getProviderService, lastUpdateDate]);
 
   const fetchAccounts = useCallback(async () => {
-    if (items.length === 0) {
+    if (connections.length === 0) {
       return;
     }
 
     setFetchingAccounts(true);
 
     try {
-      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchAccounts(id)));
-
-      const accountList = result.reduce(
-        (list, item) => [...list, ...item.results],
-        [] as Account[],
+      const result = await Promise.all(
+        connections.map((connection) => {
+          const providerService = getProviderService(connection.provider);
+          return providerService.fetchAccounts(connection);
+        }),
       );
+
+      const accountList = result.reduce((list, account) => [...list, ...account], [] as Account[]);
 
       setAccounts(accountList);
     } catch (error) {
@@ -260,20 +352,25 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingAccounts(false);
-  }, [pluggyService, items]);
+  }, [connections, getProviderService]);
 
   const fetchInvestments = useCallback(async () => {
-    if (items.length === 0) {
+    if (connections.length === 0) {
       return;
     }
 
     setFetchingInvestments(true);
 
     try {
-      const result = await Promise.all(items.map(({ id }) => pluggyService.fetchInvestments(id)));
+      const result = await Promise.all(
+        connections.map((connection) => {
+          const providerService = getProviderService(connection.provider);
+          return providerService.fetchInvestments(connection);
+        }),
+      );
 
       const investmentList = result.reduce(
-        (list, item) => [...list, ...item.results],
+        (list, investment) => [...list, ...investment],
         [] as Investment[],
       );
 
@@ -286,7 +383,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingInvestments(false);
-  }, [pluggyService, items]);
+  }, [connections, getProviderService]);
 
   const fetchMonthTransactions = useCallback(
     async (monthDate: Moment) => {
@@ -295,24 +392,24 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       const result = await Promise.all(
         accounts
-          .filter((item) => item.type !== 'CREDIT')
-          .map(({ id }) =>
-            pluggyService.fetchTransactions(id, {
-              pageSize: 500,
+          .filter(({ type }) => type !== 'CREDIT')
+          .map((account) => {
+            const providerService = getProviderService(account.provider);
+            return providerService.fetchTransactions(account, {
               from: startDate.format('YYYY-MM-DD'),
               to: endDate.format('YYYY-MM-DD'),
-            }),
-          ),
+            });
+          }),
       );
 
       const transactionsList = result
-        .reduce((list, item) => [...list, ...item.results], [] as Transaction[])
-        .filter((item) => !NUBANK_IGNORED_TRANSACTIONS.includes(item.description))
+        .reduce((list, transaction) => [...list, ...transaction], [] as Transaction[])
+        .filter(({ description }) => !NUBANK_IGNORED_TRANSACTIONS.includes(description))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       return transactionsList;
     },
-    [pluggyService, accounts],
+    [accounts, getProviderService],
   );
 
   const fetchTransactions = useCallback(async () => {
@@ -344,7 +441,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         .map((i) => currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'))
         .filter((date) => date.isSameOrAfter(minimumDateWithData, 'month'));
 
-      const results = await Promise.all(dates.map((item) => fetchMonthTransactions(item)));
+      const results = await Promise.all(dates.map((date) => fetchMonthTransactions(date)));
 
       const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
         const incomes = transactions
@@ -368,22 +465,44 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   useEffect(() => {
-    const loadItemsId = async () => {
-      setLoadingItemsId(true);
+    const loadConnectionsContext = async () => {
+      setLoadingConnectionsId(true);
 
+      const serializedConnectionsContext = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
+      let connectionsContext: ConnectionContext[] = serializedConnectionsContext
+        ? JSON.parse(serializedConnectionsContext)
+        : [];
+
+      // This is necessary to be compatible with previous versions
       const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
-      const ids: string[] = serializedIds ? JSON.parse(serializedIds) : [];
+      if (serializedIds) {
+        const ids: string[] = JSON.parse(serializedIds);
 
-      setItemsId(ids);
+        connectionsContext = [
+          ...connectionsContext,
+          ...ids.map(
+            (id) =>
+              ({
+                id,
+                provider: 'PLUGGY',
+              } as ConnectionContext),
+          ),
+        ] as ConnectionContext[];
 
-      setLoadingItemsId(false);
+        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(connectionsContext));
+        await AsyncStorage.removeItem(ItemsAsyncStorageKey);
+      }
+
+      setConnectionsContext(connectionsContext);
+
+      setLoadingConnectionsId(false);
     };
 
-    loadItemsId();
+    loadConnectionsContext();
   }, []);
 
   useEffect(() => {
-    const fetchOrUpdateItems = async () => {
+    const fetchOrUpdateConnections = async () => {
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
       const shouldUpdate = updateDate
@@ -393,24 +512,24 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       let updatedSuccess = true;
 
       if (shouldUpdate) {
-        updatedSuccess = await updateItems();
+        updatedSuccess = await updateConnections();
       }
 
-      const shouldFetchItems = !shouldUpdate || !updatedSuccess;
+      const shouldFetchConnections = !shouldUpdate || !updatedSuccess;
 
-      if (shouldFetchItems) {
+      if (shouldFetchConnections) {
         setLastUpdateDate(updateDate as string);
-        await fetchItems();
+        await fetchConnections();
       }
     };
 
-    fetchOrUpdateItems();
-  }, [itemsId, fetchItems, updateItems]);
+    fetchOrUpdateConnections();
+  }, [connectionsContext, fetchConnections, updateConnections]);
 
   useEffect(() => {
     fetchAccounts();
     fetchInvestments();
-  }, [items, fetchAccounts, fetchInvestments]);
+  }, [connections, fetchAccounts, fetchInvestments]);
 
   useEffect(() => {
     fetchTransactions();
@@ -431,13 +550,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setDate,
         minimumDateWithData,
         lastUpdateDate,
-        items,
-        storeItem,
-        deleteItem,
-        fetchItems,
-        fetchingItems,
-        updateItems,
-        updatingItems,
+        isConnectionSyncDisabled,
+        toogleConnectionSyncDisabled,
+        connections,
+        storeConnection,
+        deleteConnection,
+        fetchConnections,
+        fetchingConnections,
+        updateConnections,
+        updatingConnections,
         accounts,
         fetchAccounts,
         fetchingAccounts,
@@ -462,7 +583,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }}
     >
       {children}
-      {updatingItems && <LoadingModal text="Sincronizando conexões" />}
+      {updatingConnections && <LoadingModal text="Sincronizando conexões" />}
     </AppContext.Provider>
   );
 };

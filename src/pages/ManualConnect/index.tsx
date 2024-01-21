@@ -1,22 +1,21 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
+import Toast from 'react-native-toast-message';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
-import { Item } from '../../services/pluggy';
 import { BottomSheet, Button, StyledHeader, TextInput } from './styles';
-import Toast from 'react-native-toast-message';
-import { useNavigation } from '@react-navigation/native';
 
 const ManualConnect: React.FC = () => {
   const [id, setId] = useState('');
 
-  const { storeItem } = useContext(AppContext);
+  const { storeConnection } = useContext(AppContext);
 
   const navigation = useNavigation();
 
   const saveConnection = () => {
     try {
-      storeItem({ id } as Item);
+      storeConnection(id, 'PLUGGY');
       Toast.show({ type: 'success', text1: 'Conexão adicionada com sucesso!' });
       navigation.navigate('connections');
     } catch (err) {

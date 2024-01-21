@@ -3,9 +3,16 @@ export declare global {
     interface RootParamList {
       home: undefined;
       connections: undefined;
-      connect:
+      'connection-detail': { connectionId: string };
+      connect: undefined;
+      'connect/pluggy':
         | {
-            updateItemId?: string;
+            updateConnectionId?: string;
+          }
+        | undefined;
+      'connect/belvo':
+        | {
+            updateConnectionId?: string;
           }
         | undefined;
       manualConnect: undefined;

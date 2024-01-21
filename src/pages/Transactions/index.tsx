@@ -1,11 +1,11 @@
 import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
 import AppContext from '../../contexts/AppContext';
-import { Transaction } from '../../services/pluggy';
+import { Transaction } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
-import { StyledHeader } from './styles';
 import TransactionList from './TransactionList';
 import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
+import { StyledHeader } from './styles';
 
 const Transactions: React.FC = () => {
   const {
