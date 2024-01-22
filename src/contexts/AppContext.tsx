@@ -213,16 +213,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const deleteConnection = useCallback(
     async (id: string) => {
-      try {
-        const connectionContext = connectionsContext.find((item) => item.id === id);
+      const connectionContext = connectionsContext.find((item) => item.id === id);
 
+      try {
         if (connectionContext === undefined) {
           throw new Error('Connection not found!');
         }
-
-        const providerService = getProviderService(connectionContext.provider);
-
-        await providerService.deleteConnectionById(id);
 
         const newConnectionsContext = connectionsContext.filter((item) => item.id !== id);
 
@@ -234,6 +230,18 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setConnectionsContext(newConnectionsContext);
       } catch (error) {
         Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
+        return;
+      }
+
+      const providerService = getProviderService(connectionContext.provider);
+
+      try {
+        await providerService.deleteConnectionById(id);
+      } catch (error) {
+        Toast.show({
+          type: 'info',
+          text1: 'Não foi possível apagar a conexão no respectivo provedor.',
+        });
       }
     },
     [connectionsContext, getProviderService],
@@ -297,20 +305,22 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       const connectionList = await Promise.all(
-        connectionsContext
-          .filter(({ syncDisabled }) => !syncDisabled)
-          .map(async ({ id, provider }) => {
-            const providerService = getProviderService(provider);
+        connectionsContext.map(async ({ id, provider, syncDisabled }) => {
+          const providerService = getProviderService(provider);
 
-            let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
+          if (syncDisabled) {
+            return await providerService.fetchConnectionById(id);
+          }
 
-            while (connection.status === 'UPDATING') {
-              await sleep(2000);
-              connection = await providerService.fetchConnectionById(id);
-            }
+          let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
 
-            return connection;
-          }),
+          while (connection.status === 'UPDATING') {
+            await sleep(2000);
+            connection = await providerService.fetchConnectionById(id);
+          }
+
+          return connection;
+        }),
       );
 
       setConnections(connectionList);

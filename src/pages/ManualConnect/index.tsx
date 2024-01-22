@@ -9,7 +9,7 @@ import { BottomSheet, Button, StyledHeader, TextInput } from './styles';
 const ManualConnect: React.FC = () => {
   const [id, setId] = useState('');
 
-  const { storeConnection } = useContext(AppContext);
+  const { storeConnection, deleteConnection } = useContext(AppContext);
 
   const navigation = useNavigation();
 
@@ -23,6 +23,16 @@ const ManualConnect: React.FC = () => {
     }
   };
 
+  const RemoveConnection = () => {
+    try {
+      deleteConnection(id);
+      Toast.show({ type: 'success', text1: 'Conexão removida com sucesso!' });
+      navigation.navigate('connections');
+    } catch (err) {
+      Toast.show({ type: 'error', text1: 'Não foi possível remover a conexão!' });
+    }
+  };
+
   return (
     <ScreenContainer>
       <StyledHeader title="Conexão manual" />
@@ -31,6 +41,11 @@ const ManualConnect: React.FC = () => {
         <Button onPress={saveConnection}>
           <Text variant="title" color="textWhite">
             Adicionar
+          </Text>
+        </Button>
+        <Button onPress={RemoveConnection}>
+          <Text variant="title" color="textWhite">
+            Remover
           </Text>
         </Button>
       </BottomSheet>
