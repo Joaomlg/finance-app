@@ -63,6 +63,7 @@ const ConnectionDetail: React.FC<
           text: 'Apagar',
           onPress: async () => {
             await deleteConnection(connection.id);
+            navigation.goBack();
           },
         },
       ],
