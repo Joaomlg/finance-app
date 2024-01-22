@@ -513,6 +513,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   useEffect(() => {
     const fetchOrUpdateConnections = async () => {
+      if (connectionsContext.length === 0) {
+        return;
+      }
+
       const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
 
       const shouldUpdate = updateDate
