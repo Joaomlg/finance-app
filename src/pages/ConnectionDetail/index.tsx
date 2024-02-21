@@ -1,8 +1,10 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg';
+import { useTheme } from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
 import Money from '../../components/Money';
@@ -11,9 +13,11 @@ import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
-import { accountName, capitalize, textCompare } from '../../utils/text';
+import { ConnectionStatusMessage, accountName, capitalize, textCompare } from '../../utils/text';
 import {
   AccountLine,
+  CardErrorContainer,
+  CardErrorMessage,
   CardHeaderContent,
   ConnectionAvatar,
 } from '../Connections/ConnectionCard/styles';
@@ -34,8 +38,12 @@ const ConnectionDetail: React.FC<
     toogleConnectionSyncDisabled,
   } = useContext(AppContext);
 
+  const theme = useTheme();
+
   const connection = connections.find(({ id }) => id === connectionId);
   const connectionAccounts = accounts.filter((account) => account.connectionId === connectionId);
+
+  const hasError = connection?.status !== 'UPDATED' && connection?.status !== 'UPDATING';
 
   const handleUpdateConnection = () => {
     if (connection === undefined) {
@@ -83,6 +91,19 @@ const ConnectionDetail: React.FC<
         ]}
       ></StyledHeader>
       <BottomSheet>
+        {connection && hasError && (
+          <CardErrorContainer radius={true}>
+            <MaterialIcons name="error" size={24} color={theme.colors.textWhite} />
+            <CardErrorMessage>
+              <Text variant="light" color="textWhite">
+                Não foi possível sincronizar os dados!
+              </Text>
+              <Text variant="light" color="textWhite">
+                {ConnectionStatusMessage[connection?.status]}
+              </Text>
+            </CardErrorMessage>
+          </CardErrorContainer>
+        )}
         <BottomHeader>
           <ConnectionAvatar color={'#' + connection?.connector.primaryColor} size={48}>
             <SvgWithCssUri height="100%" width="100%" uri={connection?.connector.imageUrl || ''} />

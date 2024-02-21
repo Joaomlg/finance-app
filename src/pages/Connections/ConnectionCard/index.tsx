@@ -10,10 +10,10 @@ import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
-import { Account, Connection, ConnectionStatus } from '../../../models';
+import { Account, Connection } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 
-import { accountName, textCompare } from '../../../utils/text';
+import { ConnectionStatusMessage, accountName, textCompare } from '../../../utils/text';
 import {
   AccountLine,
   CardContainer,
@@ -24,14 +24,6 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from './styles';
-
-const ConnectionStatusMessage: Record<ConnectionStatus, string> = {
-  UPDATED: '',
-  UPDATING: '',
-  LOGIN_ERROR: 'Atualize as credenciais da conexão.',
-  WAITING_USER_INPUT: 'Autenticação de duas etapas solicitada.',
-  OUTDATED: 'Sincronize a conexão novamente.',
-};
 
 export interface ConnectionCardProps extends ViewProps {
   connection: Connection;

@@ -1,10 +1,11 @@
 import styled from 'styled-components/native';
 
-export const CardErrorContainer = styled.View`
+export const CardErrorContainer = styled.View<{ radius?: boolean }>`
   flex-direction: row;
   align-items: center;
   padding: 8px 16px;
   background-color: ${({ theme }) => theme.colors.error};
+  border-radius: ${({ radius }) => (radius ? '8px' : '0')};
 `;
 
 export const CardErrorMessage = styled.View`
