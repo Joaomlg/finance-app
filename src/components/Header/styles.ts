@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import FlexContainer from '../FlexContainer';
 
 export const Container = styled.View`
   flex-direction: row;
@@ -12,7 +11,9 @@ export const TitleButton = styled.TouchableOpacity`
   align-items: flex-end;
 `;
 
-export const Actions = styled(FlexContainer).attrs({ direction: 'row', gap: 24 })`
+export const Actions = styled.View`
+  flex-direction: row;
+  gap: 24px;
   flex-grow: 1;
   justify-content: flex-end;
 `;

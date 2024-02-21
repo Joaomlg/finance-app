@@ -1,6 +1,5 @@
 import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
-import FlexContainer from '../../../components/FlexContainer';
 import TransactionListItem from '../../../components/TransactionListItem';
 import { Transaction } from '../../../models';
 
@@ -15,8 +14,9 @@ export const StyledFlatList = styled(
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
 `;
 
-export const ListHeaderContainer = styled(FlexContainer).attrs({ gap: 4 })`
+export const ListHeaderContainer = styled.View`
   margin-bottom: 12px;
+  gap: 4px;
 `;
 
 export const ListSeparatorContainer = styled.View`

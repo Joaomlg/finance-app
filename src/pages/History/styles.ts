@@ -1,7 +1,6 @@
 import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
 import Divider from '../../components/Divider';
-import FlexContainer from '../../components/FlexContainer';
 import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
 import { MonthlyBalance } from '../../contexts/AppContext';
@@ -22,14 +21,20 @@ export const StyledFlatList = styled(
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
 `;
 
+export const ItemContainer = styled.View`
+  gap: 12px;
+`;
+
 export const ItemHeader = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 `;
 
-export const MonthTrendContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 8 })`
+export const MonthTrendContainer = styled.View`
+  flex-direction: row;
   align-items: center;
+  gap: 8px;
 `;
 
 export const TouchableIconContainer = styled.TouchableOpacity``;

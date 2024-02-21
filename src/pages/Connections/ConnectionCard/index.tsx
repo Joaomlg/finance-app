@@ -8,7 +8,6 @@ import { SvgWithCssUri } from 'react-native-svg';
 import { useTheme } from 'styled-components/native';
 import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
-import FlexContainer from '../../../components/FlexContainer';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
 import { Account, Connection, ConnectionStatus } from '../../../models';
@@ -17,6 +16,7 @@ import { LastUpdateDateFormat } from '../../../utils/contants';
 import { accountName, textCompare } from '../../../utils/text';
 import {
   AccountLine,
+  CardContainer,
   CardContent,
   CardErrorContainer,
   CardErrorMessage,
@@ -67,7 +67,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
             </CardErrorMessage>
           </CardErrorContainer>
         )}
-        <CardContent>
+        <CardContainer>
           <CardHeader>
             <ConnectionAvatar color={'#' + connection.connector.primaryColor}>
               <SvgWithCssUri height="100%" width="100%" uri={connection.connector.imageUrl} />
@@ -83,7 +83,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
             </TouchableOpacity>
           </CardHeader>
           <Divider />
-          <FlexContainer gap={16}>
+          <CardContent>
             {accounts
               .sort((a, b) => textCompare(a.subtype, b.subtype))
               .map((account, index) => (
@@ -97,8 +97,8 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
                   />
                 </AccountLine>
               ))}
-          </FlexContainer>
-        </CardContent>
+          </CardContent>
+        </CardContainer>
       </Card>
     </>
   );

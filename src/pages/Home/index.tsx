@@ -12,7 +12,6 @@ import {
   UIManager,
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import FlexContainer from '../../components/FlexContainer';
 import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
 import Money from '../../components/Money';
@@ -21,20 +20,22 @@ import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
-import { checkCurrentMonth, formatMonthYearDate, NOW } from '../../utils/date';
+import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
   BalanceContainer,
   BalanceFillLine,
   BalanceLine,
+  BalanceWithTreding,
   BottomSheet,
+  BottomSheetContent,
   ConnectionsButton,
   Divider,
   HorizontalBarContainer,
+  SectionHeader,
   SeeMoreButton,
+  SubSectionContainer,
   TopContainer,
   TransactionListContainer,
-  SectionHeader,
-  BalanceWithTreding,
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
@@ -204,7 +205,7 @@ const Home: React.FC = () => {
           )}
         </TopContainer>
         <BottomSheet>
-          <FlexContainer gap={16}>
+          <BottomSheetContent>
             <SectionHeader>
               <Text variant="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
@@ -220,14 +221,14 @@ const Home: React.FC = () => {
                   <MaterialIcons name="trending-down" color={theme.colors.error} size={16} />
                 ))}
             </BalanceWithTreding>
-            <FlexContainer gap={12}>
+            <SubSectionContainer>
               <Text variant="default-bold">Entradas</Text>
               <HorizontalBarContainer>
                 <HorizontalBar color="income" grow={incomesBarGrow} />
                 <Money value={totalIncomes} />
               </HorizontalBarContainer>
-            </FlexContainer>
-            <FlexContainer gap={12}>
+            </SubSectionContainer>
+            <SubSectionContainer>
               <Text variant="default-bold">Saídas</Text>
               <HorizontalBarContainer>
                 <HorizontalBar
@@ -237,8 +238,8 @@ const Home: React.FC = () => {
                 />
                 <Money value={totalExpenses} />
               </HorizontalBarContainer>
-            </FlexContainer>
-          </FlexContainer>
+            </SubSectionContainer>
+          </BottomSheetContent>
           <Divider />
           <SectionHeader>
             <Text variant="title">Últimas transações</Text>

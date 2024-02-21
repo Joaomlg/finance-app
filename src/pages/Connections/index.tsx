@@ -2,13 +2,12 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import FlexContainer from '../../components/FlexContainer';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { Connection } from '../../models';
 import ConnectionCard from '../Connections/ConnectionCard';
-import { BottomSheet, StyledHeader } from './styles';
+import { BottomSheet, BottomSheetContent, StyledHeader } from './styles';
 
 const Connections: React.FC = () => {
   const { isLoading, connections, accounts, hideValues, setHideValues, fetchConnections } =
@@ -60,9 +59,9 @@ const Connections: React.FC = () => {
           <Text variant="light" color="textLight">
             {connections.length} Conexões
           </Text>
-          <FlexContainer gap={24}>
+          <BottomSheetContent>
             {connections.map((connection) => renderConnection(connection))}
-          </FlexContainer>
+          </BottomSheetContent>
         </BottomSheet>
       </ScrollView>
     </ScreenContainer>
