@@ -62,7 +62,7 @@ export const SectionHeader = styled.View`
   align-items: center;
 `;
 
-export const BalanceWithTreding = styled.View`
+export const BalanceWithTrending = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 4px;

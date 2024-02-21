@@ -25,7 +25,7 @@ import {
   BalanceContainer,
   BalanceFillLine,
   BalanceLine,
-  BalanceWithTreding,
+  BalanceWithTrending,
   BottomSheet,
   BottomSheetContent,
   ConnectionsButton,
@@ -210,7 +210,7 @@ const Home: React.FC = () => {
               <Text variant="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
             </SectionHeader>
-            <BalanceWithTreding>
+            <BalanceWithTrending>
               <Text>
                 Saldo: <Money value={balance} variant="default-bold" />
               </Text>
@@ -220,7 +220,7 @@ const Home: React.FC = () => {
                 ) : (
                   <MaterialIcons name="trending-down" color={theme.colors.error} size={16} />
                 ))}
-            </BalanceWithTreding>
+            </BalanceWithTrending>
             <SubSectionContainer>
               <Text variant="default-bold">Entradas</Text>
               <HorizontalBarContainer>
