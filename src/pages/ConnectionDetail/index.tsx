@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
-import { SvgWithCssUri } from 'react-native-svg';
+import { SvgWithCssUri } from 'react-native-svg/css';
 import { useTheme } from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';

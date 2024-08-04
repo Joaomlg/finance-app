@@ -4,7 +4,7 @@ import moment from 'moment';
 import React from 'react';
 import { ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { SvgWithCssUri } from 'react-native-svg';
+import { SvgWithCssUri } from 'react-native-svg/css';
 import { useTheme } from 'styled-components/native';
 import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
