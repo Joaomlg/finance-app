@@ -147,15 +147,11 @@ const ConnectionDetail: React.FC<
         </InformationGroup>
         <Actions>
           <Button variant="secondary" onPress={handleUpdateConnection}>
-            <Text variant="title" color="primary">
-              Atualizar
-            </Text>
+            <Text variant="title">Atualizar</Text>
           </Button>
           <Button variant="secondary" onPress={() => toogleConnectionSyncDisabled(connectionId)}>
             {isConnectionSyncDisabled(connectionId) ? (
-              <Text variant="title" color="primary">
-                Retomar sincronização
-              </Text>
+              <Text variant="title">Retomar sincronização</Text>
             ) : (
               <Text variant="title" color="error">
                 Pausar sincronização
