@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "953691595970",
+    "project_id": "finance-app-97fe3",
+    "storage_bucket": "finance-app-97fe3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953691595970:android:6b667c5d9fa4813eb4075b",
+        "android_client_info": {
+          "package_name": "com.joaomlg.financeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953691595970-jgj8r4rf4fe09h0ajfah7ieebr38bbrf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfjBofIq8XyZoXWWmdMhvEJqpqv9edK-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953691595970-jgj8r4rf4fe09h0ajfah7ieebr38bbrf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

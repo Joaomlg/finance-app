@@ -4,7 +4,9 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "dev": "expo start --dev-client",
     "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 7 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
+    "build:development": "eas build --profile development",
     "build:preview": "eas build --profile preview",
     "update:preview": "eas update --channel staging",
     "android": "expo run:android",
@@ -18,6 +20,8 @@
     "@expo/metro-config": "~0.18.1",
     "@gorhom/bottom-sheet": "^4.4.5",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-firebase/app": "^20.3.0",
+    "@react-native-firebase/auth": "^20.3.0",
     "@react-navigation/bottom-tabs": "^6.5.2",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.5",
@@ -47,7 +51,8 @@
     "react-native-toast-message": "^2.1.5",
     "react-native-web": "~0.19.10",
     "react-native-webview": "13.8.6",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "expo-dev-client": "~4.0.21"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
