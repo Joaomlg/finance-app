@@ -37,7 +37,6 @@
         "projectId": "752d9743-e7cd-4faf-b1a0-e6f9a43a91d9"
       }
     },
-    "runtimeVersion": "exposdk:51.0.0",
-    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth"]
+    "runtimeVersion": "exposdk:51.0.0"
   }
 }
