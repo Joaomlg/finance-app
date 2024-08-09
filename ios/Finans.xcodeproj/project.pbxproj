@@ -14,8 +14,8 @@
 		96905EF65AED1B983A6B3ABC /* libPods-Finans.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-Finans.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		554AB0EF6B5B4577B081A2FF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3BBA75DA52E24075BCAB56C7 /* GoogleService-Info.plist */; };
-		19127948D6334B6AA43974E9 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0877BED90B4854971CB470 /* noop-file.swift */; };
+		6917C32E2D4542B3B1C7145F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9B5DA3A9982649DA8060ED02 /* GoogleService-Info.plist */; };
+		FC2C2C8376D04C25ADD85170 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = E310D88680ED44DBAE652FB5 /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,9 +32,9 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Finans/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		3BBA75DA52E24075BCAB56C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "Finans/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
-		5D0877BED90B4854971CB470 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "Finans/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
-		60D05F46111F4006A7876862 /* Finans-Bridging-Header.h */ = {isa = PBXFileReference; name = "Finans-Bridging-Header.h"; path = "Finans/Finans-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		9B5DA3A9982649DA8060ED02 /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "Finans/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		E310D88680ED44DBAE652FB5 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "Finans/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		1501067B3B894692B76F6346 /* Finans-Bridging-Header.h */ = {isa = PBXFileReference; name = "Finans-Bridging-Header.h"; path = "Finans/Finans-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +59,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				3BBA75DA52E24075BCAB56C7 /* GoogleService-Info.plist */,
-				5D0877BED90B4854971CB470 /* noop-file.swift */,
-				60D05F46111F4006A7876862 /* Finans-Bridging-Header.h */,
+				9B5DA3A9982649DA8060ED02 /* GoogleService-Info.plist */,
+				E310D88680ED44DBAE652FB5 /* noop-file.swift */,
+				1501067B3B894692B76F6346 /* Finans-Bridging-Header.h */,
 			);
 			name = Finans;
 			sourceTree = "<group>";
@@ -201,8 +201,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				554AB0EF6B5B4577B081A2FF /* GoogleService-Info.plist in Resources */,
-				62621B241D6F486CB303B3D5 /* Finans-Bridging-Header.h in Resources */,
+				6917C32E2D4542B3B1C7145F /* GoogleService-Info.plist in Resources */,
+				78AC21F6D43643698BAA01CE /* Finans-Bridging-Header.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,7 +278,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				19127948D6334B6AA43974E9 /* noop-file.swift in Sources */,
+				FC2C2C8376D04C25ADD85170 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

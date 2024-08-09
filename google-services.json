@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "953691595970-47b1oknfl8h9qqpuvupdo1trpn2p9b1d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joaomlg.financeapp",
+            "certificate_hash": "2ba7f40d075967dee623bfef71b15a8f13cc159e"
+          }
+        },
+        {
           "client_id": "953691595970-jgj8r4rf4fe09h0ajfah7ieebr38bbrf.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "953691595970-jgj8r4rf4fe09h0ajfah7ieebr38bbrf.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "953691595970-9iq4i8boie2raips97ccikad47mcl0jr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.joaomlg.financeapp"
+              }
             }
           ]
         }
