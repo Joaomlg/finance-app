@@ -1,6 +1,7 @@
 export declare global {
   namespace ReactNavigation {
     interface RootParamList {
+      login: undefined;
       home: undefined;
       connections: undefined;
       'connection-detail': { connectionId: string };
@@ -18,6 +19,7 @@ export declare global {
       manualConnect: undefined;
       transactions: undefined;
       history: undefined;
+      settings: undefined;
     }
   }
 }

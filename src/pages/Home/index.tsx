@@ -161,6 +161,10 @@ const Home: React.FC = () => {
                 icon: hideValues ? 'visibility-off' : 'visibility',
                 onPress: () => setHideValues(!hideValues),
               },
+              {
+                icon: 'settings',
+                onPress: () => navigation.navigate('settings'),
+              },
             ]}
             hideGoBackIcon={true}
           />
