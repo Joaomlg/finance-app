@@ -7,5 +7,5 @@ export const Button = styled.TouchableOpacity`
 export const Container = styled.View<{ gap: number }>`
   flex-direction: row;
   align-items: center;
-  gap: ${(props) => props.gap};
+  gap: ${(props) => props.gap + 'px'};
 `;

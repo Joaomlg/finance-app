@@ -1,8 +1,8 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
+import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
@@ -109,13 +109,13 @@ const History: React.FC = () => {
               </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
-                  <MaterialIcons name="trending-up" color={theme.colors.income} size={24} />
+                  <Icon name="trending-up" color="income" size={24} />
                 ) : (
-                  <MaterialIcons name="trending-down" color={theme.colors.error} size={24} />
+                  <Icon name="trending-down" color="error" size={24} />
                 ))}
             </MonthTrendContainer>
             <TouchableIconContainer onPress={() => handleItemPress(item)}>
-              <MaterialIcons name="navigate-next" color={theme.colors.primary} size={28} />
+              <Icon name="navigate-next" color="primary" size={28} />
             </TouchableIconContainer>
           </ItemHeader>
           <Text>
@@ -140,7 +140,7 @@ const History: React.FC = () => {
         </ItemContainer>
       );
     },
-    [hideValues, theme, maxAmount, handleItemPress],
+    [hideValues, maxAmount, handleItemPress],
   );
 
   const renderItemSeparator = useCallback(() => <StyledDivider />, []);

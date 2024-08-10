@@ -11,9 +11,4 @@ export default {
     regular: 'Inter_400Regular',
     bold: 'Inter_700Bold',
   },
-  icon: {
-    small: '',
-    medium: '',
-    large: ''
-  }
 };

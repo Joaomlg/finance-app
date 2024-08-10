@@ -1,9 +1,9 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import moment, { Moment, monthsShort } from 'moment';
 import React, { useState } from 'react';
 import { Modal, View } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import Divider from '../Divider';
+import Icon from '../Icon';
 import Text from '../Text';
 import { ActionButton, Card, Content, Header, MonthButton, Overlay } from './styles';
 
@@ -101,11 +101,11 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
         >
           <Header>
             <ActionButton onPress={prevYear} disabled={displayedYear <= minimumDateYear}>
-              <MaterialIcons name="navigate-before" size={32} color={theme.colors.secondary} />
+              <Icon name="navigate-before" size={32} color="secondary" />
             </ActionButton>
             <Text variant="heading">{displayedYear}</Text>
             <ActionButton onPress={nextYear} disabled={displayedYear >= currentYearNumber}>
-              <MaterialIcons name="navigate-next" size={32} color={theme.colors.secondary} />
+              <Icon name="navigate-next" size={32} color="secondary" />
             </ActionButton>
           </Header>
           <View>

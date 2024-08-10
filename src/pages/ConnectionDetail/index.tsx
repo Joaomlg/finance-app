@@ -1,12 +1,11 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
-import { useTheme } from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
+import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
@@ -37,8 +36,6 @@ const ConnectionDetail: React.FC<
     isConnectionSyncDisabled,
     toogleConnectionSyncDisabled,
   } = useContext(AppContext);
-
-  const theme = useTheme();
 
   const connection = connections.find(({ id }) => id === connectionId);
   const connectionAccounts = accounts.filter((account) => account.connectionId === connectionId);
@@ -93,7 +90,7 @@ const ConnectionDetail: React.FC<
       <BottomSheet>
         {connection && hasError && (
           <CardErrorContainer radius={true}>
-            <MaterialIcons name="error" size={24} color={theme.colors.textWhite} />
+            <Icon name="error" size={24} color="textWhite" />
             <CardErrorMessage>
               <Text variant="light" color="textWhite">
                 Não foi possível sincronizar os dados!

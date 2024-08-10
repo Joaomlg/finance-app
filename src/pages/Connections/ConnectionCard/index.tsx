@@ -1,11 +1,9 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React from 'react';
 import { ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SvgWithCssUri } from 'react-native-svg/css';
-import { useTheme } from 'styled-components/native';
 import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
 import Money from '../../../components/Money';
@@ -13,6 +11,7 @@ import Text from '../../../components/Text';
 import { Account, Connection } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 
+import Icon from '../../../components/Icon';
 import { ConnectionStatusMessage, accountName, textCompare } from '../../../utils/text';
 import {
   AccountLine,
@@ -31,7 +30,6 @@ export interface ConnectionCardProps extends ViewProps {
 }
 
 const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, ...viewProps }) => {
-  const theme = useTheme();
   const navigation = useNavigation();
 
   const lastUpdateDate = connection.lastUpdatedAt
@@ -48,7 +46,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
       >
         {hasError && (
           <CardErrorContainer>
-            <MaterialIcons name="error" size={24} color={theme.colors.textWhite} />
+            <Icon name="error" size={24} color="textWhite" />
             <CardErrorMessage>
               <Text variant="light" color="textWhite">
                 Não foi possível sincronizar os dados!
@@ -71,7 +69,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
               </Text>
             </CardHeaderContent>
             <TouchableOpacity>
-              <MaterialIcons name="navigate-next" size={24} color={theme.colors.primary} />
+              <Icon name="navigate-next" size={24} color="primary" />
             </TouchableOpacity>
           </CardHeader>
           <Divider />

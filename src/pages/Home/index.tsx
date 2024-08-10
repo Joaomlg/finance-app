@@ -1,4 +1,3 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
@@ -14,6 +13,7 @@ import {
 import { useTheme } from 'styled-components/native';
 import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
+import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -220,9 +220,9 @@ const Home: React.FC = () => {
               </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
-                  <MaterialIcons name="trending-up" color={theme.colors.income} size={16} />
+                  <Icon name="trending-up" color="income" size={16} />
                 ) : (
-                  <MaterialIcons name="trending-down" color={theme.colors.error} size={16} />
+                  <Icon name="trending-down" color="error" size={16} />
                 ))}
             </BalanceWithTrending>
             <SubSectionContainer>
