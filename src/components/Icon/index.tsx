@@ -21,10 +21,12 @@ const Icon: React.FC<IconProps> = ({ name, size, color, onPress, onLongPress }) 
 
   const iconColor = color ? theme.colors[color] : theme.colors.text;
 
-  return (
+  return onPress || onLongPress ? (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <MaterialIcons name={name} size={size} color={iconColor} />
     </TouchableOpacity>
+  ) : (
+    <MaterialIcons name={name} size={size} color={iconColor} />
   );
 };
 
