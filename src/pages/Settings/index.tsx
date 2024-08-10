@@ -25,7 +25,7 @@ const Settings: React.FC = () => {
       <BottomSheet>
         <UserContainer>
           {user?.avatar ? (
-            <Avatar height={48} width={48} source={{ uri: user.avatar }} />
+            <Avatar source={{ uri: user.avatar }} />
           ) : (
             <MaterialIcons name="account-circle" color={theme.colors.text} size={48} />
           )}
