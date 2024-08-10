@@ -15,13 +15,14 @@
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/752d9743-e7cd-4faf-b1a0-e6f9a43a91d9"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.joaomlg.financeapp"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#E5E7EB"
@@ -36,8 +37,11 @@
         "projectId": "752d9743-e7cd-4faf-b1a0-e6f9a43a91d9"
       }
     },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
-    }
+    "runtimeVersion": "exposdk:51.0.0",
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-google-signin/google-signin"
+    ]
   }
 }

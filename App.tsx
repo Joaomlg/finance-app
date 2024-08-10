@@ -14,8 +14,9 @@ import { SafeAreaView, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
-import AuthenticationProvider from './src/components/Authentication';
+import SecurityGuard from './src/components/SecurityGuard';
 import { AppContextProvider } from './src/contexts/AppContext';
+import { AuthContextProvider } from './src/contexts/AuthContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
@@ -48,21 +49,23 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AuthenticationProvider>
-        <AppContextProvider>
-          <HooksProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <BottomSheetModalProvider>
-                <SafeAreaView style={{ flex: 1 }}>
-                  <StatusBar style="light" backgroundColor={theme.colors.primary} />
-                  <Routes />
-                  <Toast />
-                </SafeAreaView>
-              </BottomSheetModalProvider>
-            </GestureHandlerRootView>
-          </HooksProvider>
-        </AppContextProvider>
-      </AuthenticationProvider>
+      <AuthContextProvider>
+        <SecurityGuard>
+          <AppContextProvider>
+            <HooksProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <BottomSheetModalProvider>
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                    <Routes />
+                    <Toast />
+                  </SafeAreaView>
+                </BottomSheetModalProvider>
+              </GestureHandlerRootView>
+            </HooksProvider>
+          </AppContextProvider>
+        </SecurityGuard>
+      </AuthContextProvider>
     </ThemeProvider>
   );
 }

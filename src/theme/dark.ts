@@ -4,7 +4,7 @@ export default {
   ...common,
   colors: {
     backgroundWhite: '#27272A',
-    primary: '#284D63',
+    primary: '#1C3645',
     secondary: '#81BFC3',
     income: '#15803D',
     expense: '#0369A1',

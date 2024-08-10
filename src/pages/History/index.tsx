@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import FlexContainer from '../../components/FlexContainer';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import Text from '../../components/Text';
@@ -12,6 +11,7 @@ import { checkCurrentYear } from '../../utils/date';
 import {
   Button,
   HorizontalBarContainer,
+  ItemContainer,
   ItemHeader,
   MonthTrendContainer,
   StyledDivider,
@@ -101,7 +101,7 @@ const History: React.FC = () => {
       const expensesSurplusBarGrow = balance < 0 ? (expenses - incomes) / expenses : 0;
 
       return (
-        <FlexContainer gap={12}>
+        <ItemContainer>
           <ItemHeader>
             <MonthTrendContainer>
               <Text variant="heading-regular" transform="capitalize">
@@ -137,7 +137,7 @@ const History: React.FC = () => {
               color={hideValues ? 'text' : balance < 0 ? 'error' : 'expense'}
             />
           </HorizontalBarContainer>
-        </FlexContainer>
+        </ItemContainer>
       );
     },
     [hideValues, theme, maxAmount, handleItemPress],

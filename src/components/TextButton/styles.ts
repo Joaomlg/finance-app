@@ -1,10 +1,10 @@
 import styled from 'styled-components/native';
-import FlexContainer from '../FlexContainer';
 
 export const Button = styled.TouchableOpacity`
   align-self: flex-start;
 `;
 
-export const Container = styled(FlexContainer).attrs({ direction: 'row' })`
+export const Container = styled.View`
+  flex-direction: row;
   align-items: center;
 `;

@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import FlexContainer from '../../components/FlexContainer';
 import Header from '../../components/Header';
 
 export const StyledHeader = styled(Header)`
@@ -7,10 +6,11 @@ export const StyledHeader = styled(Header)`
   padding-left: 16px;
 `;
 
-export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
+export const BottomSheet = styled.View`
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
   padding: 24px;
   flex-grow: 1;
+  gap: 24px;
 `;
 
 export const TextInput = styled.TextInput.attrs(({ theme }) => ({

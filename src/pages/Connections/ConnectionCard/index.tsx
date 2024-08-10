@@ -4,19 +4,19 @@ import moment from 'moment';
 import React from 'react';
 import { ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { SvgWithCssUri } from 'react-native-svg';
+import { SvgWithCssUri } from 'react-native-svg/css';
 import { useTheme } from 'styled-components/native';
 import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
-import FlexContainer from '../../../components/FlexContainer';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
-import { Account, Connection, ConnectionStatus } from '../../../models';
+import { Account, Connection } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 
-import { accountName, textCompare } from '../../../utils/text';
+import { ConnectionStatusMessage, accountName, textCompare } from '../../../utils/text';
 import {
   AccountLine,
+  CardContainer,
   CardContent,
   CardErrorContainer,
   CardErrorMessage,
@@ -24,14 +24,6 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from './styles';
-
-const ConnectionStatusMessage: Record<ConnectionStatus, string> = {
-  UPDATED: '',
-  UPDATING: '',
-  LOGIN_ERROR: 'Atualize as credenciais da conexão.',
-  WAITING_USER_INPUT: 'Autenticação de duas etapas solicitada.',
-  OUTDATED: 'Sincronize a conexão novamente.',
-};
 
 export interface ConnectionCardProps extends ViewProps {
   connection: Connection;
@@ -67,7 +59,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
             </CardErrorMessage>
           </CardErrorContainer>
         )}
-        <CardContent>
+        <CardContainer>
           <CardHeader>
             <ConnectionAvatar color={'#' + connection.connector.primaryColor}>
               <SvgWithCssUri height="100%" width="100%" uri={connection.connector.imageUrl} />
@@ -83,7 +75,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
             </TouchableOpacity>
           </CardHeader>
           <Divider />
-          <FlexContainer gap={16}>
+          <CardContent>
             {accounts
               .sort((a, b) => textCompare(a.subtype, b.subtype))
               .map((account, index) => (
@@ -97,8 +89,8 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
                   />
                 </AccountLine>
               ))}
-          </FlexContainer>
-        </CardContent>
+          </CardContent>
+        </CardContainer>
       </Card>
     </>
   );

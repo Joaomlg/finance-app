@@ -70,7 +70,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
           onPress={() => handleMonthOnPress(currentMonthIndex)}
           active={isSelected}
         >
-          <Text variant="title" color="primary" transform="capitalize">
+          <Text variant="title" transform="capitalize">
             {monthsShort(i)}
           </Text>
         </MonthButton>
@@ -96,15 +96,14 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
             shadowOpacity: 0.25,
             shadowRadius: 4,
             elevation: 5,
+            backgroundColor: theme.colors.backgroundWhite,
           }}
         >
           <Header>
             <ActionButton onPress={prevYear} disabled={displayedYear <= minimumDateYear}>
               <MaterialIcons name="navigate-before" size={32} color={theme.colors.secondary} />
             </ActionButton>
-            <Text variant="heading" color="primary">
-              {displayedYear}
-            </Text>
+            <Text variant="heading">{displayedYear}</Text>
             <ActionButton onPress={nextYear} disabled={displayedYear >= currentYearNumber}>
               <MaterialIcons name="navigate-next" size={32} color={theme.colors.secondary} />
             </ActionButton>

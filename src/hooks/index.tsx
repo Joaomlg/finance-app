@@ -1,12 +1,15 @@
 import React from 'react';
-import { PluggyServiceContextProvider } from './usePluggyService';
+import { AuthContextProvider } from '../contexts/AuthContext';
 import { BelvoServiceContextProvider } from './useBelvoService';
+import { PluggyServiceContextProvider } from './usePluggyService';
 
 const HooksProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <PluggyServiceContextProvider>
-      <BelvoServiceContextProvider>{children}</BelvoServiceContextProvider>
-    </PluggyServiceContextProvider>
+    <AuthContextProvider>
+      <PluggyServiceContextProvider>
+        <BelvoServiceContextProvider>{children}</BelvoServiceContextProvider>
+      </PluggyServiceContextProvider>
+    </AuthContextProvider>
   );
 };
 

@@ -1,21 +1,27 @@
 import styled from 'styled-components/native';
-import FlexContainer from '../../components/FlexContainer';
 import TextButton from '../../components/TextButton';
 
-export const TopContainer = styled(FlexContainer).attrs({ gap: 12 })`
+export const TopContainer = styled.View`
   padding: 24px;
+  gap: 12px;
 `;
 
-export const BottomSheet = styled(FlexContainer).attrs({ gap: 24 })`
+export const BottomSheet = styled.View`
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   padding: 24px;
   flex-grow: 1;
+  gap: 24px;
 `;
 
-export const BalanceContainer = styled(FlexContainer).attrs({ gap: 12 })`
+export const BottomSheetContent = styled.View`
+  gap: 16px;
+`;
+
+export const BalanceContainer = styled.View`
   margin-top: 8px;
+  gap: 12px;
 `;
 
 export const BalanceLine = styled.View`
@@ -35,8 +41,14 @@ export const ConnectionsButton = styled(TextButton)`
   padding: 8px 0;
 `;
 
-export const HorizontalBarContainer = styled(FlexContainer).attrs({ direction: 'row', gap: 16 })`
+export const SubSectionContainer = styled.View`
+  gap: 12px;
+`;
+
+export const HorizontalBarContainer = styled.View`
+  flex-direction: row;
   align-items: center;
+  gap: 16px;
 `;
 
 export const Divider = styled.View`
@@ -50,8 +62,10 @@ export const SectionHeader = styled.View`
   align-items: center;
 `;
 
-export const BalanceWithTreding = styled(FlexContainer).attrs({ direction: 'row', gap: 4 })`
+export const BalanceWithTrending = styled.View`
+  flex-direction: row;
   align-items: center;
+  gap: 4px;
 `;
 
 export const SeeMoreButton = styled(TextButton).attrs({
@@ -65,6 +79,7 @@ export const SeeMoreButton = styled(TextButton).attrs({
   align-items: center;
 `;
 
-export const TransactionListContainer = styled(FlexContainer).attrs({ gap: 24 })`
+export const TransactionListContainer = styled.View`
   flex: 1;
+  gap: 24px;
 `;
