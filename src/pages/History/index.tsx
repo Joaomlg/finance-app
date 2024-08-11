@@ -1,20 +1,20 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
+import { ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
+import ScreenHeader from '../../components/ScreenHeader';
 import Text from '../../components/Text';
 import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
 import {
-  Button,
   HorizontalBarContainer,
   ItemContainer,
   ItemHeader,
   MonthTrendContainer,
+  StyledButton,
   StyledDivider,
   StyledFlatList,
   StyledHorizontalBar,
@@ -148,17 +148,13 @@ const History: React.FC = () => {
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 && canLoadMore ? (
-        <Button onPress={handleLoadMore}>
-          {isLoading ? (
-            <ActivityIndicator size={24} color={theme.colors.textWhite} />
-          ) : (
-            <Text variant="title" color="textWhite">
-              Ver mais
-            </Text>
-          )}
-        </Button>
+        <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
+          <Text variant="title" color="textWhite">
+            Ver mais
+          </Text>
+        </StyledButton>
       ) : null,
-    [canLoadMore, handleLoadMore, isLoading, monthlyBalances, theme],
+    [canLoadMore, handleLoadMore, isLoading, monthlyBalances],
   );
 
   const handleRefresh = useCallback(async () => {

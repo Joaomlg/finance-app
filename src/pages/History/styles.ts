@@ -1,5 +1,6 @@
 import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
+import Button from '../../components/Button';
 import Divider from '../../components/Divider';
 import HorizontalBar from '../../components/HorizontalBar';
 import { MonthlyBalance } from '../../contexts/AppContext';
@@ -48,13 +49,6 @@ export const StyledDivider = styled(Divider)`
   margin: 24px 0;
 `;
 
-export const Button = styled.TouchableOpacity.attrs({ activeOpacity: 0.8 })`
-  flex: 1;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background-color: ${({ theme }) => theme.colors.primary};
-  border-radius: 100px;
+export const StyledButton = styled(Button)`
   margin-top: 48px;
 `;

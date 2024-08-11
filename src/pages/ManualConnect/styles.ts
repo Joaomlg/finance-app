@@ -12,11 +12,3 @@ export const TextInput = styled.TextInput.attrs(({ theme }) => ({
   font-size: ${({ theme }) => theme.text.title};
   color: ${({ theme }) => theme.colors.text};
 `;
-
-export const Button = styled.TouchableOpacity.attrs({ activeOpacity: 0.9 })`
-  width: 100%;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.primary};
-  padding: 24px;
-  border-radius: 48px;
-`;

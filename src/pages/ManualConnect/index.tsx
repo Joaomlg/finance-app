@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
 import Toast from 'react-native-toast-message';
-import ScreenHeader from '../../components/ScreenHeader';
+import Button from '../../components/Button';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
+import ScreenHeader from '../../components/ScreenHeader';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
-import { Button, TextInput } from './styles';
+import { TextInput } from './styles';
 
 const ManualConnect: React.FC = () => {
   const [id, setId] = useState('');
