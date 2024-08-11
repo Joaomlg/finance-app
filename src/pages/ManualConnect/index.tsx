@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
 import Toast from 'react-native-toast-message';
+import Header from '../../components/Header';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
-import { Button, StyledHeader, TextInput } from './styles';
+import { Button, TextInput } from './styles';
 
 const ManualConnect: React.FC = () => {
   const [id, setId] = useState('');
@@ -36,7 +37,7 @@ const ManualConnect: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader title="Conexão manual" />
+      <Header title="Conexão manual" />
       <ScreenContent>
         <TextInput placeholder="Identificador" onChangeText={setId} value={id} />
         <Button onPress={saveConnection}>

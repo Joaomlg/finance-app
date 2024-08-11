@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
+import Header from '../../components/Header';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -21,7 +22,7 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from '../Connections/ConnectionCard/styles';
-import { Actions, BottomHeader, InformationGroup, StyledHeader } from './styles';
+import { Actions, BottomHeader, InformationGroup } from './styles';
 
 const ConnectionDetail: React.FC<
   NativeStackScreenProps<StackRouteParamList, 'connection-detail'>
@@ -79,7 +80,7 @@ const ConnectionDetail: React.FC<
 
   return (
     <ScreenContainer>
-      <StyledHeader
+      <Header
         title="Detalhes da conexão"
         actions={[
           {
@@ -87,7 +88,7 @@ const ConnectionDetail: React.FC<
             onPress: () => setHideValues(!hideValues),
           },
         ]}
-      ></StyledHeader>
+      />
       <ScreenContent>
         {connection && hasError && (
           <CardErrorContainer radius={true}>

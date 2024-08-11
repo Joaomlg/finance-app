@@ -1,11 +1,11 @@
 import React, { useCallback, useContext } from 'react';
+import Header from '../../components/Header';
 import ScreenContainer from '../../components/ScreenContainer';
 import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import TransactionList from './TransactionList';
 import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
-import { StyledHeader } from './styles';
 
 const Transactions: React.FC = () => {
   const {
@@ -62,7 +62,7 @@ const Transactions: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader
+      <Header
         title={formatMonthYearDate(date)}
         actions={[
           {

@@ -2,17 +2,18 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import BelvoLogo from '../../assets/icon/belvo_logo.svg';
 import PluggyLogo from '../../assets/icon/pluggy_logo.svg';
+import Header from '../../components/Header';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
-import { CustomCard, StyledHeader } from './styles';
+import { CustomCard } from './styles';
 
 const Connect: React.FC = () => {
   const navigation = useNavigation();
 
   return (
     <ScreenContainer>
-      <StyledHeader title="Connectar"></StyledHeader>
+      <Header title="Connectar" />
       <ScreenContent>
         <Text variant="title">Selecione um provedor</Text>
         <CustomCard onPress={() => navigation.navigate('connect/pluggy')}>

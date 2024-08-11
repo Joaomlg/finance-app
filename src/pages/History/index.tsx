@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
+import Header from '../../components/Header';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -16,9 +17,8 @@ import {
   MonthTrendContainer,
   StyledDivider,
   StyledFlatList,
-  StyledHeader,
   StyledHorizontalBar,
-  TouchableIconContainer,
+  TouchableIconContainer
 } from './styles';
 
 const ITEMS_PER_PAGE = 4;
@@ -167,7 +167,7 @@ const History: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader
+      <Header
         title="Histórico mensal"
         actions={[
           {

@@ -1,9 +1,14 @@
 import styled from 'styled-components/native';
 import TextButton from '../../components/TextButton';
+import Header from '../../components/Header';
 
 export const TopContainer = styled.View`
   padding: 24px;
   gap: 12px;
+`;
+
+export const StyledHeader = styled(Header)`
+  padding: 0;
 `;
 
 export const SummaryContainer = styled.View`

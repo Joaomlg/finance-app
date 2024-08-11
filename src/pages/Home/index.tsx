@@ -11,7 +11,6 @@ import {
   UIManager,
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import Header from '../../components/Header';
 import HorizontalBar from '../../components/HorizontalBar';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
@@ -32,6 +31,7 @@ import {
   HorizontalBarContainer,
   SectionHeader,
   SeeMoreButton,
+  StyledHeader,
   SubSectionContainer,
   SummaryContainer,
   TopContainer,
@@ -147,7 +147,7 @@ const Home: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1, overflow: 'hidden' }}
       >
         <TopContainer>
-          <Header
+          <StyledHeader
             title={formatMonthYearDate(date)}
             titleIcon="expand-more"
             onTitlePress={() => setMonthYearPickerOpened(true)}

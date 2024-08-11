@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import Divider from '../../components/Divider';
+import Header from '../../components/Header';
 import Icon from '../../components/Icon';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AuthContext from '../../contexts/AuthContext';
-import { Avatar, StyledHeader, UserContainer, UserInfo } from './styles';
+import { Avatar, UserContainer, UserInfo } from './styles';
 
 const Settings: React.FC = () => {
   const navigation = useNavigation();
@@ -20,7 +21,7 @@ const Settings: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader title="Configurações" />
+      <Header title="Configurações" />
       <ScreenContent>
         <UserContainer>
           {user?.avatar ? (

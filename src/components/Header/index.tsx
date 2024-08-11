@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <Container {...viewProps}>
+    <Container canGoBack={canGoBack} {...viewProps}>
       {!hideGoBackIcon && canGoBack && (
         <Icon
           name="navigate-before"

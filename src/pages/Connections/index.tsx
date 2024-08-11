@@ -2,13 +2,13 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
+import Header from '../../components/Header';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { Connection } from '../../models';
 import ConnectionCard from '../Connections/ConnectionCard';
-import { StyledHeader } from './styles';
 
 const Connections: React.FC = () => {
   const { isLoading, connections, accounts, hideValues, setHideValues, fetchConnections } =
@@ -42,7 +42,7 @@ const Connections: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         stickyHeaderIndices={[0]}
       >
-        <StyledHeader
+        <Header
           title="Conexões"
           actions={[
             {
@@ -55,7 +55,7 @@ const Connections: React.FC = () => {
               onLongPress: () => navigation.navigate('manualConnect'),
             },
           ]}
-        ></StyledHeader>
+        />
         <ScreenContent>
           <Text variant="light" color="textLight">
             {connections.length} Conexões
