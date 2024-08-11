@@ -69,7 +69,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
               </Text>
             </CardHeaderContent>
             <TouchableOpacity>
-              <Icon name="navigate-next" size={24} color="primary" />
+              <Icon name="navigate-next" size={24} />
             </TouchableOpacity>
           </CardHeader>
           <Divider />

@@ -115,7 +115,7 @@ const History: React.FC = () => {
                 ))}
             </MonthTrendContainer>
             <TouchableIconContainer onPress={() => handleItemPress(item)}>
-              <Icon name="navigate-next" color="primary" size={28} />
+              <Icon name="navigate-next" size={28} />
             </TouchableIconContainer>
           </ItemHeader>
           <Text>
