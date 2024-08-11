@@ -5,7 +5,7 @@ import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -80,7 +80,7 @@ const ConnectionDetail: React.FC<
 
   return (
     <ScreenContainer>
-      <Header
+      <ScreenHeader
         title="Detalhes da conexão"
         actions={[
           {

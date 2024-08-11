@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -167,7 +167,7 @@ const History: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <Header
+      <ScreenHeader
         title="Histórico mensal"
         actions={[
           {

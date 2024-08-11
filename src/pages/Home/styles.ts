@@ -1,13 +1,13 @@
 import styled from 'styled-components/native';
 import TextButton from '../../components/TextButton';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export const TopContainer = styled.View`
   padding: 24px;
   gap: 12px;
 `;
 
-export const StyledHeader = styled(Header)`
+export const StyledHeader = styled(ScreenHeader)`
   padding: 0;
 `;
 

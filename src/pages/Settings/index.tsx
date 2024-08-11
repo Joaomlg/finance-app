@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import Divider from '../../components/Divider';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
@@ -21,7 +21,7 @@ const Settings: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <Header title="Configurações" />
+      <ScreenHeader title="Configurações" />
       <ScreenContent>
         <UserContainer>
           {user?.avatar ? (

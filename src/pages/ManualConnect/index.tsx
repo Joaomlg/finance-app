@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
 import Toast from 'react-native-toast-message';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
@@ -37,7 +37,7 @@ const ManualConnect: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <Header title="Conexão manual" />
+      <ScreenHeader title="Conexão manual" />
       <ScreenContent>
         <TextInput placeholder="Identificador" onChangeText={setId} value={id} />
         <Button onPress={saveConnection}>

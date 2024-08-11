@@ -12,7 +12,7 @@ type Action = {
   hidden?: boolean;
 };
 
-export interface HeaderProps extends ViewProps {
+export interface ScreenHeaderProps extends ViewProps {
   title: string;
   titleIcon?: IconName;
   onTitlePress?: () => void;
@@ -20,7 +20,7 @@ export interface HeaderProps extends ViewProps {
   hideGoBackIcon?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({
+const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   title,
   titleIcon,
   onTitlePress,
@@ -83,4 +83,4 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
-export default Header;
+export default ScreenHeader;

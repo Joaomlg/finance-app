@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from 'react';
-import Header from '../../components/Header';
+import ScreenHeader from '../../components/ScreenHeader';
 import ScreenContainer from '../../components/ScreenContainer';
 import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../models';
@@ -62,7 +62,7 @@ const Transactions: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <Header
+      <ScreenHeader
         title={formatMonthYearDate(date)}
         actions={[
           {
