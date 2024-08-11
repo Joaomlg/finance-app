@@ -6,6 +6,7 @@ import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
@@ -18,7 +19,7 @@ import {
   StyledDivider,
   StyledFlatList,
   StyledHorizontalBar,
-  TouchableIconContainer
+  TouchableIconContainer,
 } from './styles';
 
 const ITEMS_PER_PAGE = 4;
@@ -29,7 +30,6 @@ const History: React.FC = () => {
   const {
     isLoading,
     hideValues,
-    setHideValues,
     monthlyBalances,
     fetchMonthlyBalancesPage,
     currentMonthlyBalancesPage,
@@ -163,15 +163,7 @@ const History: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <ScreenHeader
-        title="Histórico mensal"
-        actions={[
-          {
-            icon: hideValues ? 'visibility-off' : 'visibility',
-            onPress: () => setHideValues(!hideValues),
-          },
-        ]}
-      />
+      <ScreenHeader title="Histórico mensal" actions={[HideValuesAction()]} />
       <StyledFlatList
         refreshControl={
           <RefreshControl

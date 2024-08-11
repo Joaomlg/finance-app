@@ -17,6 +17,7 @@ import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
@@ -60,7 +61,6 @@ const Home: React.FC = () => {
     setDate,
     minimumDateWithData,
     lastUpdateDate,
-    setHideValues,
     updateConnections,
     fetchConnections,
     transactions,
@@ -157,10 +157,7 @@ const Home: React.FC = () => {
                 onPress: () => animatedChangeDate(NOW),
                 hidden: isCurrentMonth,
               },
-              {
-                icon: hideValues ? 'visibility-off' : 'visibility',
-                onPress: () => setHideValues(!hideValues),
-              },
+              HideValuesAction(),
               {
                 icon: 'settings',
                 onPress: () => navigation.navigate('settings'),

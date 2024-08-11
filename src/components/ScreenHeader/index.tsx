@@ -5,7 +5,7 @@ import Icon, { IconName } from '../Icon';
 import Text from '../Text';
 import { Actions, Container, TitleButton } from './styles';
 
-type Action = {
+export type Action = {
   icon: IconName;
   onPress?: () => void;
   onLongPress?: () => void;

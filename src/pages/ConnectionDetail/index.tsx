@@ -5,11 +5,12 @@ import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
-import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import { ScreenContent } from '../../components/ScreenContent';
+import ScreenHeader from '../../components/ScreenHeader';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -32,8 +33,6 @@ const ConnectionDetail: React.FC<
   const {
     connections,
     accounts,
-    hideValues,
-    setHideValues,
     deleteConnection,
     isConnectionSyncDisabled,
     toogleConnectionSyncDisabled,
@@ -80,15 +79,7 @@ const ConnectionDetail: React.FC<
 
   return (
     <ScreenContainer>
-      <ScreenHeader
-        title="Detalhes da conexão"
-        actions={[
-          {
-            icon: hideValues ? 'visibility-off' : 'visibility',
-            onPress: () => setHideValues(!hideValues),
-          },
-        ]}
-      />
+      <ScreenHeader title="Detalhes da conexão" actions={[HideValuesAction()]} />
       <ScreenContent>
         {connection && hasError && (
           <CardErrorContainer radius={true}>
