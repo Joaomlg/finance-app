@@ -8,6 +8,7 @@ import Divider from '../../components/Divider';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -20,7 +21,7 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from '../Connections/ConnectionCard/styles';
-import { Actions, BottomHeader, BottomSheet, InformationGroup, StyledHeader } from './styles';
+import { Actions, BottomHeader, InformationGroup, StyledHeader } from './styles';
 
 const ConnectionDetail: React.FC<
   NativeStackScreenProps<StackRouteParamList, 'connection-detail'>
@@ -87,7 +88,7 @@ const ConnectionDetail: React.FC<
           },
         ]}
       ></StyledHeader>
-      <BottomSheet>
+      <ScreenContent>
         {connection && hasError && (
           <CardErrorContainer radius={true}>
             <Icon name="error" size={24} color="textWhite" />
@@ -161,7 +162,7 @@ const ConnectionDetail: React.FC<
             </Text>
           </Button>
         </Actions>
-      </BottomSheet>
+      </ScreenContent>
     </ScreenContainer>
   );
 };

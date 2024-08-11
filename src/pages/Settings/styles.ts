@@ -6,13 +6,6 @@ export const StyledHeader = styled(Header)`
   padding-left: 16px;
 `;
 
-export const BottomSheet = styled.View`
-  background-color: ${({ theme }) => theme.colors.backgroundWhite};
-  padding: 24px;
-  flex-grow: 1;
-  gap: 24px;
-`;
-
 export const UserContainer = styled.View`
   flex-direction: row;
   align-items: center;

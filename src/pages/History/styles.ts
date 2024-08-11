@@ -19,6 +19,8 @@ export const StyledFlatList = styled(
 })`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 `;
 
 export const ItemContainer = styled.View`

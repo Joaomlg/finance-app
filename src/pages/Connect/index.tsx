@@ -3,8 +3,9 @@ import React from 'react';
 import BelvoLogo from '../../assets/icon/belvo_logo.svg';
 import PluggyLogo from '../../assets/icon/pluggy_logo.svg';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
-import { BottomSheet, CustomCard, StyledHeader } from './styles';
+import { CustomCard, StyledHeader } from './styles';
 
 const Connect: React.FC = () => {
   const navigation = useNavigation();
@@ -12,7 +13,7 @@ const Connect: React.FC = () => {
   return (
     <ScreenContainer>
       <StyledHeader title="Connectar"></StyledHeader>
-      <BottomSheet>
+      <ScreenContent>
         <Text variant="title">Selecione um provedor</Text>
         <CustomCard onPress={() => navigation.navigate('connect/pluggy')}>
           <PluggyLogo height={36} width={130} />
@@ -20,7 +21,7 @@ const Connect: React.FC = () => {
         <CustomCard onPress={() => navigation.navigate('connect/belvo')}>
           <BelvoLogo height={36} width={100} />
         </CustomCard>
-      </BottomSheet>
+      </ScreenContent>
     </ScreenContainer>
   );
 };

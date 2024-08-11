@@ -17,6 +17,7 @@ import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
@@ -26,14 +27,13 @@ import {
   BalanceFillLine,
   BalanceLine,
   BalanceWithTrending,
-  BottomSheet,
-  BottomSheetContent,
   ConnectionsButton,
   Divider,
   HorizontalBarContainer,
   SectionHeader,
   SeeMoreButton,
   SubSectionContainer,
+  SummaryContainer,
   TopContainer,
   TransactionListContainer,
 } from './styles';
@@ -208,8 +208,8 @@ const Home: React.FC = () => {
             </BalanceContainer>
           )}
         </TopContainer>
-        <BottomSheet>
-          <BottomSheetContent>
+        <ScreenContent>
+          <SummaryContainer>
             <SectionHeader>
               <Text variant="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
@@ -243,7 +243,7 @@ const Home: React.FC = () => {
                 <Money value={totalExpenses} />
               </HorizontalBarContainer>
             </SubSectionContainer>
-          </BottomSheetContent>
+          </SummaryContainer>
           <Divider />
           <SectionHeader>
             <Text variant="title">Últimas transações</Text>
@@ -254,7 +254,7 @@ const Home: React.FC = () => {
               <TransactionListItem item={transaction} key={index} />
             ))}
           </TransactionListContainer>
-        </BottomSheet>
+        </ScreenContent>
       </ScrollView>
       <MonthYearPicker
         isOpen={monthYearPickerOpened}

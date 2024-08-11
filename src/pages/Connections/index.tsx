@@ -3,11 +3,12 @@ import React, { useCallback, useContext } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { Connection } from '../../models';
 import ConnectionCard from '../Connections/ConnectionCard';
-import { BottomSheet, BottomSheetContent, StyledHeader } from './styles';
+import { StyledHeader } from './styles';
 
 const Connections: React.FC = () => {
   const { isLoading, connections, accounts, hideValues, setHideValues, fetchConnections } =
@@ -55,14 +56,12 @@ const Connections: React.FC = () => {
             },
           ]}
         ></StyledHeader>
-        <BottomSheet>
+        <ScreenContent>
           <Text variant="light" color="textLight">
             {connections.length} Conexões
           </Text>
-          <BottomSheetContent>
-            {connections.map((connection) => renderConnection(connection))}
-          </BottomSheetContent>
-        </BottomSheet>
+          {connections.map((connection) => renderConnection(connection))}
+        </ScreenContent>
       </ScrollView>
     </ScreenContainer>
   );

@@ -3,9 +3,10 @@ import React, { useContext } from 'react';
 import Divider from '../../components/Divider';
 import Icon from '../../components/Icon';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AuthContext from '../../contexts/AuthContext';
-import { Avatar, BottomSheet, StyledHeader, UserContainer, UserInfo } from './styles';
+import { Avatar, StyledHeader, UserContainer, UserInfo } from './styles';
 
 const Settings: React.FC = () => {
   const navigation = useNavigation();
@@ -20,7 +21,7 @@ const Settings: React.FC = () => {
   return (
     <ScreenContainer>
       <StyledHeader title="Configurações" />
-      <BottomSheet>
+      <ScreenContent>
         <UserContainer>
           {user?.avatar ? (
             <Avatar source={{ uri: user.avatar }} />
@@ -34,7 +35,7 @@ const Settings: React.FC = () => {
           <Icon name="logout" color="text" size={24} onPress={handleSignOut} />
         </UserContainer>
         <Divider />
-      </BottomSheet>
+      </ScreenContent>
     </ScreenContainer>
   );
 };
