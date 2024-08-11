@@ -1,21 +1,17 @@
 import styled from 'styled-components/native';
 import TextButton from '../../components/TextButton';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export const TopContainer = styled.View`
   padding: 24px;
   gap: 12px;
 `;
 
-export const BottomSheet = styled.View`
-  background-color: ${({ theme }) => theme.colors.backgroundWhite};
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  padding: 24px;
-  flex-grow: 1;
-  gap: 24px;
+export const StyledHeader = styled(ScreenHeader)`
+  padding: 0;
 `;
 
-export const BottomSheetContent = styled.View`
+export const SummaryContainer = styled.View`
   gap: 16px;
 `;
 

@@ -1,17 +1,4 @@
 import styled from 'styled-components/native';
-import Header from '../../components/Header';
-
-export const StyledHeader = styled(Header)`
-  padding: 24px;
-  padding-left: 16px;
-`;
-
-export const BottomSheet = styled.View`
-  background-color: ${({ theme }) => theme.colors.backgroundWhite};
-  padding: 24px;
-  flex-grow: 1;
-  gap: 24px;
-`;
 
 export const TextInput = styled.TextInput.attrs(({ theme }) => ({
   selectionColor: theme.colors.primary,
@@ -24,12 +11,4 @@ export const TextInput = styled.TextInput.attrs(({ theme }) => ({
   padding-left: 24px;
   font-size: ${({ theme }) => theme.text.title};
   color: ${({ theme }) => theme.colors.text};
-`;
-
-export const Button = styled.TouchableOpacity.attrs({ activeOpacity: 0.9 })`
-  width: 100%;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.primary};
-  padding: 24px;
-  border-radius: 48px;
 `;

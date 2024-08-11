@@ -1,22 +1,23 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
+import { ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
+import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
+import ScreenHeader from '../../components/ScreenHeader';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
 import {
-  Button,
   HorizontalBarContainer,
   ItemContainer,
   ItemHeader,
   MonthTrendContainer,
+  StyledButton,
   StyledDivider,
   StyledFlatList,
-  StyledHeader,
   StyledHorizontalBar,
   TouchableIconContainer,
 } from './styles';
@@ -29,7 +30,6 @@ const History: React.FC = () => {
   const {
     isLoading,
     hideValues,
-    setHideValues,
     monthlyBalances,
     fetchMonthlyBalancesPage,
     currentMonthlyBalancesPage,
@@ -109,13 +109,13 @@ const History: React.FC = () => {
               </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
-                  <MaterialIcons name="trending-up" color={theme.colors.income} size={24} />
+                  <Icon name="trending-up" color="income" size={24} />
                 ) : (
-                  <MaterialIcons name="trending-down" color={theme.colors.error} size={24} />
+                  <Icon name="trending-down" color="error" size={24} />
                 ))}
             </MonthTrendContainer>
             <TouchableIconContainer onPress={() => handleItemPress(item)}>
-              <MaterialIcons name="navigate-next" color={theme.colors.primary} size={28} />
+              <Icon name="navigate-next" size={28} />
             </TouchableIconContainer>
           </ItemHeader>
           <Text>
@@ -140,7 +140,7 @@ const History: React.FC = () => {
         </ItemContainer>
       );
     },
-    [hideValues, theme, maxAmount, handleItemPress],
+    [hideValues, maxAmount, handleItemPress],
   );
 
   const renderItemSeparator = useCallback(() => <StyledDivider />, []);
@@ -148,17 +148,13 @@ const History: React.FC = () => {
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 && canLoadMore ? (
-        <Button onPress={handleLoadMore}>
-          {isLoading ? (
-            <ActivityIndicator size={24} color={theme.colors.textWhite} />
-          ) : (
-            <Text variant="title" color="textWhite">
-              Ver mais
-            </Text>
-          )}
-        </Button>
+        <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
+          <Text variant="title" color="textWhite">
+            Ver mais
+          </Text>
+        </StyledButton>
       ) : null,
-    [canLoadMore, handleLoadMore, isLoading, monthlyBalances, theme],
+    [canLoadMore, handleLoadMore, isLoading, monthlyBalances],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -167,15 +163,7 @@ const History: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader
-        title="Histórico mensal"
-        actions={[
-          {
-            icon: hideValues ? 'visibility-off' : 'visibility',
-            onPress: () => setHideValues(!hideValues),
-          },
-        ]}
-      />
+      <ScreenHeader title="Histórico mensal" actions={[HideValuesAction()]} />
       <StyledFlatList
         refreshControl={
           <RefreshControl

@@ -1,15 +1,15 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
-import { useTheme } from 'styled-components';
 import Divider from '../../components/Divider';
+import ScreenHeader from '../../components/ScreenHeader';
+import Icon from '../../components/Icon';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AuthContext from '../../contexts/AuthContext';
-import { Avatar, BottomSheet, StyledHeader, UserContainer, UserInfo } from './styles';
+import { Avatar, UserContainer, UserInfo } from './styles';
 
 const Settings: React.FC = () => {
-  const theme = useTheme();
   const navigation = useNavigation();
 
   const { user, signOut } = useContext(AuthContext);
@@ -21,27 +21,22 @@ const Settings: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader title="Configurações" />
-      <BottomSheet>
+      <ScreenHeader title="Configurações" />
+      <ScreenContent>
         <UserContainer>
           {user?.avatar ? (
-            <Avatar height={48} width={48} source={{ uri: user.avatar }} />
+            <Avatar source={{ uri: user.avatar }} />
           ) : (
-            <MaterialIcons name="account-circle" color={theme.colors.text} size={48} />
+            <Icon name="account-circle" color="text" size={48} />
           )}
           <UserInfo>
             <Text>{user?.name}</Text>
             <Text variant="extra-light">{user?.email}</Text>
           </UserInfo>
-          <MaterialIcons
-            name="logout"
-            color={theme.colors.text}
-            size={24}
-            onPress={handleSignOut}
-          />
+          <Icon name="logout" color="text" size={24} onPress={handleSignOut} />
         </UserContainer>
         <Divider />
-      </BottomSheet>
+      </ScreenContent>
     </ScreenContainer>
   );
 };

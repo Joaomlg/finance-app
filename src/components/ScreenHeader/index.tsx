@@ -1,28 +1,26 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { ViewProps } from 'react-native';
+import Icon, { IconName } from '../Icon';
 import Text from '../Text';
-
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useTheme } from 'styled-components/native';
 import { Actions, Container, TitleButton } from './styles';
 
-type Action = {
-  icon: keyof typeof MaterialIcons.glyphMap;
+export type Action = {
+  icon: IconName;
   onPress?: () => void;
   onLongPress?: () => void;
   hidden?: boolean;
 };
 
-export interface HeaderProps extends ViewProps {
+export interface ScreenHeaderProps extends ViewProps {
   title: string;
-  titleIcon?: keyof typeof MaterialIcons.glyphMap;
+  titleIcon?: IconName;
   onTitlePress?: () => void;
   actions?: Action[];
   hideGoBackIcon?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({
+const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   title,
   titleIcon,
   onTitlePress,
@@ -32,7 +30,6 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [canGoBack, setCanGoBack] = useState(false);
 
-  const theme = useTheme();
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -42,11 +39,11 @@ const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <Container {...viewProps}>
+    <Container canGoBack={canGoBack} {...viewProps}>
       {!hideGoBackIcon && canGoBack && (
-        <MaterialIcons
+        <Icon
           name="navigate-before"
-          color={theme.colors.secondary}
+          color="secondary"
           size={32}
           onPress={() => navigation.goBack()}
         />
@@ -57,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({
             <Text variant="heading" color="textWhite" transform="capitalize">
               {title}
             </Text>
-            <MaterialIcons name={titleIcon} color={theme.colors.secondary} size={28} />
+            {titleIcon && <Icon name={titleIcon} color="secondary" size={28} />}
           </>
         </TitleButton>
       ) : (
@@ -71,10 +68,10 @@ const Header: React.FC<HeaderProps> = ({
           {actions
             .filter((action) => !action.hidden)
             .map((action, index) => (
-              <MaterialIcons
+              <Icon
                 key={index}
                 name={action.icon}
-                color={theme.colors.textWhite}
+                color="textWhite"
                 size={28}
                 onPress={action.onPress}
                 onLongPress={action.onLongPress}
@@ -86,4 +83,4 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
-export default Header;
+export default ScreenHeader;

@@ -1,17 +1,16 @@
 import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
+import ScreenHeader from '../../components/ScreenHeader';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import TransactionList from './TransactionList';
 import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
-import { StyledHeader } from './styles';
 
 const Transactions: React.FC = () => {
   const {
     isLoading,
-    hideValues,
-    setHideValues,
     transactions,
     fetchTransactions,
     date,
@@ -62,15 +61,7 @@ const Transactions: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <StyledHeader
-        title={formatMonthYearDate(date)}
-        actions={[
-          {
-            icon: hideValues ? 'visibility-off' : 'visibility',
-            onPress: () => setHideValues(!hideValues),
-          },
-        ]}
-      />
+      <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
       <TransactionTabs renderScene={renderScene} />
     </ScreenContainer>
   );

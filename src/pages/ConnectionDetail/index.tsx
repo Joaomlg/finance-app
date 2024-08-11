@@ -1,14 +1,16 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
-import { useTheme } from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
+import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
+import { ScreenContent } from '../../components/ScreenContent';
+import ScreenHeader from '../../components/ScreenHeader';
+import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -21,7 +23,7 @@ import {
   CardHeaderContent,
   ConnectionAvatar,
 } from '../Connections/ConnectionCard/styles';
-import { Actions, BottomHeader, BottomSheet, InformationGroup, StyledHeader } from './styles';
+import { Actions, BottomHeader, InformationGroup } from './styles';
 
 const ConnectionDetail: React.FC<
   NativeStackScreenProps<StackRouteParamList, 'connection-detail'>
@@ -31,14 +33,10 @@ const ConnectionDetail: React.FC<
   const {
     connections,
     accounts,
-    hideValues,
-    setHideValues,
     deleteConnection,
     isConnectionSyncDisabled,
     toogleConnectionSyncDisabled,
   } = useContext(AppContext);
-
-  const theme = useTheme();
 
   const connection = connections.find(({ id }) => id === connectionId);
   const connectionAccounts = accounts.filter((account) => account.connectionId === connectionId);
@@ -81,19 +79,11 @@ const ConnectionDetail: React.FC<
 
   return (
     <ScreenContainer>
-      <StyledHeader
-        title="Detalhes da conexão"
-        actions={[
-          {
-            icon: hideValues ? 'visibility-off' : 'visibility',
-            onPress: () => setHideValues(!hideValues),
-          },
-        ]}
-      ></StyledHeader>
-      <BottomSheet>
+      <ScreenHeader title="Detalhes da conexão" actions={[HideValuesAction()]} />
+      <ScreenContent>
         {connection && hasError && (
           <CardErrorContainer radius={true}>
-            <MaterialIcons name="error" size={24} color={theme.colors.textWhite} />
+            <Icon name="error" size={24} color="textWhite" />
             <CardErrorMessage>
               <Text variant="light" color="textWhite">
                 Não foi possível sincronizar os dados!
@@ -164,7 +154,7 @@ const ConnectionDetail: React.FC<
             </Text>
           </Button>
         </Actions>
-      </BottomSheet>
+      </ScreenContent>
     </ScreenContainer>
   );
 };
