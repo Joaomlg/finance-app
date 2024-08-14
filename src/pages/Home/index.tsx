@@ -6,7 +6,7 @@ import {
   LayoutAnimation,
   LayoutChangeEvent,
   RefreshControl,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import HorizontalBar from '../../components/HorizontalBar';
