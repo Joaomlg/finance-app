@@ -5,10 +5,8 @@ import {
   Alert,
   LayoutAnimation,
   LayoutChangeEvent,
-  Platform,
   RefreshControl,
-  ScrollView,
-  UIManager,
+  ScrollView
 } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import HorizontalBar from '../../components/HorizontalBar';
@@ -40,12 +38,6 @@ import {
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
-
-if (Platform.OS === 'android') {
-  if (UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-}
 
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);

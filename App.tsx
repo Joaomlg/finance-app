@@ -10,7 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
 import React, { useEffect } from 'react';
-import { SafeAreaView, useColorScheme } from 'react-native';
+import { Platform, SafeAreaView, UIManager, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
@@ -45,6 +45,12 @@ export default function App() {
 
   if (!fontsLoaded) {
     return null;
+  }
+
+  if (Platform.OS === 'android') {
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
   }
 
   return (
