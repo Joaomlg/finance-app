@@ -76,7 +76,7 @@ const ScreenFloatingActionButton: React.FC<ScreenFloatingActionButtonProps> = ({
                 onLongPress={() => handleActionPress(action.onLongPress)}
               >
                 <FloatingActionText>
-                  <Text variant="default-bold">{action.text}</Text>
+                  <Text typography="defaultBold">{action.text}</Text>
                 </FloatingActionText>
                 <FLoatingActionButton>
                   <Icon name={action.icon} size={24} color="text" />

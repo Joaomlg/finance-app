@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { ViewProps } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import AppContext from '../../contexts/AppContext';
-import light from '../../theme/light';
-import { BarContainer, Bar } from './styles';
+import { Color } from '../../theme';
+import { Bar, BarContainer } from './styles';
 
 export interface HorizontalBarProps extends ViewProps {
-  color: keyof typeof light.colors;
+  color: Color;
   grow?: number;
   surplusGrow?: number;
 }

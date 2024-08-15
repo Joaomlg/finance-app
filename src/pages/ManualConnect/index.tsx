@@ -42,12 +42,12 @@ const ManualConnect: React.FC = () => {
       <ScreenContent>
         <TextInput placeholder="Identificador" onChangeText={setId} value={id} />
         <Button onPress={saveConnection}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Adicionar
           </Text>
         </Button>
         <Button onPress={RemoveConnection}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Remover
           </Text>
         </Button>

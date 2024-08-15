@@ -9,6 +9,6 @@ export const TextInput = styled.TextInput.attrs(({ theme }) => ({
   border-radius: 24px;
   height: 64px;
   padding-left: 24px;
-  font-size: ${({ theme }) => theme.text.title};
+  font-size: ${({ theme }) => theme.text.title + 'px'};
   color: ${({ theme }) => theme.colors.text};
 `;

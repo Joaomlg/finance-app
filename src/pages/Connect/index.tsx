@@ -15,7 +15,7 @@ const Connect: React.FC = () => {
     <ScreenContainer>
       <ScreenHeader title="Connectar" />
       <ScreenContent>
-        <Text variant="title">Selecione um provedor</Text>
+        <Text typography="title">Selecione um provedor</Text>
         <CustomCard onPress={() => navigation.navigate('connect/pluggy')}>
           <PluggyLogo height={36} width={130} />
         </CustomCard>

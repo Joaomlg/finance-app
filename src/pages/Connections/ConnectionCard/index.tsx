@@ -48,10 +48,10 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
           <CardErrorContainer>
             <Icon name="error" size={24} color="textWhite" />
             <CardErrorMessage>
-              <Text variant="light" color="textWhite">
+              <Text typography="light" color="textWhite">
                 Não foi possível sincronizar os dados!
               </Text>
-              <Text variant="light" color="textWhite">
+              <Text typography="light" color="textWhite">
                 {ConnectionStatusMessage[connection.status]}
               </Text>
             </CardErrorMessage>
@@ -64,7 +64,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
             </ConnectionAvatar>
             <CardHeaderContent>
               <Text>{connection.connector.name}</Text>
-              <Text variant="extra-light" color="textLight">
+              <Text typography="extraLight" color="textLight">
                 Sincronizado em: {lastUpdateDate}
               </Text>
             </CardHeaderContent>
@@ -80,7 +80,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
                 <AccountLine key={index}>
                   <Text>{accountName[account.subtype]}</Text>
                   <Money
-                    variant="default-bold"
+                    typography="defaultBold"
                     value={
                       account.subtype === 'CREDIT_CARD' ? -1 * account.balance : account.balance
                     }

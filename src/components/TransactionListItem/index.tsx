@@ -23,7 +23,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...view
       />
       <ListItemContent>
         {item.category && (
-          <Text variant="extra-light" color="textLight">
+          <Text typography="extraLight" color="textLight">
             {item.category}
           </Text>
         )}
@@ -32,7 +32,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...view
         </Text>
       </ListItemContent>
       <ListItemAmount>
-        <Money variant="default-bold" value={value} />
+        <Money typography="defaultBold" value={value} />
       </ListItemAmount>
     </ListItem>
   );

@@ -51,14 +51,14 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       {onTitlePress ? (
         <TitleButton onPress={onTitlePress}>
           <>
-            <Text variant="heading" color="textWhite" transform="capitalize">
+            <Text typography="heading" color="textWhite" transform="capitalize">
               {title}
             </Text>
             {titleIcon && <Icon name={titleIcon} color="secondary" size={28} />}
           </>
         </TitleButton>
       ) : (
-        <Text variant="heading" color="textWhite" transform="capitalize">
+        <Text typography="heading" color="textWhite" transform="capitalize">
           {title}
         </Text>
       )}

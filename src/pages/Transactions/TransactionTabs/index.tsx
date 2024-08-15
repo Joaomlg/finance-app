@@ -33,7 +33,7 @@ const TransactionTabs: React.FC<TransactionTabsProps> = ({ renderScene }) => {
       style={{ backgroundColor: theme.colors.primary, marginHorizontal: 24, elevation: 0 }}
       indicatorStyle={{ backgroundColor: theme.colors.secondary, height: 2 }}
       renderLabel={({ route, color }) => (
-        <Text variant="default-bold" style={{ color }}>
+        <Text typography="defaultBold" style={{ color }}>
           {route.title}
         </Text>
       )}

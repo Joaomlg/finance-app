@@ -104,7 +104,7 @@ const History: React.FC = () => {
         <ItemContainer>
           <ItemHeader>
             <MonthTrendContainer>
-              <Text variant="heading-regular" transform="capitalize">
+              <Text typography="headingRegular" transform="capitalize">
                 {dateText}
               </Text>
               {showTrendingIcon &&
@@ -119,11 +119,15 @@ const History: React.FC = () => {
             </TouchableIconContainer>
           </ItemHeader>
           <Text>
-            Saldo: <Money value={balance} variant="default-bold" />
+            Saldo: <Money value={balance} typography="defaultBold" />
           </Text>
           <HorizontalBarContainer>
             <StyledHorizontalBar color="income" grow={incomesBarGrow} />
-            <Money value={incomes} variant="default-bold" color={hideValues ? 'text' : 'income'} />
+            <Money
+              value={incomes}
+              typography="defaultBold"
+              color={hideValues ? 'text' : 'income'}
+            />
           </HorizontalBarContainer>
           <HorizontalBarContainer>
             <StyledHorizontalBar
@@ -133,7 +137,7 @@ const History: React.FC = () => {
             />
             <Money
               value={expenses}
-              variant="default-bold"
+              typography="defaultBold"
               color={hideValues ? 'text' : balance < 0 ? 'error' : 'expense'}
             />
           </HorizontalBarContainer>
@@ -149,7 +153,7 @@ const History: React.FC = () => {
     () =>
       monthlyBalances.length > 0 && canLoadMore ? (
         <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Ver mais
           </Text>
         </StyledButton>

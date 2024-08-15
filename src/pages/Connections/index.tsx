@@ -54,7 +54,7 @@ const Connections: React.FC = () => {
           ]}
         />
         <ScreenContent>
-          <Text variant="light" color="textLight">
+          <Text typography="light" color="textLight">
             {connections.length} Conexões
           </Text>
           {connections.map((connection) => renderConnection(connection))}

@@ -159,7 +159,7 @@ const Home: React.FC = () => {
           />
           {isCurrentMonth && (
             <BalanceContainer>
-              <Text variant="light" color="textWhite">
+              <Text typography="light" color="textWhite">
                 Atualizado em {lastUpdateDate}
               </Text>
               <BalanceLine>
@@ -178,13 +178,13 @@ const Home: React.FC = () => {
                 <Money value={totalInvestment} color="textWhite" />
               </BalanceLine>
               <BalanceLine>
-                <Text variant="title" color="textWhite">
+                <Text typography="title" color="textWhite">
                   Total
                 </Text>
                 <BalanceFillLine />
                 <Money
                   value={totalBalance + totalInvestment - totalInvoice}
-                  variant="title"
+                  typography="title"
                   color="textWhite"
                 />
               </BalanceLine>
@@ -200,12 +200,12 @@ const Home: React.FC = () => {
         <ScreenContent>
           <SummaryContainer>
             <SectionHeader>
-              <Text variant="title">Resumo do mês</Text>
+              <Text typography="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
             </SectionHeader>
             <BalanceWithTrending>
               <Text>
-                Saldo: <Money value={balance} variant="default-bold" />
+                Saldo: <Money value={balance} typography="defaultBold" />
               </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
@@ -215,14 +215,14 @@ const Home: React.FC = () => {
                 ))}
             </BalanceWithTrending>
             <SubSectionContainer>
-              <Text variant="default-bold">Entradas</Text>
+              <Text typography="defaultBold">Entradas</Text>
               <HorizontalBarContainer>
                 <HorizontalBar color="income" grow={incomesBarGrow} />
                 <Money value={totalIncomes} />
               </HorizontalBarContainer>
             </SubSectionContainer>
             <SubSectionContainer>
-              <Text variant="default-bold">Saídas</Text>
+              <Text typography="defaultBold">Saídas</Text>
               <HorizontalBarContainer>
                 <HorizontalBar
                   color="expense"
@@ -235,7 +235,7 @@ const Home: React.FC = () => {
           </SummaryContainer>
           <Divider />
           <SectionHeader>
-            <Text variant="title">Últimas transações</Text>
+            <Text typography="title">Últimas transações</Text>
             <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
           </SectionHeader>
           <TransactionListContainer onLayout={onTransactionListLayout}>

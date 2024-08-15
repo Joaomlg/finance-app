@@ -85,10 +85,10 @@ const ConnectionDetail: React.FC<
           <CardErrorContainer radius={true}>
             <Icon name="error" size={24} color="textWhite" />
             <CardErrorMessage>
-              <Text variant="light" color="textWhite">
+              <Text typography="light" color="textWhite">
                 Não foi possível sincronizar os dados!
               </Text>
-              <Text variant="light" color="textWhite">
+              <Text typography="light" color="textWhite">
                 {ConnectionStatusMessage[connection?.status]}
               </Text>
             </CardErrorMessage>
@@ -99,8 +99,8 @@ const ConnectionDetail: React.FC<
             <SvgWithCssUri height="100%" width="100%" uri={connection?.connector.imageUrl || ''} />
           </ConnectionAvatar>
           <CardHeaderContent>
-            <Text variant="heading">{connection?.connector.name}</Text>
-            <Text variant="extra-light" color="textLight">
+            <Text typography="heading">{connection?.connector.name}</Text>
+            <Text typography="extraLight" color="textLight">
               {connection?.id}
             </Text>
           </CardHeaderContent>
@@ -108,17 +108,19 @@ const ConnectionDetail: React.FC<
         <InformationGroup>
           <AccountLine>
             <Text>Criado em</Text>
-            <Text variant="default-bold">{formatDateHourFull(moment(connection?.createdAt))}</Text>
+            <Text typography="defaultBold">
+              {formatDateHourFull(moment(connection?.createdAt))}
+            </Text>
           </AccountLine>
           <AccountLine>
             <Text>Atualizado em</Text>
-            <Text variant="default-bold">
+            <Text typography="defaultBold">
               {formatDateHourFull(moment(connection?.lastUpdatedAt))}
             </Text>
           </AccountLine>
           <AccountLine>
             <Text>Provedor</Text>
-            <Text variant="default-bold">{capitalize(connection?.provider || '')}</Text>
+            <Text typography="defaultBold">{capitalize(connection?.provider || '')}</Text>
           </AccountLine>
         </InformationGroup>
         <Divider />
@@ -129,7 +131,7 @@ const ConnectionDetail: React.FC<
               <AccountLine key={index}>
                 <Text>{accountName[account.subtype]}</Text>
                 <Money
-                  variant="default-bold"
+                  typography="defaultBold"
                   value={account.subtype === 'CREDIT_CARD' ? -1 * account.balance : account.balance}
                 />
               </AccountLine>
@@ -137,19 +139,19 @@ const ConnectionDetail: React.FC<
         </InformationGroup>
         <Actions>
           <Button variant="secondary" onPress={handleUpdateConnection}>
-            <Text variant="title">Atualizar</Text>
+            <Text typography="title">Atualizar</Text>
           </Button>
           <Button variant="secondary" onPress={() => toogleConnectionSyncDisabled(connectionId)}>
             {isConnectionSyncDisabled(connectionId) ? (
-              <Text variant="title">Retomar sincronização</Text>
+              <Text typography="title">Retomar sincronização</Text>
             ) : (
-              <Text variant="title" color="error">
+              <Text typography="title" color="error">
                 Pausar sincronização
               </Text>
             )}
           </Button>
           <Button variant="secondary" onPress={handleDeleteConnection}>
-            <Text variant="title" color="error">
+            <Text typography="title" color="error">
               Apagar
             </Text>
           </Button>

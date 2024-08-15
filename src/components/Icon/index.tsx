@@ -2,9 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { useTheme } from 'styled-components';
-import light from '../../theme/light';
-
-type Color = keyof typeof light.colors;
+import { Color } from '../../theme';
 
 export type IconName = keyof typeof MaterialIcons.glyphMap;
 

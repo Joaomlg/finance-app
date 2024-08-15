@@ -31,7 +31,7 @@ const Settings: React.FC = () => {
           )}
           <UserInfo>
             <Text>{user?.name}</Text>
-            <Text variant="extra-light">{user?.email}</Text>
+            <Text typography="extraLight">{user?.email}</Text>
           </UserInfo>
           <Icon name="logout" color="text" size={24} onPress={handleSignOut} />
         </UserContainer>
