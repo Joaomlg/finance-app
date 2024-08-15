@@ -18,10 +18,11 @@ export type Action = {
   onLongPress?: () => void;
 };
 
-export interface ScreenFloatingActionButtonProps {
+export interface ScreenFloatingButtonProps {
   icon?: IconName;
   closeIcon?: IconName;
   actions?: Action[];
+  onPress?: () => void;
 }
 
 const DEFAULT_ICON: IconName = 'add';
@@ -29,10 +30,11 @@ const DEFAULT_CLOSE_ICON: IconName = 'close';
 
 const CLOSE_ON_ACTION_PRESS_DELAY_MS = 100;
 
-const ScreenFloatingActionButton: React.FC<ScreenFloatingActionButtonProps> = ({
+const ScreenFloatingButton: React.FC<ScreenFloatingButtonProps> = ({
   icon,
   closeIcon,
   actions,
+  onPress,
 }) => {
   const [opened, setOpened] = useState(false);
 
@@ -46,6 +48,14 @@ const ScreenFloatingActionButton: React.FC<ScreenFloatingActionButtonProps> = ({
     setOpened(false);
   };
 
+  const handleButtonPress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      animatedToogle();
+    }
+  };
+
   const handleActionPress = (func: (() => void) | undefined) => {
     if (func) func();
     setTimeout(animatedClose, CLOSE_ON_ACTION_PRESS_DELAY_MS);
@@ -53,7 +63,7 @@ const ScreenFloatingActionButton: React.FC<ScreenFloatingActionButtonProps> = ({
 
   const renderFloatingButton = () => {
     return (
-      <FloatingButton onPress={animatedToogle}>
+      <FloatingButton onPress={handleButtonPress}>
         {opened ? (
           <Icon name={closeIcon || DEFAULT_CLOSE_ICON} size={24} color="textWhite" />
         ) : (
@@ -96,4 +106,4 @@ const ScreenFloatingActionButton: React.FC<ScreenFloatingActionButtonProps> = ({
   );
 };
 
-export default ScreenFloatingActionButton;
+export default ScreenFloatingButton;
