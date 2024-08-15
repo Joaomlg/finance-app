@@ -4,7 +4,6 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
@@ -17,6 +16,7 @@ import { ThemeProvider } from 'styled-components/native';
 import SecurityGuard from './src/components/SecurityGuard';
 import { AppContextProvider } from './src/contexts/AppContext';
 import { AuthContextProvider } from './src/contexts/AuthContext';
+import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
@@ -60,13 +60,13 @@ export default function App() {
           <AppContextProvider>
             <HooksProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
-                <BottomSheetModalProvider>
+                <BottomSheetContextProvider>
                   <SafeAreaView style={{ flex: 1 }}>
                     <StatusBar style="light" backgroundColor={theme.colors.primary} />
                     <Routes />
                     <Toast />
                   </SafeAreaView>
-                </BottomSheetModalProvider>
+                </BottomSheetContextProvider>
               </GestureHandlerRootView>
             </HooksProvider>
           </AppContextProvider>
