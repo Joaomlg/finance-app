@@ -6,14 +6,15 @@ import Icon, { IconName } from '../../../Icon';
 import Text from '../../../Text';
 import { Container, Item, ItemDividerContainer, Title } from './styles';
 
-export type Item = {
+export type SelectionItem = {
   text: string;
-  icon: IconName;
   onPress: () => void;
+  icon?: IconName;
+  renderIcon?: () => React.ReactNode;
 };
 
 export interface ListItemSelectionProps extends ViewProps {
-  items: Item[];
+  items: SelectionItem[];
   title?: string;
 }
 
@@ -24,7 +25,7 @@ const ListItemSelection: React.FC<ListItemSelectionProps> = ({ items, title }) =
       {items.map((item, index) => (
         <ItemDividerContainer key={index}>
           <Item onPress={item.onPress}>
-            <Icon name={item.icon} size={24} />
+            {item.icon ? <Icon name={item.icon} size={24} /> : item.renderIcon && item.renderIcon()}
             <Text>{item.text}</Text>
           </Item>
           {index < items.length - 1 && <Divider />}
