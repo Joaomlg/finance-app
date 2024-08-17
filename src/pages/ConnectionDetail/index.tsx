@@ -3,6 +3,7 @@ import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
 import { SvgWithCssUri } from 'react-native-svg/css';
+import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
 import Icon from '../../components/Icon';
@@ -21,7 +22,6 @@ import {
   CardErrorContainer,
   CardErrorMessage,
   CardHeaderContent,
-  ConnectionAvatar,
 } from '../Connections/ConnectionCard/styles';
 import { Actions, BottomHeader, InformationGroup } from './styles';
 
@@ -95,9 +95,9 @@ const ConnectionDetail: React.FC<
           </CardErrorContainer>
         )}
         <BottomHeader>
-          <ConnectionAvatar color={'#' + connection?.connector.primaryColor} size={48}>
+          <Avatar color={'#' + connection?.connector.primaryColor} size={48}>
             <SvgWithCssUri height="100%" width="100%" uri={connection?.connector.imageUrl || ''} />
-          </ConnectionAvatar>
+          </Avatar>
           <CardHeaderContent>
             <Text typography="heading">{connection?.connector.name}</Text>
             <Text typography="extraLight" color="textLight">

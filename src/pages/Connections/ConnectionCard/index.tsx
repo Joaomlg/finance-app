@@ -11,6 +11,7 @@ import Text from '../../../components/Text';
 import { Account, Connection } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 
+import Avatar from '../../../components/Avatar';
 import Icon from '../../../components/Icon';
 import { ConnectionStatusMessage, accountName, textCompare } from '../../../utils/text';
 import {
@@ -20,8 +21,7 @@ import {
   CardErrorContainer,
   CardErrorMessage,
   CardHeader,
-  CardHeaderContent,
-  ConnectionAvatar,
+  CardHeaderContent
 } from './styles';
 
 export interface ConnectionCardProps extends ViewProps {
@@ -59,9 +59,9 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection, accounts, .
         )}
         <CardContainer>
           <CardHeader>
-            <ConnectionAvatar color={'#' + connection.connector.primaryColor}>
+            <Avatar color={'#' + connection.connector.primaryColor}>
               <SvgWithCssUri height="100%" width="100%" uri={connection.connector.imageUrl} />
-            </ConnectionAvatar>
+            </Avatar>
             <CardHeaderContent>
               <Text>{connection.connector.name}</Text>
               <Text typography="extraLight" color="textLight">
