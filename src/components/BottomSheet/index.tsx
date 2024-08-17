@@ -3,7 +3,15 @@ import {
   BottomSheetBackdropProps,
   BottomSheetModal,
 } from '@gorhom/bottom-sheet';
-import React, { useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { BackHandler } from 'react-native';
 import { useTheme } from 'styled-components';
 import { Container } from './styles';
 
@@ -22,6 +30,8 @@ const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetMethods, Connect
   { children },
   ref,
 ) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+
   const modalRef = useRef<BottomSheetModal>(null);
 
   const snapPoints = useMemo(() => ['30%', '60%', '100%'], []);
@@ -50,6 +60,20 @@ const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetMethods, Connect
     [],
   );
 
+  useEffect(() => {
+    const onBackPress = () => {
+      if (modalRef !== null) {
+        modalRef.current?.close();
+        return true;
+      }
+    };
+
+    if (currentIndex !== -1) {
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }
+  }, [currentIndex, ref]);
+
   return (
     <BottomSheetModal
       ref={modalRef}
@@ -57,6 +81,9 @@ const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetMethods, Connect
       backdropComponent={renderBackdrop}
       backgroundStyle={{
         backgroundColor: theme.colors.backgroundWhite,
+      }}
+      onChange={(index) => {
+        setCurrentIndex(index);
       }}
     >
       <Container>{children}</Container>
