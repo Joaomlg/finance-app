@@ -21,3 +21,10 @@ export type Connection = {
   connector: Connector;
   provider: Provider;
 };
+
+export type NewConnection = {
+  id: string;
+  lastUpdatedAt: Date;
+  status: ConnectionStatus;
+  provider: Provider;
+};
