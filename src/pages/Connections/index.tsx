@@ -4,6 +4,7 @@ import { RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
+import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
@@ -30,37 +31,45 @@ const Connections: React.FC = () => {
   );
 
   return (
-    <ScreenContainer>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={fetchConnections}
-            colors={[theme.colors.primary]}
-          />
-        }
-        contentContainerStyle={{ flexGrow: 1 }}
-        stickyHeaderIndices={[0]}
-      >
-        <ScreenHeader
-          title="Conexões"
-          actions={[
-            HideValuesAction(),
-            {
-              icon: 'add-circle-outline',
-              onPress: () => navigation.navigate('connect'),
-              onLongPress: () => navigation.navigate('manualConnect'),
-            },
-          ]}
-        />
-        <ScreenContent>
-          <Text typography="light" color="textLight">
-            {connections.length} Conexões
-          </Text>
-          {connections.map((connection) => renderConnection(connection))}
-        </ScreenContent>
-      </ScrollView>
-    </ScreenContainer>
+    <>
+      <ScreenContainer>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={fetchConnections}
+              colors={[theme.colors.primary]}
+            />
+          }
+          contentContainerStyle={{ flexGrow: 1 }}
+          stickyHeaderIndices={[0]}
+        >
+          <ScreenHeader title="Conexões" actions={[HideValuesAction()]} />
+          <ScreenContent>
+            <Text typography="light" color="textLight">
+              {connections.length} Conexões
+            </Text>
+            {connections.map((connection) => renderConnection(connection))}
+          </ScreenContent>
+        </ScrollView>
+      </ScreenContainer>
+      <ScreenFloatingButton
+        icon="add"
+        actions={[
+          {
+            icon: 'link',
+            text: 'Conexão automática',
+            onPress: () => navigation.navigate('connect'),
+            onLongPress: () => navigation.navigate('manualConnect'),
+          },
+          {
+            icon: 'link-off',
+            text: 'Conta manual',
+            onPress: () => navigation.navigate('createAccount'),
+          },
+        ]}
+      />
+    </>
   );
 };
 

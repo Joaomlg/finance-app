@@ -11,12 +11,14 @@ import Login from '../pages/Login';
 import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
 import Transactions from '../pages/Transactions';
+import CreateAccount from '../pages/CreateAccount';
 
 export type StackRouteParamList = {
   login: undefined;
   home: undefined;
   connections: undefined;
   'connection-detail': { connectionId: string };
+  createAccount: undefined;
   connect: undefined;
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };
@@ -35,6 +37,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="login" component={Login} />
         <Screen name="home" component={Home} />
         <Screen name="connections" component={Connections} />
+        <Screen name="createAccount" component={CreateAccount} />
         <Screen name="connection-detail" component={ConnectionDetail} />
         <Screen name="connect" component={Connect} />
         <Screen name="connect/pluggy" component={PluggyConnect} />

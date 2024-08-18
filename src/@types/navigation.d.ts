@@ -5,6 +5,7 @@ export declare global {
       home: undefined;
       connections: undefined;
       'connection-detail': { connectionId: string };
+      createAccount: undefined;
       connect: undefined;
       'connect/pluggy':
         | {
