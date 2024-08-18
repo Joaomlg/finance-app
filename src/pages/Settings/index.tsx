@@ -4,7 +4,7 @@ import Divider from '../../components/Divider';
 import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
 import ScreenContainer from '../../components/ScreenContainer';
-import { ScreenContent } from '../../components/ScreenContent';
+import ScreenContent from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import AuthContext from '../../contexts/AuthContext';
 import { Avatar, UserContainer, UserInfo } from './styles';

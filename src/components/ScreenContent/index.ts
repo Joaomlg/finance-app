@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 
-export const ScreenContent = styled.View`
+export default styled.View`
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
