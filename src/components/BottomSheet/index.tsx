@@ -22,11 +22,11 @@ export interface BottomSheetMethods {
   close: () => void;
 }
 
-export interface ConnectionCardProps {
+export interface BottomSheetProps {
   children?: React.ReactNode;
 }
 
-const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetMethods, ConnectionCardProps> = (
+const BottomSheet: React.ForwardRefRenderFunction<BottomSheetMethods, BottomSheetProps> = (
   { children },
   ref,
 ) => {
@@ -91,4 +91,4 @@ const ConnectionMenu: React.ForwardRefRenderFunction<BottomSheetMethods, Connect
   );
 };
 
-export default React.forwardRef(ConnectionMenu);
+export default React.forwardRef(BottomSheet);
