@@ -16,6 +16,7 @@ export type Action = {
   icon: IconName;
   onPress?: () => void;
   onLongPress?: () => void;
+  disabled?: boolean;
 };
 
 export interface ScreenFloatingButtonProps {
@@ -82,8 +83,9 @@ const ScreenFloatingButton: React.FC<ScreenFloatingButtonProps> = ({
             actions.map((action, index) => (
               <FloatingActionContainer
                 key={index}
-                onPress={() => handleActionPress(action.onPress)}
-                onLongPress={() => handleActionPress(action.onLongPress)}
+                onPress={() => !action.disabled && handleActionPress(action.onPress)}
+                onLongPress={() => !action.disabled && handleActionPress(action.onLongPress)}
+                disabled={action.disabled}
               >
                 <FloatingActionText>
                   <Text typography="defaultBold">{action.text}</Text>

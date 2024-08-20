@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -8,27 +8,14 @@ import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext from '../../contexts/AppContext';
-import { Connection } from '../../models';
-import ConnectionCard from '../Connections/ConnectionCard';
+import AppContext2 from '../../contexts/AppContext2';
+import AccountCard from './AccountCard';
 
-const Connections: React.FC = () => {
-  const { isLoading, connections, accounts, fetchConnections } = useContext(AppContext);
+const Accounts: React.FC = () => {
+  const { accounts, fetchAccounts, fetchingAccounts } = useContext(AppContext2);
 
   const theme = useTheme();
   const navigation = useNavigation();
-
-  const renderConnection = useCallback(
-    (connection: Connection) => {
-      const connectionAccounts = accounts.filter(
-        (account) => account.connectionId === connection.id,
-      );
-      return (
-        <ConnectionCard key={connection.id} connection={connection} accounts={connectionAccounts} />
-      );
-    },
-    [accounts],
-  );
 
   return (
     <>
@@ -36,20 +23,22 @@ const Connections: React.FC = () => {
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={isLoading}
-              onRefresh={fetchConnections}
+              refreshing={fetchingAccounts}
+              onRefresh={fetchAccounts}
               colors={[theme.colors.primary]}
             />
           }
           contentContainerStyle={{ flexGrow: 1 }}
           stickyHeaderIndices={[0]}
         >
-          <ScreenHeader title="Conexões" actions={[HideValuesAction()]} />
+          <ScreenHeader title="Contas" actions={[HideValuesAction()]} />
           <ScreenContent>
             <Text typography="light" color="textLight">
-              {connections.length} Conexões
+              {accounts.length} Contas
             </Text>
-            {connections.map((connection) => renderConnection(connection))}
+            {accounts.map((account) => (
+              <AccountCard key={account.id} account={account} />
+            ))}
           </ScreenContent>
         </ScrollView>
       </ScreenContainer>
@@ -73,4 +62,4 @@ const Connections: React.FC = () => {
   );
 };
 
-export default Connections;
+export default Accounts;

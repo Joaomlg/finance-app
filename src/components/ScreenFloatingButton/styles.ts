@@ -1,4 +1,9 @@
+import { TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
+
+export type FloatingActionContainer = TouchableOpacityProps & {
+  disabled?: boolean;
+};
 
 export const Container = styled.View`
   height: 100%;
@@ -24,10 +29,11 @@ export const FloatingButton = styled.TouchableOpacity`
   border-radius: 64px;
 `;
 
-export const FloatingActionContainer = styled.TouchableOpacity`
+export const FloatingActionContainer = styled.TouchableOpacity<FloatingActionContainer>`
   flex-direction: row;
   gap: 24px;
   align-items: center;
+  opacity: ${(props) => (props.disabled ? 0.2 : 1)};
 `;
 
 export const FLoatingActionButton = styled.View`

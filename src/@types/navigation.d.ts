@@ -3,8 +3,8 @@ export declare global {
     interface RootParamList {
       login: undefined;
       home: undefined;
-      connections: undefined;
-      'connection-detail': { connectionId: string };
+      accounts: undefined;
+      accountDetail: { accountId: string };
       createAccount: undefined;
       connect: undefined;
       'connect/pluggy':

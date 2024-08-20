@@ -17,7 +17,7 @@ export const onAccountsChange = (callback: (accounts: NewAccount[]) => void) => 
 };
 
 export const setAccount = async (account: NewAccount) => {
-  await accountsCollection.add(account);
+  await accountsCollection.doc(account.id).set(account);
 };
 
 export const deleteAccount = async (account: NewAccount) => {

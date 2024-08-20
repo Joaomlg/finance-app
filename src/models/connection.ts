@@ -25,6 +25,7 @@ export type Connection = {
 export type NewConnection = {
   id: string;
   lastUpdatedAt: Date;
+  updateDisabled: boolean;
   status: ConnectionStatus;
   provider: Provider;
 };
