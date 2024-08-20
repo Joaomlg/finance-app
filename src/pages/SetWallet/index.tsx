@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import Divider from '../../components/Divider';
@@ -12,42 +12,41 @@ import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
+import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { NewAccount } from '../../models';
-import { WalletSubType } from '../../models/wallet';
-import { setAccount } from '../../repositories/accountRepository';
+import { WalletType } from '../../models';
 import { getSvgComponent } from '../../utils/svg';
 import { accountName } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
-import Toast from 'react-native-toast-message';
 
-type AccountFormValues = {
+type WalletFormValues = {
   balance: number;
   name: string;
-  type: WalletSubType;
+  type: WalletType;
   institution: PresetInstitution;
 };
 
-const CreateAccount: React.FC = () => {
-  const [accountFormValues, setAccountFormValues] = useState({} as AccountFormValues);
+const SetWallet: React.FC = () => {
+  const [walletFormValues, setWalletFormValues] = useState({} as WalletFormValues);
 
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
+  const { setWallet } = useContext(AppContext2);
 
   const navigate = useNavigation();
 
-  const handleAccountBalanceChange = (value: string) => {
+  const handleWalletBalanceChange = (value: string) => {
     const balance = parseFloat(value.replace(',', '.'));
-    setAccountFormValues((value) => ({ ...value, balance }));
+    setWalletFormValues((value) => ({ ...value, balance }));
   };
 
-  const handleAccountNameChange = (name: string) => {
-    setAccountFormValues((value) => ({ ...value, name }));
+  const handleWalletNameChange = (name: string) => {
+    setWalletFormValues((value) => ({ ...value, name }));
   };
 
-  const renderAccountTypeSelector = () => {
-    const handleItemPressed = (type: WalletSubType) => {
-      setAccountFormValues((value) => ({
+  const renderWalletTypeSelector = () => {
+    const handleItemPressed = (type: WalletType) => {
+      setWalletFormValues((value) => ({
         ...value,
         type,
       }));
@@ -56,7 +55,7 @@ const CreateAccount: React.FC = () => {
 
     return (
       <ListItemSelection
-        title="Tipo de conta"
+        title="Tipo de carteira"
         items={[
           {
             text: 'Conta corrente',
@@ -75,7 +74,7 @@ const CreateAccount: React.FC = () => {
 
   const renderInstitutionSelector = () => {
     const handleItemPressed = (institution: PresetInstitution) => {
-      setAccountFormValues((value) => ({
+      setWalletFormValues((value) => ({
         ...value,
         institution,
       }));
@@ -102,37 +101,27 @@ const CreateAccount: React.FC = () => {
     return <ListItemSelection title="Instituição" items={items} />;
   };
 
-  const handleSubmitAccount = async () => {
-    const account: NewAccount = {
+  const handleSubmitWallet = async () => {
+    await setWallet({
       id: uuid.v4().toString(),
-      name: accountFormValues.name,
-      logoSvg: accountFormValues.institution.logoSvg,
-      primaryColor: accountFormValues.institution.primaryColor,
-      wallets: [
-        {
-          id: uuid.v4().toString(),
-          initialBalance: accountFormValues.balance || 0,
-          balance: accountFormValues.balance || 0,
-          type: 'BANK',
-          subtype: accountFormValues.type,
-        },
-      ],
+      name: walletFormValues.name,
+      styles: {
+        logoSvg: walletFormValues.institution.logoSvg,
+        primaryColor: walletFormValues.institution.primaryColor,
+      },
+      initialBalance: walletFormValues.balance || 0,
+      balance: walletFormValues.balance || 0,
+      type: walletFormValues.type,
       createdAt: new Date(),
-    };
-
-    try {
-      await setAccount(account);
-      Toast.show({ type: 'success', text1: 'Conta criada com sucesso!' });
-      navigate.goBack();
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível criar a conta!' });
-    }
+      institutionId: walletFormValues.institution.id,
+    });
+    navigate.goBack();
   };
 
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title="Nova conta" />
+        <ScreenHeader title="Nova carteira" />
         <HeaderExtensionContainer>
           <BalanceValueContainer>
             <Text typography="light" color="textWhite">
@@ -145,7 +134,7 @@ const CreateAccount: React.FC = () => {
               color="textWhite"
               keyboardType="decimal-pad"
               iconRight="edit"
-              onChangeText={handleAccountBalanceChange}
+              onChangeText={handleWalletBalanceChange}
             />
           </BalanceValueContainer>
         </HeaderExtensionContainer>
@@ -153,15 +142,15 @@ const CreateAccount: React.FC = () => {
           <TextInput
             placeholder="Nome"
             iconLeft="font-download"
-            onChangeText={handleAccountNameChange}
+            onChangeText={handleWalletNameChange}
           />
           <Divider />
           <TextInput
             placeholder="Tipo"
             iconLeft="account-balance-wallet"
             iconRight="navigate-next"
-            onPress={() => openBottomSheet(renderAccountTypeSelector())}
-            value={accountName[accountFormValues.type]}
+            onPress={() => openBottomSheet(renderWalletTypeSelector())}
+            value={accountName[walletFormValues.type]}
             readOnly
           />
           <Divider />
@@ -170,15 +159,15 @@ const CreateAccount: React.FC = () => {
             iconLeft="circle"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderInstitutionSelector())}
-            value={accountFormValues.institution?.name}
+            value={walletFormValues.institution?.name}
             readOnly={true}
           />
           <Divider />
         </ScreenContent>
       </ScreenContainer>
-      <ScreenFloatingButton icon="check" onPress={handleSubmitAccount} />
+      <ScreenFloatingButton icon="check" onPress={handleSubmitWallet} />
     </>
   );
 };
 
-export default CreateAccount;
+export default SetWallet;

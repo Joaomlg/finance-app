@@ -189,10 +189,10 @@ const Home: React.FC = () => {
                 />
               </BalanceLine>
               <ConnectionsButton
-                text="Ver minhas contas"
+                text="Ver minhas carteiras"
                 color="secondary"
-                icon="account-balance"
-                onPress={() => navigation.navigate('accounts')}
+                icon="account-balance-wallet"
+                onPress={() => navigation.navigate('wallets')}
               />
             </BalanceContainer>
           )}

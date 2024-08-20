@@ -14,66 +14,66 @@ import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
-import { NewAccount } from '../../models';
+import { Wallet } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
 import { cloneObject } from '../../utils/object';
 import { getSvgComponent } from '../../utils/svg';
-import { ConnectionStatusMessage, accountName, capitalize, textCompare } from '../../utils/text';
+import { ConnectionStatusMessage, accountName, capitalize } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup, Line } from './styles';
 
-const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'accountDetail'>> = ({
+const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet'>> = ({
   route,
   navigation,
 }) => {
-  const { accounts, setAccount, deleteAccount } = useContext(AppContext2);
+  const { wallets, setWallet, deleteWallet } = useContext(AppContext2);
 
   const theme = useTheme();
 
-  const account = accounts.find(({ id }) => id === route.params.accountId);
+  const wallet = wallets.find(({ id }) => id === route.params.walletId);
 
-  if (!account) return;
+  if (!wallet) return;
 
-  const LogoSvgComponent = getSvgComponent(account.logoSvg);
+  const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
 
   const hasError =
-    account.connection?.status !== 'UPDATED' && account.connection?.status !== 'UPDATING';
+    wallet.connection?.status !== 'UPDATED' && wallet.connection?.status !== 'UPDATING';
 
   const toggleAutoUpdate = async () => {
-    if (!account.connection) {
+    if (!wallet.connection) {
       return;
     }
 
-    const clonedAccount = cloneObject(account) as NewAccount;
+    const clonedAccount = cloneObject(wallet) as Wallet;
 
     //@ts-expect-error connection is defined
     clonedAccount.connection.updateDisabled = !clonedAccount.connection.updateDisabled;
 
-    setAccount(clonedAccount);
+    setWallet(clonedAccount);
   };
 
   const handleUpdateConnection = () => {
-    if (account.connection === undefined) {
+    if (wallet.connection === undefined) {
       return;
     }
 
-    const provider = account.connection?.provider.toLowerCase();
+    const provider = wallet.connection?.provider.toLowerCase();
     const uri = `connect/${provider}`;
 
     // @ts-expect-error Initially, the route to connect using a provider is `connect/<provider>`
-    navigation.navigate(uri, { updateConnectionId: account.connection.id });
+    navigation.navigate(uri, { updateConnectionId: wallet.connection.id });
   };
 
   const handleDeleteAccount = async () => {
     Alert.alert(
-      'Apagar conta?',
-      'Tem certeza que deseja apagar a conta?',
+      'Apagar carteira?',
+      'Tem certeza que deseja apagar a carteira?',
       [
         { text: 'Cancelar', onPress: () => {} },
         {
           text: 'Apagar',
           onPress: async () => {
-            await deleteAccount(account);
+            await deleteWallet(wallet);
             navigation.goBack();
           },
         },
@@ -85,48 +85,48 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'accou
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title="Detalhes da conta" actions={[HideValuesAction()]} />
+        <ScreenHeader title="Detalhes da carteira" actions={[HideValuesAction()]} />
         <ScreenContent>
-          {account.connection && hasError && (
+          {wallet.connection && hasError && (
             <Banner
               icon="error"
               message="Não foi possível sincronizar os dados!"
-              message2={ConnectionStatusMessage[account.connection?.status]}
+              message2={ConnectionStatusMessage[wallet.connection?.status]}
               rounded={true}
             />
           )}
           <BottomHeader>
-            <Avatar color={account.primaryColor} size={48}>
+            <Avatar color={wallet.styles.primaryColor} size={48}>
               <LogoSvgComponent height="100%" width="100%" />
             </Avatar>
             <BottomHeaderContent>
-              <Text typography="heading">{account.name}</Text>
+              <Text typography="heading">{wallet.name}</Text>
               <Text typography="extraLight" color="textLight" selectable={true}>
-                {account.connection?.id || account.id}
+                {wallet.connection?.id || wallet.id}
               </Text>
             </BottomHeaderContent>
           </BottomHeader>
           <InformationGroup>
             <Line>
               <Text>Criado em</Text>
-              <Text typography="defaultBold">{formatDateHourFull(moment(account.createdAt))}</Text>
+              <Text typography="defaultBold">{formatDateHourFull(moment(wallet.createdAt))}</Text>
             </Line>
             <Line>
               <Text>Tipo</Text>
-              <Text typography="defaultBold">{account.connection ? 'Automático' : 'Manual'}</Text>
+              <Text typography="defaultBold">{wallet.connection ? 'Automático' : 'Manual'}</Text>
             </Line>
-            {account.connection && (
+            {wallet.connection && (
               <>
                 <Line>
                   <Text>Atualizado em</Text>
                   <Text typography="defaultBold">
-                    {formatDateHourFull(moment(account.connection?.lastUpdatedAt))}
+                    {formatDateHourFull(moment(wallet.connection?.lastUpdatedAt))}
                   </Text>
                 </Line>
                 <Line>
                   <Text>Provedor</Text>
                   <Text typography="defaultBold">
-                    {capitalize(account.connection?.provider || '')}
+                    {capitalize(wallet.connection?.provider || '')}
                   </Text>
                 </Line>
               </>
@@ -134,30 +134,24 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'accou
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            {account.wallets
-              .sort((a, b) => textCompare(a.subtype, b.subtype))
-              .map((account, index) => (
-                <Line key={index}>
-                  <Text>{accountName[account.subtype]}</Text>
-                  <Money
-                    typography="defaultBold"
-                    value={
-                      account.subtype === 'CREDIT_CARD' ? -1 * account.balance : account.balance
-                    }
-                  />
-                </Line>
-              ))}
+            <Line>
+              <Text>{accountName[wallet.type]}</Text>
+              <Money
+                typography="defaultBold"
+                value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
+              />
+            </Line>
           </InformationGroup>
           <Divider />
-          {account.connection && (
+          {wallet.connection && (
             <Line>
               <Text>Pausar sincronização</Text>
               <Switch
                 onValueChange={toggleAutoUpdate}
-                value={account.connection?.updateDisabled}
+                value={wallet.connection?.updateDisabled}
                 trackColor={{ false: theme.colors.lightGray, true: theme.colors.primary }}
                 thumbColor={
-                  account.connection?.updateDisabled ? theme.colors.white : theme.colors.lightGray
+                  wallet.connection?.updateDisabled ? theme.colors.white : theme.colors.lightGray
                 }
               />
             </Line>
@@ -170,7 +164,7 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'accou
             text: 'Atualizar',
             icon: 'sync',
             onPress: handleUpdateConnection,
-            disabled: account.connection === undefined,
+            disabled: wallet.connection === undefined,
           },
           { text: 'Remover', icon: 'delete', onPress: handleDeleteAccount },
         ]}

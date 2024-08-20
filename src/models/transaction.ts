@@ -9,6 +9,6 @@ export type Transaction = {
   amount: number;
   category?: string;
   date: Date;
-  accountId: string;
+  walletId: string;
   provider: Provider;
 };

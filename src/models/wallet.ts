@@ -1,11 +1,21 @@
-export type WalletType = 'BANK' | 'CREDIT';
+import { SvgKey } from '../utils/svg';
+import { NewConnection } from './connection';
 
-export type WalletSubType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
+export type WalletType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
+
+export type WalletStyles = {
+  logoSvg: SvgKey;
+  primaryColor: string;
+};
 
 export type Wallet = {
   id: string;
-  type: WalletType;
-  subtype: WalletSubType;
-  initialBalance: number;
+  name: string;
   balance: number;
+  initialBalance: number;
+  type: WalletType;
+  styles: WalletStyles;
+  createdAt: Date;
+  institutionId?: number;
+  connection?: NewConnection;
 };

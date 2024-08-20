@@ -9,10 +9,10 @@ import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
-import AccountCard from './AccountCard';
+import AccountCard from './WalletCard';
 
 const Accounts: React.FC = () => {
-  const { accounts, fetchAccounts, fetchingAccounts } = useContext(AppContext2);
+  const { wallets, fetchWallets, fetchingWallets } = useContext(AppContext2);
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -23,21 +23,21 @@ const Accounts: React.FC = () => {
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={fetchingAccounts}
-              onRefresh={fetchAccounts}
+              refreshing={fetchingWallets}
+              onRefresh={fetchWallets}
               colors={[theme.colors.primary]}
             />
           }
           contentContainerStyle={{ flexGrow: 1 }}
           stickyHeaderIndices={[0]}
         >
-          <ScreenHeader title="Contas" actions={[HideValuesAction()]} />
+          <ScreenHeader title="Carteiras" actions={[HideValuesAction()]} />
           <ScreenContent>
             <Text typography="light" color="textLight">
-              {accounts.length} Contas
+              {wallets.length} Carteiras
             </Text>
-            {accounts.map((account) => (
-              <AccountCard key={account.id} account={account} />
+            {wallets.map((wallet) => (
+              <AccountCard key={wallet.id} wallet={wallet} />
             ))}
           </ScreenContent>
         </ScrollView>
@@ -53,8 +53,8 @@ const Accounts: React.FC = () => {
           },
           {
             icon: 'link-off',
-            text: 'Conta manual',
-            onPress: () => navigation.navigate('createAccount'),
+            text: 'Carteira manual',
+            onPress: () => navigation.navigate('setWallet'),
           },
         ]}
       />

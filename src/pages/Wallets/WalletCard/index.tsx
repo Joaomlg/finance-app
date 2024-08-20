@@ -7,54 +7,54 @@ import Card from '../../../components/Card';
 import Divider from '../../../components/Divider';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
-import { NewAccount } from '../../../models';
+import { Wallet } from '../../../models';
 import { LastUpdateDateFormat } from '../../../utils/contants';
 
 import Avatar from '../../../components/Avatar';
 import Banner from '../../../components/Banner';
 import Icon from '../../../components/Icon';
 import { getSvgComponent } from '../../../utils/svg';
-import { ConnectionStatusMessage, accountName, textCompare } from '../../../utils/text';
+import { ConnectionStatusMessage, accountName } from '../../../utils/text';
 import { CardContainer, CardContent, CardHeader, CardHeaderContent, Line } from './styles';
 
 export interface AccountCardProps extends ViewProps {
-  account: NewAccount;
+  wallet: Wallet;
 }
 
-const AccountCard: React.FC<AccountCardProps> = ({ account, ...viewProps }) => {
+const AccountCard: React.FC<AccountCardProps> = ({ wallet, ...viewProps }) => {
   const navigation = useNavigation();
 
-  const LogoSvgComponent = getSvgComponent(account.logoSvg);
+  const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
 
-  const lastUpdateDate = account.connection?.lastUpdatedAt
-    ? moment(account.connection?.lastUpdatedAt).format(LastUpdateDateFormat)
+  const lastUpdateDate = wallet.connection?.lastUpdatedAt
+    ? moment(wallet.connection?.lastUpdatedAt).format(LastUpdateDateFormat)
     : 'nunca';
 
   const hasError =
-    account.connection?.status !== 'UPDATED' && account.connection?.status !== 'UPDATING';
+    wallet.connection?.status !== 'UPDATED' && wallet.connection?.status !== 'UPDATING';
 
   const handleCardPressed = () => {
-    navigation.navigate('accountDetail', { accountId: account.id });
+    navigation.navigate('wallet', { walletId: wallet.id });
   };
 
   return (
     <>
       <Card {...viewProps} onPress={handleCardPressed}>
-        {account.connection && hasError && (
+        {wallet.connection && hasError && (
           <Banner
             icon="error"
             message="Não foi possível sincronizar os dados!"
-            message2={ConnectionStatusMessage[account.connection?.status]}
+            message2={ConnectionStatusMessage[wallet.connection?.status]}
           />
         )}
         <CardContainer>
           <CardHeader>
-            <Avatar color={account.primaryColor}>
+            <Avatar color={wallet.styles.primaryColor}>
               <LogoSvgComponent height="100%" width="100%" />
             </Avatar>
             <CardHeaderContent>
-              <Text>{account.name}</Text>
-              {account.connection && (
+              <Text>{wallet.name}</Text>
+              {wallet.connection && (
                 <Text typography="extraLight" color="textLight">
                   Sincronizado em: {lastUpdateDate}
                 </Text>
@@ -66,17 +66,13 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, ...viewProps }) => {
           </CardHeader>
           <Divider />
           <CardContent>
-            {account.wallets
-              .sort((a, b) => textCompare(a.subtype, b.subtype))
-              .map((wallet, index) => (
-                <Line key={index}>
-                  <Text>{accountName[wallet.subtype]}</Text>
-                  <Money
-                    typography="defaultBold"
-                    value={wallet.subtype === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
-                  />
-                </Line>
-              ))}
+            <Line>
+              <Text>{accountName[wallet.type]}</Text>
+              <Money
+                typography="defaultBold"
+                value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
+              />
+            </Line>
           </CardContent>
         </CardContainer>
       </Card>

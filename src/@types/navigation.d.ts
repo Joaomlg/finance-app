@@ -3,9 +3,9 @@ export declare global {
     interface RootParamList {
       login: undefined;
       home: undefined;
-      accounts: undefined;
-      accountDetail: { accountId: string };
-      createAccount: undefined;
+      wallets: undefined;
+      wallet: { walletId: string };
+      setWallet: undefined;
       connect: undefined;
       'connect/pluggy':
         | {

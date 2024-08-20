@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import Accounts from '../pages/Accounts';
+import Wallets from '../pages/Wallets';
 import Connect from '../pages/Connect';
 import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
-import AccountDetail from '../pages/AccountDetail';
-import CreateAccount from '../pages/CreateAccount';
+import WalletDetail from '../pages/WalletDetail';
+import SetWallet from '../pages/SetWallet';
 import History from '../pages/History';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
@@ -16,9 +16,9 @@ import Transactions from '../pages/Transactions';
 export type StackRouteParamList = {
   login: undefined;
   home: undefined;
-  accounts: undefined;
-  accountDetail: { accountId: string };
-  createAccount: undefined;
+  wallets: undefined;
+  wallet: { walletId: string };
+  setWallet: undefined;
   connect: undefined;
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };
@@ -36,9 +36,9 @@ const StackRoutes: React.FC = () => {
       <Group screenOptions={{ headerShown: false }}>
         <Screen name="login" component={Login} />
         <Screen name="home" component={Home} />
-        <Screen name="accounts" component={Accounts} />
-        <Screen name="createAccount" component={CreateAccount} />
-        <Screen name="accountDetail" component={AccountDetail} />
+        <Screen name="wallets" component={Wallets} />
+        <Screen name="setWallet" component={SetWallet} />
+        <Screen name="wallet" component={WalletDetail} />
         <Screen name="connect" component={Connect} />
         <Screen name="connect/pluggy" component={PluggyConnect} />
         <Screen name="connect/belvo" component={BelvoConnect} />

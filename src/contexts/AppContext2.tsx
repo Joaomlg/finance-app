@@ -1,69 +1,75 @@
 import React, { createContext, useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
-import { NewAccount } from '../models';
-import * as accountRepository from '../repositories/accountRepository';
+import { Wallet } from '../models';
+import * as walletRepository from '../repositories/walletRepository';
 
 export type AppContextValue2 = {
-  accounts: NewAccount[];
-  fetchAccounts: () => Promise<void>;
-  fetchingAccounts: boolean;
-  setAccount: (account: NewAccount) => Promise<void>;
-  deleteAccount: (account: NewAccount) => Promise<void>;
+  wallets: Wallet[];
+  fetchWallets: () => Promise<void>;
+  fetchingWallets: boolean;
+  setWallet: (wallet: Wallet) => Promise<void>;
+  deleteWallet: (wallet: Wallet) => Promise<void>;
 };
 
 const AppContext2 = createContext({} as AppContextValue2);
 
 export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [accounts, setAccounts] = useState([] as NewAccount[]);
-  const [fetchingAccounts, setFetchingAccounts] = useState(false);
+  const [wallets, setWallets] = useState([] as Wallet[]);
+  const [fetchingWallets, setFetchingWallets] = useState(false);
 
-  const fetchAccounts = async () => {
-    setFetchingAccounts(true);
+  const fetchWallets = async () => {
+    setFetchingWallets(true);
 
     try {
-      const accounts = await accountRepository.getAccounts();
-      setAccounts(accounts);
+      const wallets = await walletRepository.getWallets();
+      setWallets(wallets);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das contas!' });
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
     }
 
-    setFetchingAccounts(false);
+    setFetchingWallets(false);
   };
 
-  const setAccount = async (account: NewAccount) => {
-    setFetchingAccounts(true);
+  const setWallet = async (wallet: Wallet) => {
+    setFetchingWallets(true);
 
     try {
-      await accountRepository.setAccount(account);
+      await walletRepository.setWallet(wallet);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível efetuar a operação!' });
     }
 
-    setFetchingAccounts(false);
+    setFetchingWallets(false);
   };
 
-  const deleteAccount = async (account: NewAccount) => {
-    setFetchingAccounts(true);
+  const deleteWallet = async (wallet: Wallet) => {
+    setFetchingWallets(true);
 
     try {
-      accountRepository.deleteAccount(account);
+      walletRepository.deleteWallet(wallet);
     } catch (error) {
       Toast.show({
         type: 'info',
-        text1: 'Não foi possível apagar a conta.',
+        text1: 'Não foi possível apagar a carteira.',
       });
     }
 
-    setFetchingAccounts(false);
+    setFetchingWallets(false);
   };
 
   useEffect(() => {
-    return accountRepository.onAccountsChange((accounts) => setAccounts(accounts));
+    return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
   }, []);
 
   return (
     <AppContext2.Provider
-      value={{ accounts, fetchAccounts, fetchingAccounts, setAccount, deleteAccount }}
+      value={{
+        wallets,
+        fetchWallets: fetchWallets,
+        fetchingWallets: fetchingWallets,
+        setWallet: setWallet,
+        deleteWallet: deleteWallet,
+      }}
     >
       {children}
     </AppContext2.Provider>
