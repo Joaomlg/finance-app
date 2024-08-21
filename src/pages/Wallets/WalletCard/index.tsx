@@ -17,11 +17,11 @@ import { getSvgComponent } from '../../../utils/svg';
 import { ConnectionStatusMessage, accountName } from '../../../utils/text';
 import { CardContainer, CardContent, CardHeader, CardHeaderContent, Line } from './styles';
 
-export interface AccountCardProps extends ViewProps {
+export interface WalletCardProps extends ViewProps {
   wallet: Wallet;
 }
 
-const AccountCard: React.FC<AccountCardProps> = ({ wallet, ...viewProps }) => {
+const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
   const navigation = useNavigation();
 
   const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
@@ -80,4 +80,4 @@ const AccountCard: React.FC<AccountCardProps> = ({ wallet, ...viewProps }) => {
   );
 };
 
-export default AccountCard;
+export default WalletCard;

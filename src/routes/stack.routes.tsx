@@ -18,7 +18,7 @@ export type StackRouteParamList = {
   home: undefined;
   wallets: undefined;
   wallet: { walletId: string };
-  setWallet: { walletId?: string };
+  setWallet: { walletId?: string } | undefined;
   connect: undefined;
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };

@@ -9,9 +9,9 @@ import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
-import AccountCard from './WalletCard';
+import WalletCard from './WalletCard';
 
-const Accounts: React.FC = () => {
+const Wallets: React.FC = () => {
   const { wallets, fetchWallets, fetchingWallets } = useContext(AppContext2);
 
   const theme = useTheme();
@@ -37,7 +37,7 @@ const Accounts: React.FC = () => {
               {wallets.length} Carteiras
             </Text>
             {wallets.map((wallet) => (
-              <AccountCard key={wallet.id} wallet={wallet} />
+              <WalletCard key={wallet.id} wallet={wallet} />
             ))}
           </ScreenContent>
         </ScrollView>
@@ -62,4 +62,4 @@ const Accounts: React.FC = () => {
   );
 };
 
-export default Accounts;
+export default Wallets;
