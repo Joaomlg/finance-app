@@ -7,7 +7,8 @@ export type AppContextValue2 = {
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
   fetchingWallets: boolean;
-  setWallet: (wallet: Wallet) => Promise<void>;
+  createWallet: (wallet: Wallet) => Promise<void>;
+  updateWallet: (id: string, values: Partial<Wallet>) => Promise<void>;
   deleteWallet: (wallet: Wallet) => Promise<void>;
 };
 
@@ -30,13 +31,28 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingWallets(false);
   };
 
-  const setWallet = async (wallet: Wallet) => {
+  const createWallet = async (wallet: Wallet) => {
     setFetchingWallets(true);
 
     try {
       await walletRepository.setWallet(wallet);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível efetuar a operação!' });
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a carteira!' });
+    }
+
+    setFetchingWallets(false);
+  };
+
+  const updateWallet = async (id: string, values: Partial<Wallet>) => {
+    setFetchingWallets(true);
+
+    try {
+      await walletRepository.updateWallet(id, values);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da carteira!',
+      });
     }
 
     setFetchingWallets(false);
@@ -65,10 +81,11 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     <AppContext2.Provider
       value={{
         wallets,
-        fetchWallets: fetchWallets,
-        fetchingWallets: fetchingWallets,
-        setWallet: setWallet,
-        deleteWallet: deleteWallet,
+        fetchWallets,
+        fetchingWallets,
+        createWallet,
+        updateWallet,
+        deleteWallet,
       }}
     >
       {children}

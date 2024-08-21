@@ -22,11 +22,11 @@ import { getSvgComponent } from '../../utils/svg';
 import { ConnectionStatusMessage, accountName, capitalize } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup, Line } from './styles';
 
-const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet'>> = ({
+const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet'>> = ({
   route,
   navigation,
 }) => {
-  const { wallets, setWallet, deleteWallet } = useContext(AppContext2);
+  const { wallets, createWallet, deleteWallet } = useContext(AppContext2);
 
   const theme = useTheme();
 
@@ -44,12 +44,12 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'walle
       return;
     }
 
-    const clonedAccount = cloneObject(wallet) as Wallet;
+    const clonedWallet = cloneObject(wallet) as Wallet;
 
     //@ts-expect-error connection is defined
-    clonedAccount.connection.updateDisabled = !clonedAccount.connection.updateDisabled;
+    clonedWallet.connection.updateDisabled = !clonedWallet.connection.updateDisabled;
 
-    setWallet(clonedAccount);
+    createWallet(clonedWallet);
   };
 
   const handleUpdateConnection = () => {
@@ -64,7 +64,11 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'walle
     navigation.navigate(uri, { updateConnectionId: wallet.connection.id });
   };
 
-  const handleDeleteAccount = async () => {
+  const handleEditWallet = () => {
+    navigation.navigate('setWallet', { walletId: wallet.id });
+  };
+
+  const handleDeleteWallet = async () => {
     Alert.alert(
       'Apagar carteira?',
       'Tem certeza que deseja apagar a carteira?',
@@ -166,7 +170,8 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'walle
             onPress: handleUpdateConnection,
             disabled: wallet.connection === undefined,
           },
-          { text: 'Remover', icon: 'delete', onPress: handleDeleteAccount },
+          { text: 'Editar', icon: 'edit', onPress: handleEditWallet },
+          { text: 'Remover', icon: 'delete', onPress: handleDeleteWallet },
         ]}
         icon="more-horiz"
       />
@@ -174,4 +179,4 @@ const AccountDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'walle
   );
 };
 
-export default AccountDetail;
+export default WalletDetail;

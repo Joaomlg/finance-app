@@ -1,24 +1,24 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import Wallets from '../pages/Wallets';
 import Connect from '../pages/Connect';
 import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
-import WalletDetail from '../pages/WalletDetail';
-import SetWallet from '../pages/SetWallet';
 import History from '../pages/History';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
+import SetWallet from '../pages/SetWallet';
 import Transactions from '../pages/Transactions';
+import WalletDetail from '../pages/WalletDetail';
+import Wallets from '../pages/Wallets';
 
 export type StackRouteParamList = {
   login: undefined;
   home: undefined;
   wallets: undefined;
   wallet: { walletId: string };
-  setWallet: undefined;
+  setWallet: { walletId?: string };
   connect: undefined;
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };

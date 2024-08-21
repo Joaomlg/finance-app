@@ -16,10 +16,14 @@ export const onWalletsChange = (callback: (wallets: Wallet[]) => void) => {
   return unsubscribe;
 };
 
-export const setWallet = async (account: Wallet) => {
-  await walletsCollection.doc(account.id).set(account);
+export const setWallet = async (wallet: Wallet) => {
+  await walletsCollection.doc(wallet.id).set(wallet);
 };
 
-export const deleteWallet = async (account: Wallet) => {
-  await walletsCollection.doc(account.id).delete();
+export const updateWallet = async (id: string, values: Partial<Wallet>) => {
+  await walletsCollection.doc(id).update(values);
+};
+
+export const deleteWallet = async (wallet: Wallet) => {
+  await walletsCollection.doc(wallet.id).delete();
 };

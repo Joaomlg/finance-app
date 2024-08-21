@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useState } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import Divider from '../../components/Divider';
@@ -14,39 +14,42 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { WalletType } from '../../models';
+import { Wallet, WalletType } from '../../models';
+import { StackRouteParamList } from '../../routes/stack.routes';
+import { formatMoney } from '../../utils/money';
 import { getSvgComponent } from '../../utils/svg';
 import { accountName } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 
-type WalletFormValues = {
-  balance: number;
-  name: string;
-  type: WalletType;
-  institution: PresetInstitution;
-};
+const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet'>> = ({
+  route,
+  navigation,
+}) => {
+  const [walletValues, setWalletValues] = useState({} as Wallet);
 
-const SetWallet: React.FC = () => {
-  const [walletFormValues, setWalletFormValues] = useState({} as WalletFormValues);
+  const walletId = route.params?.walletId;
+  const isEditing = walletId !== undefined;
 
+  const selectedInstitution = presetInstituitions.find(
+    ({ id }) => id === walletValues.institutionId,
+  );
+
+  const { wallets, createWallet, updateWallet } = useContext(AppContext2);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
-  const { setWallet } = useContext(AppContext2);
-
-  const navigate = useNavigation();
 
   const handleWalletBalanceChange = (value: string) => {
     const balance = parseFloat(value.replace(',', '.'));
-    setWalletFormValues((value) => ({ ...value, balance }));
+    setWalletValues((value) => ({ ...value, balance }));
   };
 
   const handleWalletNameChange = (name: string) => {
-    setWalletFormValues((value) => ({ ...value, name }));
+    setWalletValues((value) => ({ ...value, name }));
   };
 
   const renderWalletTypeSelector = () => {
     const handleItemPressed = (type: WalletType) => {
-      setWalletFormValues((value) => ({
+      setWalletValues((value) => ({
         ...value,
         type,
       }));
@@ -74,10 +77,15 @@ const SetWallet: React.FC = () => {
 
   const renderInstitutionSelector = () => {
     const handleItemPressed = (institution: PresetInstitution) => {
-      setWalletFormValues((value) => ({
+      setWalletValues((value) => ({
         ...value,
-        institution,
+        institutionId: institution.id,
+        styles: {
+          logoSvg: institution.logoSvg,
+          primaryColor: institution.primaryColor,
+        },
       }));
+
       closeBottomSheet();
     };
 
@@ -102,26 +110,32 @@ const SetWallet: React.FC = () => {
   };
 
   const handleSubmitWallet = async () => {
-    await setWallet({
-      id: uuid.v4().toString(),
-      name: walletFormValues.name,
-      styles: {
-        logoSvg: walletFormValues.institution.logoSvg,
-        primaryColor: walletFormValues.institution.primaryColor,
-      },
-      initialBalance: walletFormValues.balance || 0,
-      balance: walletFormValues.balance || 0,
-      type: walletFormValues.type,
-      createdAt: new Date(),
-      institutionId: walletFormValues.institution.id,
-    });
-    navigate.goBack();
+    if (isEditing) {
+      await updateWallet(walletId, walletValues);
+    } else {
+      createWallet({
+        ...walletValues,
+        id: uuid.v4().toString(),
+        createdAt: new Date(),
+        balance: walletValues.balance || 0,
+        initialBalance: walletValues.balance || 0,
+      });
+    }
+
+    navigation.goBack();
   };
+
+  useEffect(() => {
+    const initialValue = wallets.find(({ id }) => id === walletId);
+    if (initialValue) {
+      setWalletValues(initialValue);
+    }
+  }, [walletId, wallets]);
 
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title="Nova carteira" />
+        <ScreenHeader title={isEditing ? 'Editar carteira' : 'Nova carteira'} />
         <HeaderExtensionContainer>
           <BalanceValueContainer>
             <Text typography="light" color="textWhite">
@@ -133,8 +147,12 @@ const SetWallet: React.FC = () => {
               typography="heading"
               color="textWhite"
               keyboardType="decimal-pad"
-              iconRight="edit"
+              iconRight={!isEditing ? 'edit' : undefined}
+              defaultValue={
+                walletValues.balance ? formatMoney({ value: walletValues.balance }) : undefined
+              }
               onChangeText={handleWalletBalanceChange}
+              readOnly={isEditing}
             />
           </BalanceValueContainer>
         </HeaderExtensionContainer>
@@ -142,6 +160,7 @@ const SetWallet: React.FC = () => {
           <TextInput
             placeholder="Nome"
             iconLeft="font-download"
+            defaultValue={walletValues.name}
             onChangeText={handleWalletNameChange}
           />
           <Divider />
@@ -150,7 +169,7 @@ const SetWallet: React.FC = () => {
             iconLeft="account-balance-wallet"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderWalletTypeSelector())}
-            value={accountName[walletFormValues.type]}
+            value={accountName[walletValues.type]}
             readOnly
           />
           <Divider />
@@ -159,7 +178,7 @@ const SetWallet: React.FC = () => {
             iconLeft="circle"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderInstitutionSelector())}
-            value={walletFormValues.institution?.name}
+            value={selectedInstitution?.name}
             readOnly={true}
           />
           <Divider />

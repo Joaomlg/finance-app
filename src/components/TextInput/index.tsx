@@ -26,6 +26,7 @@ const TextInput: React.FC<TextInputProps> = ({
   typography,
   textPrefix,
   onPress,
+  readOnly,
   ...rnProps
 }) => {
   const fieldRef = useRef<RNTextInput>(null);
@@ -40,9 +41,11 @@ const TextInput: React.FC<TextInputProps> = ({
 
   const onFieldPress = () => {
     if (onPress) {
-      onPress();
-    } else {
-      fieldFocus();
+      return onPress();
+    }
+
+    if (!readOnly) {
+      return fieldFocus();
     }
   };
 
@@ -58,6 +61,7 @@ const TextInput: React.FC<TextInputProps> = ({
           ...theme.typography[typography || 'default'],
         }}
         blurOnSubmit={true}
+        readOnly={readOnly}
         {...rnProps}
       />
     );

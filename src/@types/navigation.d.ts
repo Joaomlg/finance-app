@@ -5,7 +5,7 @@ export declare global {
       home: undefined;
       wallets: undefined;
       wallet: { walletId: string };
-      setWallet: undefined;
+      setWallet: { walletId?: string };
       connect: undefined;
       'connect/pluggy':
         | {
