@@ -9,6 +9,7 @@ const Switch: React.FC<SwitchProps> = ({ value, ...props }) => {
     <RNSwitch
       value={value}
       trackColor={{ false: theme.colors.lightGray, true: theme.colors.secondary }}
+      thumbColor={'white'}
       {...props}
     />
   );

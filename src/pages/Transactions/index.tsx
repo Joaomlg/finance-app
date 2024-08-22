@@ -1,16 +1,20 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
+import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
-import AppContext from '../../contexts/AppContext';
+import AppContext2 from '../../contexts/AppContext2';
 import { Transaction } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import TransactionList from './TransactionList';
 import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
 
 const Transactions: React.FC = () => {
+  const navigation = useNavigation();
+
   const {
-    isLoading,
+    fetchingTransactions,
     transactions,
     fetchTransactions,
     date,
@@ -18,7 +22,12 @@ const Transactions: React.FC = () => {
     totalIncomes,
     expenseTransactions,
     totalExpenses,
-  } = useContext(AppContext);
+  } = useContext(AppContext2);
+
+  console.log(incomeTransactions);
+  console.log(totalIncomes);
+  console.log(expenseTransactions);
+  console.log(totalExpenses);
 
   const renderScene = useCallback(
     ({ route }: { route: TransactionTabsRoute }) => {
@@ -41,7 +50,7 @@ const Transactions: React.FC = () => {
 
       return (
         <TransactionList
-          isLoading={isLoading}
+          isLoading={fetchingTransactions}
           onRefresh={fetchTransactions}
           transactions={data}
           reducedValue={balance}
@@ -52,18 +61,25 @@ const Transactions: React.FC = () => {
       expenseTransactions,
       fetchTransactions,
       incomeTransactions,
-      isLoading,
+      fetchingTransactions,
       totalExpenses,
       totalIncomes,
       transactions,
     ],
   );
 
+  const handleFloatingButtoPressed = () => {
+    navigation.navigate('setTransaction');
+  };
+
   return (
-    <ScreenContainer>
-      <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
-      <TransactionTabs renderScene={renderScene} />
-    </ScreenContainer>
+    <>
+      <ScreenContainer>
+        <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
+        <TransactionTabs renderScene={renderScene} />
+      </ScreenContainer>
+      <ScreenFloatingButton onPress={handleFloatingButtoPressed} />
+    </>
   );
 };
 

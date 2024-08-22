@@ -17,6 +17,7 @@ export interface TextInputProps extends RNTextInputProps {
   typography?: Typography;
   textPrefix?: string;
   onPress?: () => void;
+  renderIconRight?: () => React.ReactNode;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -26,6 +27,7 @@ const TextInput: React.FC<TextInputProps> = ({
   typography,
   textPrefix,
   onPress,
+  renderIconRight,
   readOnly,
   ...rnProps
 }) => {
@@ -81,7 +83,9 @@ const TextInput: React.FC<TextInputProps> = ({
         ) : (
           renderField()
         )}
-        {iconRight && <Icon name={iconRight} size={24} color={color} />}
+        {renderIconRight
+          ? renderIconRight()
+          : iconRight && <Icon name={iconRight} size={24} color={color} />}
       </Container>
     </TouchableOpacity>
   );
