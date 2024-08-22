@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { ViewProps } from 'react-native';
 import { Transaction } from '../../models';
 import Money from '../Money';
 import Text from '../Text';
 
+import AppContext2 from '../../contexts/AppContext2';
 import Icon from '../Icon';
 import { ListItem, ListItemAmount, ListItemContent } from './styles';
 
@@ -13,6 +14,10 @@ export interface TransactionListItemProps extends ViewProps {
 
 const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...viewProps }) => {
   const value = item.type === 'DEBIT' && item.amount > 0 ? -1 * item.amount : item.amount;
+
+  const { wallets } = useContext(AppContext2);
+
+  const wallet = wallets.find(({ id }) => id === item.walletId);
 
   return (
     <ListItem {...viewProps}>
@@ -32,6 +37,11 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...view
         </Text>
       </ListItemContent>
       <ListItemAmount>
+        {wallet?.name && (
+          <Text typography="extraLight" color="textLight">
+            {wallet.name}
+          </Text>
+        )}
         <Money typography="defaultBold" value={value} />
       </ListItemAmount>
     </ListItem>
