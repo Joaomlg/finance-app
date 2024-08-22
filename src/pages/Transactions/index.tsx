@@ -24,11 +24,6 @@ const Transactions: React.FC = () => {
     totalExpenses,
   } = useContext(AppContext2);
 
-  console.log(incomeTransactions);
-  console.log(totalIncomes);
-  console.log(expenseTransactions);
-  console.log(totalExpenses);
-
   const renderScene = useCallback(
     ({ route }: { route: TransactionTabsRoute }) => {
       let data: Transaction[];
