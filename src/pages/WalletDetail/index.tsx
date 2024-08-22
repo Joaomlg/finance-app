@@ -1,8 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
-import { Alert, Switch } from 'react-native';
-import { useTheme } from 'styled-components';
+import { Alert } from 'react-native';
 import Avatar from '../../components/Avatar';
 import Banner from '../../components/Banner';
 import Divider from '../../components/Divider';
@@ -12,6 +11,7 @@ import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
+import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
 import { Wallet } from '../../models';
@@ -27,8 +27,6 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
   navigation,
 }) => {
   const { wallets, createWallet, deleteWallet } = useContext(AppContext2);
-
-  const theme = useTheme();
 
   const wallet = wallets.find(({ id }) => id === route.params.walletId);
 
@@ -150,14 +148,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
           {wallet.connection && (
             <Line>
               <Text>Pausar sincronização</Text>
-              <Switch
-                onValueChange={toggleAutoUpdate}
-                value={wallet.connection?.updateDisabled}
-                trackColor={{ false: theme.colors.lightGray, true: theme.colors.primary }}
-                thumbColor={
-                  wallet.connection?.updateDisabled ? theme.colors.white : theme.colors.lightGray
-                }
-              />
+              <Switch onValueChange={toggleAutoUpdate} value={wallet.connection?.updateDisabled} />
             </Line>
           )}
         </ScreenContent>
