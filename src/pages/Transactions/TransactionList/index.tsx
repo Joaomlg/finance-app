@@ -45,7 +45,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   const renderListItemSeparator = useCallback((transaction: Transaction, index: number) => {
     const date = moment(transaction.date).startOf('day');
-    console.log(transaction.date, date);
 
     const component =
       index === 0 || date.isBefore(ItemDividerPreviousDateRef.current, 'day') ? (
