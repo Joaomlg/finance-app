@@ -2,6 +2,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
+import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import Divider from '../../components/Divider';
 import ListItemSelection, {
@@ -23,7 +24,6 @@ import { formatMoney } from '../../utils/money';
 import { getSvgComponent } from '../../utils/svg';
 import { transactionName } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
-import uuid from 'react-native-uuid';
 
 const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setTransaction'>> = ({
   route,
@@ -134,7 +134,6 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       createTransaction({
         ...transactionValues,
         id: uuid.v4().toString(),
-        date: new Date(),
       });
     }
 
