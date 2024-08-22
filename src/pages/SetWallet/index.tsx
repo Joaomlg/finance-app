@@ -16,7 +16,6 @@ import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Wallet, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
-import { formatMoney } from '../../utils/money';
 import { getSvgComponent } from '../../utils/svg';
 import { accountName } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
@@ -148,9 +147,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
               color="textWhite"
               keyboardType="decimal-pad"
               iconRight={!isEditing ? 'edit' : undefined}
-              defaultValue={
-                walletValues.balance ? formatMoney({ value: walletValues.balance }) : undefined
-              }
+              defaultValue={walletValues.balance?.toString()}
               onChangeText={handleWalletBalanceChange}
               readOnly={isEditing}
             />

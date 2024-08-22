@@ -20,7 +20,6 @@ import useBottomSheet from '../../hooks/useBottomSheet';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDate } from '../../utils/date';
-import { formatMoney } from '../../utils/money';
 import { getSvgComponent } from '../../utils/svg';
 import { transactionName } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
@@ -163,11 +162,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
               color="textWhite"
               keyboardType="decimal-pad"
               iconRight={!isEditing ? 'edit' : undefined}
-              defaultValue={
-                transactionValues.amount
-                  ? formatMoney({ value: transactionValues.amount })
-                  : undefined
-              }
+              defaultValue={transactionValues.amount?.toString()}
               onChangeText={handleTransactionBalanceChange}
               readOnly={isEditing}
             />
