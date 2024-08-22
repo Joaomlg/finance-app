@@ -55,7 +55,8 @@
     "react-native-uuid": "^2.0.2",
     "react-native-web": "~0.19.10",
     "react-native-webview": "13.8.6",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "@react-native-community/datetimepicker": "8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
