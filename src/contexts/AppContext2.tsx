@@ -41,6 +41,21 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
 
+  const transactionQueryOptions = useMemo(
+    () =>
+      ({
+        interval: {
+          startDate: date.startOf('month').toDate(),
+          endDate: date.endOf('month').toDate(),
+        },
+        order: {
+          by: 'date',
+          direction: 'desc',
+        },
+      } as transactionRepository.TransactionQueryOptions),
+    [date],
+  );
+
   const incomeTransactions = useMemo(
     () => transactions.filter(({ type }) => type === 'CREDIT'),
     [transactions],
@@ -122,7 +137,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingTransactions(true);
 
     try {
-      const transactions = await transactionRepository.getTransactions();
+      const transactions = await transactionRepository.getTransactions(transactionQueryOptions);
       setTransactions(transactions);
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
@@ -177,9 +192,12 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
   }, []);
 
-  // useEffect(() => {
-  //   return transactionRepository.onTransactionsChange((transactions) => setTransactions(transactions));
-  // }, []);
+  useEffect(() => {
+    return transactionRepository.onTransactionsChange(
+      (transactions) => setTransactions(transactions),
+      transactionQueryOptions,
+    );
+  }, [transactionQueryOptions]);
 
   return (
     <AppContext2.Provider
