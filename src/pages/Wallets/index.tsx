@@ -34,7 +34,7 @@ const Wallets: React.FC = () => {
           <ScreenHeader title="Carteiras" actions={[HideValuesAction()]} />
           <ScreenContent>
             <Text typography="light" color="textLight">
-              {wallets.length} Carteiras
+              {wallets.length} carteiras
             </Text>
             {wallets.map((wallet) => (
               <WalletCard key={wallet.id} wallet={wallet} />
