@@ -1,17 +1,25 @@
-import firestore from '@react-native-firebase/firestore';
+import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Wallet } from '../models';
 import { RecursivePartial } from '../utils/type';
 
 const walletsCollection = firestore().collection('wallets');
 
+const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
+  const { createdAt, ...values } = data;
+  return {
+    ...values,
+    createdAt: createdAt.toDate(),
+  } as Wallet;
+};
+
 export const getWallets = async () => {
   const result = await walletsCollection.get();
-  return result.docs.map((item) => item.data() as Wallet);
+  return result.docs.map((item) => parseWallet(item.data()));
 };
 
 export const onWalletsChange = (callback: (wallets: Wallet[]) => void) => {
   const unsubscribe = walletsCollection.onSnapshot((snap) => {
-    const wallets = snap.docs.map((item) => item.data() as Wallet);
+    const wallets = snap.docs.map((item) => parseWallet(item.data()));
     callback(wallets);
   });
   return unsubscribe;
