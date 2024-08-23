@@ -7,6 +7,7 @@ import Avatar from '../../components/Avatar';
 import Divider from '../../components/Divider';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
+import RowContent from '../../components/RowContent';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
@@ -18,7 +19,7 @@ import AppContext2 from '../../contexts/AppContext2';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
 import { transactionName } from '../../utils/text';
-import { BottomHeader, BottomHeaderContent, InformationGroup, Line } from './styles';
+import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
 
 const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'transaction'>> = ({
   route,
@@ -87,34 +88,29 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             </BottomHeaderContent>
           </BottomHeader>
           <InformationGroup>
-            <Line>
-              <Text>Criado em</Text>
+            <RowContent text="Criado em">
               <Text typography="defaultBold">{formatDateHourFull(moment(transaction.date))}</Text>
-            </Line>
-            <Line>
-              <Text>Conta</Text>
+            </RowContent>
+            <RowContent text="Conta">
               <Text typography="defaultBold">{wallet?.name}</Text>
-            </Line>
-            <Line>
-              <Text>Tipo</Text>
+            </RowContent>
+            <RowContent text="Tipo">
               <Text typography="defaultBold">{transactionName[transaction.type]}</Text>
-            </Line>
+            </RowContent>
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            <Line>
-              <Text>Valor</Text>
+            <RowContent text="Valor">
               <Money
                 typography="defaultBold"
                 value={transaction.type === 'DEBIT' ? -1 * transaction.amount : transaction.amount}
               />
-            </Line>
+            </RowContent>
           </InformationGroup>
           <Divider />
-          <Line>
-            <Text>Ignorar transação</Text>
+          <RowContent text="Ignorar transação">
             <Switch onValueChange={toggleIgnore} value={transaction.ignore} />
-          </Line>
+          </RowContent>
         </ScreenContent>
       </ScreenContainer>
       <ScreenFloatingButton

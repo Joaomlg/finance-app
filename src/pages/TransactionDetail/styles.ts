@@ -10,12 +10,6 @@ export const BottomHeaderContent = styled.View`
   flex: 1;
 `;
 
-export const Line = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 export const InformationGroup = styled.View`
   gap: 16px;
 `;

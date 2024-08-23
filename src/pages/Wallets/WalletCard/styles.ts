@@ -17,9 +17,3 @@ export const CardHeaderContent = styled.View`
 export const CardContent = styled.View`
   gap: 16px;
 `;
-
-export const Line = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;

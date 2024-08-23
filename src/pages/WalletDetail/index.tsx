@@ -18,7 +18,8 @@ import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
 import { getSvgComponent } from '../../utils/svg';
 import { ConnectionStatusMessage, accountName, capitalize } from '../../utils/text';
-import { BottomHeader, BottomHeaderContent, InformationGroup, Line } from './styles';
+import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
+import RowContent from '../../components/RowContent';
 
 const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet'>> = ({
   route,
@@ -106,47 +107,41 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
             </BottomHeaderContent>
           </BottomHeader>
           <InformationGroup>
-            <Line>
-              <Text>Criado em</Text>
+            <RowContent text="Criado em">
               <Text typography="defaultBold">{formatDateHourFull(moment(wallet.createdAt))}</Text>
-            </Line>
-            <Line>
-              <Text>Tipo</Text>
+            </RowContent>
+            <RowContent text="Tipo">
               <Text typography="defaultBold">{wallet.connection ? 'Automático' : 'Manual'}</Text>
-            </Line>
+            </RowContent>
             {wallet.connection && (
               <>
-                <Line>
-                  <Text>Atualizado em</Text>
+                <RowContent text="Atualizado em">
                   <Text typography="defaultBold">
                     {formatDateHourFull(moment(wallet.connection?.lastUpdatedAt))}
                   </Text>
-                </Line>
-                <Line>
-                  <Text>Provedor</Text>
+                </RowContent>
+                <RowContent text="Provedor">
                   <Text typography="defaultBold">
                     {capitalize(wallet.connection?.provider || '')}
                   </Text>
-                </Line>
+                </RowContent>
               </>
             )}
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            <Line>
-              <Text>{accountName[wallet.type]}</Text>
+            <RowContent text={accountName[wallet.type]}>
               <Money
                 typography="defaultBold"
                 value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
               />
-            </Line>
+            </RowContent>
           </InformationGroup>
           <Divider />
           {wallet.connection && (
-            <Line>
-              <Text>Pausar sincronização</Text>
+            <RowContent text="Pausar sincronização">
               <Switch onValueChange={toggleAutoUpdate} value={wallet.connection?.updateDisabled} />
-            </Line>
+            </RowContent>
           )}
         </ScreenContent>
       </ScreenContainer>

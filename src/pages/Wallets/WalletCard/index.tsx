@@ -13,9 +13,10 @@ import { LastUpdateDateFormat } from '../../../utils/contants';
 import Avatar from '../../../components/Avatar';
 import Banner from '../../../components/Banner';
 import Icon from '../../../components/Icon';
+import RowContent from '../../../components/RowContent';
 import { getSvgComponent } from '../../../utils/svg';
 import { ConnectionStatusMessage, accountName } from '../../../utils/text';
-import { CardContainer, CardContent, CardHeader, CardHeaderContent, Line } from './styles';
+import { CardContainer, CardContent, CardHeader, CardHeaderContent } from './styles';
 
 export interface WalletCardProps extends ViewProps {
   wallet: Wallet;
@@ -66,13 +67,12 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
           </CardHeader>
           <Divider />
           <CardContent>
-            <Line>
-              <Text>{accountName[wallet.type]}</Text>
+            <RowContent text={accountName[wallet.type]}>
               <Money
                 typography="defaultBold"
                 value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
               />
-            </Line>
+            </RowContent>
           </CardContent>
         </CardContainer>
       </Card>
