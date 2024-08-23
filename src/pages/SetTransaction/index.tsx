@@ -37,6 +37,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const selectedWallet = wallets.find(({ id }) => id === transactionValues.walletId);
+  const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
   const handleTransactionBalanceChange = (value: string) => {
     const amount = parseFloat(value.replace(',', '.'));
@@ -161,10 +162,10 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
               typography="heading"
               color="textWhite"
               keyboardType="decimal-pad"
-              iconRight={!isEditing ? 'edit' : undefined}
+              iconRight={!isEditingAutomaticTransaction ? 'edit' : undefined}
               defaultValue={transactionValues.amount?.toString()}
               onChangeText={handleTransactionBalanceChange}
-              readOnly={isEditing}
+              readOnly={isEditingAutomaticTransaction}
             />
           </BalanceValueContainer>
         </HeaderExtensionContainer>
@@ -182,6 +183,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconRight="navigate-next"
             onPress={showTransactionDatePicker}
             value={transactionValues.date ? formatDate(moment(transactionValues.date)) : undefined}
+            disabled={isEditingAutomaticTransaction}
             readOnly
           />
           <Divider />
@@ -191,6 +193,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionWalletSelector())}
             value={selectedWallet?.name}
+            disabled={isEditing}
             readOnly
           />
           <Divider />
@@ -200,6 +203,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionTypeSelector())}
             value={transactionName[transactionValues.type]}
+            disabled={isEditingAutomaticTransaction}
             readOnly
           />
           <Divider />

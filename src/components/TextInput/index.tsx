@@ -18,6 +18,7 @@ export interface TextInputProps extends RNTextInputProps {
   textPrefix?: string;
   onPress?: () => void;
   renderIconRight?: () => React.ReactNode;
+  disabled?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -28,6 +29,7 @@ const TextInput: React.FC<TextInputProps> = ({
   textPrefix,
   onPress,
   renderIconRight,
+  disabled,
   readOnly,
   ...rnProps
 }) => {
@@ -42,6 +44,10 @@ const TextInput: React.FC<TextInputProps> = ({
   };
 
   const onFieldPress = () => {
+    if (disabled) {
+      return;
+    }
+
     if (onPress) {
       return onPress();
     }
@@ -63,15 +69,15 @@ const TextInput: React.FC<TextInputProps> = ({
           ...theme.typography[typography || 'default'],
         }}
         blurOnSubmit={true}
-        readOnly={readOnly}
+        readOnly={readOnly || disabled}
         {...rnProps}
       />
     );
   };
 
   return (
-    <TouchableOpacity onPress={onFieldPress} activeOpacity={onPress ? 0.2 : 1}>
-      <Container>
+    <TouchableOpacity onPress={onFieldPress} activeOpacity={onPress && !disabled ? 0.2 : 1}>
+      <Container disabled={disabled}>
         {iconLeft && <Icon name={iconLeft} size={24} color={color} />}
         {textPrefix ? (
           <FieldWithPrefixContainer>

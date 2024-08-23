@@ -30,6 +30,8 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   const walletId = route.params?.walletId;
   const isEditing = walletId !== undefined;
 
+  const isEditingAutomaticWallet = walletValues.connection !== undefined;
+
   const selectedInstitution = presetInstituitions.find(
     ({ id }) => id === walletValues.institutionId,
   );
@@ -167,6 +169,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderWalletTypeSelector())}
             value={accountName[walletValues.type]}
+            disabled={isEditingAutomaticWallet}
             readOnly
           />
           <Divider />
