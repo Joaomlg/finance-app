@@ -19,6 +19,7 @@ export declare global {
         | undefined;
       manualConnect: undefined;
       transactions: undefined;
+      transaction: { transactionId: string };
       setTransaction: { transactionId?: string } | undefined;
       history: undefined;
       settings: undefined;

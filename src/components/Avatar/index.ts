@@ -15,6 +15,8 @@ export const Avatar = styled.View<AvatarProps>`
   height: ${(props) => (props.size ? `${props.size}px` : '32px')};
   width: ${(props) => (props.size ? `${props.size}px` : '32px')};
   overflow: hidden;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default Avatar;

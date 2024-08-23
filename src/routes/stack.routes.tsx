@@ -13,6 +13,7 @@ import SetWallet from '../pages/SetWallet';
 import Transactions from '../pages/Transactions';
 import WalletDetail from '../pages/WalletDetail';
 import Wallets from '../pages/Wallets';
+import TransactionDetail from '../pages/TransactionDetail';
 
 export type StackRouteParamList = {
   login: undefined;
@@ -25,6 +26,7 @@ export type StackRouteParamList = {
   'connect/belvo': { updateConnectionId?: string };
   manualConnect: undefined;
   transactions: undefined;
+  transaction: { transactionId: string };
   setTransaction: { transactionId?: string } | undefined;
   history: undefined;
   settings: undefined;
@@ -46,6 +48,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="connect/belvo" component={BelvoConnect} />
         <Screen name="manualConnect" component={ManualConnect} />
         <Screen name="transactions" component={Transactions} />
+        <Screen name="transaction" component={TransactionDetail} />
         <Screen name="setTransaction" component={SetTransaction} />
         <Screen name="history" component={History} />
         <Screen name="settings" component={Settings} />
