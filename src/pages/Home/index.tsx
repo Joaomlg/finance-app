@@ -19,6 +19,7 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
+import AppContext2 from '../../contexts/AppContext2';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
   BalanceContainer,
@@ -46,22 +47,22 @@ const Home: React.FC = () => {
   const theme = useTheme();
   const navigation = useNavigation();
 
+  const { minimumDateWithData, lastUpdateDate, updateConnections, fetchConnections } =
+    useContext(AppContext);
+
   const {
     isLoading,
     hideValues,
     date,
     setDate,
-    minimumDateWithData,
-    lastUpdateDate,
-    updateConnections,
-    fetchConnections,
     transactions,
     totalBalance,
-    totalInvestment,
-    totalInvoice,
     totalIncomes,
     totalExpenses,
-  } = useContext(AppContext);
+  } = useContext(AppContext2);
+
+  const totalInvestment = 0;
+  const totalInvoice = 0;
 
   const isCurrentMonth = checkCurrentMonth(date);
 

@@ -6,8 +6,11 @@ import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
 
 export type AppContextValue2 = {
+  isLoading: boolean;
   date: Moment;
   setDate: (value: Moment) => void;
+  hideValues: boolean;
+  setHideValues: (value: boolean) => void;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
@@ -15,6 +18,7 @@ export type AppContextValue2 = {
   createWallet: (wallet: Wallet) => Promise<void>;
   updateWallet: (id: string, values: Partial<Wallet>) => Promise<void>;
   deleteWallet: (wallet: Wallet) => Promise<void>;
+  totalBalance: number;
 
   transactions: Transaction[];
   fetchTransactions: () => Promise<void>;
@@ -34,12 +38,15 @@ const now = moment();
 
 export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [date, setDate] = useState(now);
+  const [hideValues, setHideValues] = useState(false);
 
   const [wallets, setWallets] = useState([] as Wallet[]);
   const [fetchingWallets, setFetchingWallets] = useState(false);
 
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
+
+  const isLoading = fetchingWallets || fetchingTransactions;
 
   const transactionQueryOptions = useMemo(
     () =>
@@ -54,6 +61,14 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         },
       } as transactionRepository.TransactionQueryOptions),
     [date],
+  );
+
+  const totalBalance = useMemo(
+    () =>
+      wallets
+        .filter(({ type }) => type === 'CHECKING_ACCOUNT' || type === 'SAVINGS_ACCOUNT')
+        .reduce((total, { balance }) => total + balance, 0),
+    [wallets],
   );
 
   const incomeTransactions = useMemo(
@@ -202,14 +217,18 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   return (
     <AppContext2.Provider
       value={{
+        isLoading,
         date,
         setDate,
+        hideValues,
+        setHideValues,
         wallets,
         fetchWallets,
         fetchingWallets,
         createWallet,
         updateWallet,
         deleteWallet,
+        totalBalance,
         transactions,
         fetchTransactions,
         fetchingTransactions,
