@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import { Transaction, Wallet } from '../models';
 import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
+import { RecursivePartial } from '../utils/type';
 
 export type AppContextValue2 = {
   isLoading: boolean;
@@ -16,7 +17,7 @@ export type AppContextValue2 = {
   fetchWallets: () => Promise<void>;
   fetchingWallets: boolean;
   createWallet: (wallet: Wallet) => Promise<void>;
-  updateWallet: (id: string, values: Partial<Wallet>) => Promise<void>;
+  updateWallet: (id: string, values: RecursivePartial<Wallet>) => Promise<void>;
   deleteWallet: (wallet: Wallet) => Promise<void>;
   totalBalance: number;
 
@@ -24,7 +25,7 @@ export type AppContextValue2 = {
   fetchTransactions: () => Promise<void>;
   fetchingTransactions: boolean;
   createTransaction: (transaction: Transaction) => Promise<void>;
-  updateTransaction: (id: string, values: Partial<Transaction>) => Promise<void>;
+  updateTransaction: (id: string, values: RecursivePartial<Transaction>) => Promise<void>;
   deleteTransaction: (transaction: Transaction) => Promise<void>;
   incomeTransactions: Transaction[];
   totalIncomes: number;
@@ -118,7 +119,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingWallets(false);
   };
 
-  const updateWallet = async (id: string, values: Partial<Wallet>) => {
+  const updateWallet = async (id: string, values: RecursivePartial<Wallet>) => {
     setFetchingWallets(true);
 
     try {
@@ -173,7 +174,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingTransactions(false);
   };
 
-  const updateTransaction = async (id: string, values: Partial<Transaction>) => {
+  const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
     setFetchingTransactions(true);
 
     try {

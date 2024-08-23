@@ -1,5 +1,6 @@
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Transaction } from '../models';
+import { RecursivePartial } from '../utils/type';
 
 type DateInterval = {
   startDate: Date;
@@ -63,7 +64,7 @@ export const setTransaction = async (transaction: Transaction) => {
   await transactionsCollection.doc(transaction.id).set(transaction);
 };
 
-export const updateTransaction = async (id: string, values: Partial<Transaction>) => {
+export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
   await transactionsCollection.doc(id).update(values);
 };
 

@@ -1,5 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 import { Wallet } from '../models';
+import { RecursivePartial } from '../utils/type';
 
 const walletsCollection = firestore().collection('wallets');
 
@@ -20,7 +21,7 @@ export const setWallet = async (wallet: Wallet) => {
   await walletsCollection.doc(wallet.id).set(wallet);
 };
 
-export const updateWallet = async (id: string, values: Partial<Wallet>) => {
+export const updateWallet = async (id: string, values: RecursivePartial<Wallet>) => {
   await walletsCollection.doc(id).update(values);
 };
 
