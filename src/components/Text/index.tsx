@@ -7,9 +7,10 @@ export interface TextProps extends RNTextProps {
   typography?: Typography;
   color?: Color;
   transform?: TextStyle['textTransform'];
+  strike?: boolean;
 }
 
-const Text: React.FC<TextProps> = ({ typography, color, style, transform, ...rnProps }) => {
+const Text: React.FC<TextProps> = ({ typography, color, style, transform, strike, ...rnProps }) => {
   const theme = useTheme();
 
   return (
@@ -18,6 +19,7 @@ const Text: React.FC<TextProps> = ({ typography, color, style, transform, ...rnP
         {
           textTransform: transform || 'none',
           color: theme.colors[color || 'text'],
+          textDecorationLine: strike ? 'line-through' : 'none',
           ...theme.typography[typography || 'default'],
         },
         style,

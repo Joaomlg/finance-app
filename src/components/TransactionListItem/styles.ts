@@ -1,8 +1,9 @@
 import styled from 'styled-components/native';
 
-export const ListItem = styled.TouchableOpacity`
+export const ListItem = styled.TouchableOpacity<{ ignored?: boolean }>`
   flex-direction: row;
   align-items: center;
+  opacity: ${(props) => (props.ignored ? 0.6 : 1)};
 `;
 
 export const ListItemContent = styled.View`

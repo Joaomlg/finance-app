@@ -28,11 +28,11 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
   };
 
   return (
-    <ListItem onPress={handleItemPressed} {...props}>
+    <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
       <Icon
         name={item.type === 'DEBIT' ? 'shopping-cart' : 'attach-money'}
         size={28}
-        color={item.type === 'DEBIT' ? 'expense' : 'income'}
+        color={item.ignore ? 'lightGray' : item.type === 'DEBIT' ? 'expense' : 'income'}
       />
       <ListItemContent>
         {item.category && (
@@ -50,7 +50,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
             {wallet.name}
           </Text>
         )}
-        <Money typography="defaultBold" value={value} />
+        <Money typography="defaultBold" value={value} strike={item.ignore} />
       </ListItemAmount>
     </ListItem>
   );
