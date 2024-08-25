@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
 import { TabBar, TabBarProps, TabView } from 'react-native-tab-view';
 import { useTheme } from 'styled-components/native';
-import Text from '../../../components/Text';
+import Text from '../Text';
 import { TabLazyPlaceholder } from './styles';
 
-type TransactionTabsRouteKey = 'default' | 'incomes' | 'expenses';
-
-export type TransactionTabsRoute = {
-  key: TransactionTabsRouteKey;
+export type TabProps = {
+  key: string;
   title: string;
 };
 
-export interface TransactionTabsProps {
-  renderScene: (props: { route: TransactionTabsRoute }) => React.ReactNode;
+export interface ScreenTabsProps {
+  tabs: TabProps[];
+  renderScene: (tabKey: string) => React.ReactNode;
 }
 
-const TransactionTabs: React.FC<TransactionTabsProps> = ({ renderScene }) => {
+const ScreenTabs: React.FC<ScreenTabsProps> = ({ tabs, renderScene }) => {
   const theme = useTheme();
 
   const [index, setIndex] = useState(0);
 
-  const routes: TransactionTabsRoute[] = [
-    { key: 'default', title: 'Tudo' },
-    { key: 'incomes', title: 'Entradas' },
-    { key: 'expenses', title: 'Saídas' },
-  ];
-
-  const renderTabBar = (props: TabBarProps<TransactionTabsRoute>) => (
+  const renderTabBar = (props: TabBarProps<TabProps>) => (
     <TabBar
       {...props}
       pressColor={theme.colors.primary}
@@ -42,8 +35,8 @@ const TransactionTabs: React.FC<TransactionTabsProps> = ({ renderScene }) => {
 
   return (
     <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
+      navigationState={{ index, routes: tabs }}
+      renderScene={({ route }) => renderScene(route.key)}
       onIndexChange={setIndex}
       renderTabBar={renderTabBar}
       lazy={({ route }) => route.key !== 'default'}
@@ -52,4 +45,4 @@ const TransactionTabs: React.FC<TransactionTabsProps> = ({ renderScene }) => {
   );
 };
 
-export default TransactionTabs;
+export default ScreenTabs;

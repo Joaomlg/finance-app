@@ -4,11 +4,11 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
+import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext2 from '../../contexts/AppContext2';
 import { Transaction } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import TransactionList from './TransactionList';
-import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
 
 const Transactions: React.FC = () => {
   const navigation = useNavigation();
@@ -24,12 +24,18 @@ const Transactions: React.FC = () => {
     totalExpenses,
   } = useContext(AppContext2);
 
+  const tabs: TabProps[] = [
+    { key: 'default', title: 'Tudo' },
+    { key: 'incomes', title: 'Entradas' },
+    { key: 'expenses', title: 'Saídas' },
+  ];
+
   const renderScene = useCallback(
-    ({ route }: { route: TransactionTabsRoute }) => {
+    (tabKey: string) => {
       let data: Transaction[];
       let balance: number;
 
-      switch (route.key) {
+      switch (tabKey) {
         case 'incomes':
           data = incomeTransactions;
           balance = totalIncomes;
@@ -71,7 +77,7 @@ const Transactions: React.FC = () => {
     <>
       <ScreenContainer>
         <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
-        <TransactionTabs renderScene={renderScene} />
+        <ScreenTabs tabs={tabs} renderScene={renderScene} />
       </ScreenContainer>
       <ScreenFloatingButton onPress={handleFloatingButtoPressed} />
     </>
