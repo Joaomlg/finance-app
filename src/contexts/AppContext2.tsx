@@ -4,7 +4,14 @@ import Toast from 'react-native-toast-message';
 import { Transaction, Wallet } from '../models';
 import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
+import { range } from '../utils/array';
 import { RecursivePartial } from '../utils/type';
+
+export type MonthlyBalance = {
+  date: Moment;
+  incomes: number;
+  expenses: number;
+};
 
 export type AppContextValue2 = {
   isLoading: boolean;
@@ -31,11 +38,18 @@ export type AppContextValue2 = {
   totalIncomes: number;
   expenseTransactions: Transaction[];
   totalExpenses: number;
+
+  monthlyBalances: MonthlyBalance[];
+  fetchMonthlyBalancesPage: (itemsPerPage: number, currentPage: number) => Promise<void>;
+  fetchingMonthlyBalances: boolean;
+  currentMonthlyBalancesPage: number;
+  setCurrentMonthlyBalancesPage: (value: number) => void;
 };
 
 const AppContext2 = createContext({} as AppContextValue2);
 
 const now = moment();
+const currentMonth = moment(now).startOf('month');
 
 export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [date, setDate] = useState(now);
@@ -47,7 +61,11 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
 
-  const isLoading = fetchingWallets || fetchingTransactions;
+  const [monthlyBalances, setMonthlyBalances] = useState([] as MonthlyBalance[]);
+  const [fetchingMonthlyBalances, setFetchingMonthlyBalances] = useState(false);
+  const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
+
+  const isLoading = fetchingWallets || fetchingTransactions || fetchingMonthlyBalances;
 
   const transactionQueryOptions = useMemo(
     () =>
@@ -204,7 +222,54 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingTransactions(false);
   };
 
+  const fetchMonthlyBalancesPage = async (itemsPerPage: number, currentPage: number) => {
+    if (wallets.length === 0) {
+      return;
+    }
+
+    setFetchingMonthlyBalances(true);
+
+    const dates = range(itemsPerPage).map((i) =>
+      currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'),
+    );
+
+    const results = await Promise.all(
+      dates.map((date) =>
+        transactionRepository.getTransactions({
+          interval: {
+            startDate: date.startOf('month').toDate(),
+            endDate: date.endOf('month').toDate(),
+          },
+          order: {
+            by: 'date',
+            direction: 'desc',
+          },
+        }),
+      ),
+    );
+
+    const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
+      const incomes = transactions
+        .filter((transaction) => transaction.type === 'CREDIT')
+        .reduce((total, transaction) => total + transaction.amount, 0);
+
+      const expenses = transactions
+        .filter((transaction) => transaction.type === 'DEBIT')
+        .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+
+      return { date: dates[index], incomes, expenses };
+    });
+
+    setMonthlyBalances((current) =>
+      currentPage === 0 ? newBalances : [...current, ...newBalances],
+    );
+
+    setFetchingMonthlyBalances(false);
+  };
+
   useEffect(() => {
+    setMonthlyBalances([]);
+    setCurrentMonthlyBalancesPage(0);
     return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
   }, []);
 
@@ -240,6 +305,11 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         expenseTransactions,
         totalIncomes,
         totalExpenses,
+        monthlyBalances,
+        fetchMonthlyBalancesPage,
+        fetchingMonthlyBalances,
+        currentMonthlyBalancesPage,
+        setCurrentMonthlyBalancesPage,
       }}
     >
       {children}
