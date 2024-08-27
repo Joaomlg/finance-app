@@ -11,7 +11,6 @@ export const Avatar = styled.View<AvatarProps>`
   border-width: 1px;
   border-color: ${(props) => props.color};
   border-radius: 100px;
-  margin-right: 12px;
   height: ${(props) => (props.size ? `${props.size}px` : '32px')};
   width: ${(props) => (props.size ? `${props.size}px` : '32px')};
   overflow: hidden;
