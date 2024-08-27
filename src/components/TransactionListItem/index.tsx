@@ -6,8 +6,8 @@ import Text from '../Text';
 
 import { useNavigation } from '@react-navigation/native';
 import AppContext2 from '../../contexts/AppContext2';
-import Icon from '../Icon';
-import { ListItem, ListItemAmount, ListItemContent } from './styles';
+import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
+import { ListItem, ListItemAmount, ListItemContent, StyledCategoryIcon } from './styles';
 
 export interface TransactionListItemProps extends TouchableOpacityProps {
   item: Transaction;
@@ -20,6 +20,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
   const navigation = useNavigation();
 
   const wallet = wallets.find(({ id }) => id === item.walletId);
+  const category = getCategoryById(item.categoryId) || getDefaultCategoryByType(item.type);
 
   const handleItemPressed = () => {
     navigation.navigate('transaction', {
@@ -29,15 +30,11 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
 
   return (
     <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
-      <Icon
-        name={item.type === 'DEBIT' ? 'shopping-cart' : 'attach-money'}
-        size={28}
-        color={item.ignore ? 'lightGray' : item.type === 'DEBIT' ? 'expense' : 'income'}
-      />
+      <StyledCategoryIcon category={category} ignored={item.ignore} />
       <ListItemContent>
-        {item.category && (
+        {category.name && (
           <Text typography="extraLight" color="textLight">
-            {item.category}
+            {category.name}
           </Text>
         )}
         <Text numberOfLines={2} ellipsizeMode="tail">

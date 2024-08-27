@@ -2,10 +2,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert } from 'react-native';
-import { useTheme } from 'styled-components';
-import Avatar from '../../components/Avatar';
+import CategoryIcon from '../../components/CategoryIcon';
 import Divider from '../../components/Divider';
-import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import RowContent from '../../components/RowContent';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -17,6 +15,7 @@ import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
 import { StackRouteParamList } from '../../routes/stack.routes';
+import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { formatDateHourFull } from '../../utils/date';
 import { transactionName } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
@@ -26,13 +25,14 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   navigation,
 }) => {
   const { wallets, transactions, updateTransaction, deleteTransaction } = useContext(AppContext2);
-  const theme = useTheme();
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 
   if (!transaction) return;
 
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
+  const category =
+    getCategoryById(transaction.categoryId) || getDefaultCategoryByType(transaction.type);
 
   const toggleIgnore = async () => {
     updateTransaction(transaction.id, {
@@ -68,21 +68,12 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
         <ScreenHeader title="Detalhes" actions={[HideValuesAction()]} />
         <ScreenContent>
           <BottomHeader>
-            <Avatar
-              color={transaction.type === 'CREDIT' ? theme.colors.income : theme.colors.expense}
-              size={48}
-            >
-              <Icon
-                name={transaction.type === 'CREDIT' ? 'attach-money' : 'shopping-cart'}
-                size={32}
-                color={transaction.type === 'CREDIT' ? 'income' : 'expense'}
-              />
-            </Avatar>
+            <CategoryIcon category={category} size={48} />
             <BottomHeaderContent>
               <Text typography="heading">{transaction.description}</Text>
-              {transaction.category && (
+              {category.name && (
                 <Text typography="extraLight" color="textLight" selectable={true}>
-                  {transaction.category}
+                  {category.name}
                 </Text>
               )}
             </BottomHeaderContent>

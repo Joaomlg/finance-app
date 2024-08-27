@@ -1,9 +1,9 @@
-import { Category } from '../models';
+import { Category, TransactionType } from '../models';
 
 const PRESET_CATEGORY_ID_PREFIX = 'finance-app-category-';
 
-export const getCategoryById = (id: string) => {
-  if (!id.startsWith(PRESET_CATEGORY_ID_PREFIX)) {
+export const getCategoryById = (id?: string) => {
+  if (!id || !id.startsWith(PRESET_CATEGORY_ID_PREFIX)) {
     return;
   }
 
@@ -14,6 +14,15 @@ export const getCategoryById = (id: string) => {
   if (id.includes('income')) {
     return incomePresetCategories.find((item) => item.id === id);
   }
+};
+
+export const getDefaultCategoryByType = (type: TransactionType) => {
+  return {
+    name: '',
+    icon: type === 'DEBIT' ? 'shopping-cart' : 'attach-money',
+    color: type === 'DEBIT' ? 'expense' : 'income',
+    type: type,
+  } as Category;
 };
 
 export const expensePresetCategories: Category[] = [

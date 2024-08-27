@@ -1,15 +1,16 @@
 import { ViewProps } from 'react-native';
 import styled from 'styled-components/native';
+import { Color } from '../../theme';
 
 export interface AvatarProps extends ViewProps {
-  color: string;
+  color: Color | string;
   size?: number;
 }
 
 export const Avatar = styled.View<AvatarProps>`
   border-style: solid;
   border-width: 1px;
-  border-color: ${(props) => props.color};
+  border-color: ${({ theme, ...props }) => theme.colors[props.color as Color] || props.color};
   border-radius: 100px;
   height: ${(props) => (props.size ? `${props.size}px` : '32px')};
   width: ${(props) => (props.size ? `${props.size}px` : '32px')};

@@ -4,6 +4,7 @@ import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
+import CategoryIcon from '../../components/CategoryIcon';
 import Divider from '../../components/Divider';
 import ListItemSelection, {
   SelectionItem,
@@ -19,6 +20,11 @@ import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
+import {
+  expensePresetCategories,
+  getCategoryById,
+  incomePresetCategories,
+} from '../../utils/category';
 import { formatDate } from '../../utils/date';
 import { getSvgComponent } from '../../utils/svg';
 import { transactionName } from '../../utils/text';
@@ -37,6 +43,8 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const selectedWallet = wallets.find(({ id }) => id === transactionValues.walletId);
+  const selectedCategory = getCategoryById(transactionValues.categoryId);
+
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
   const handleTransactionBalanceChange = (value: string) => {
@@ -100,6 +108,27 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
         ]}
       />
     );
+  };
+
+  const renderTransactionCategorySelector = () => {
+    const handleItemPressed = (categoryId: string) => {
+      setTransactionValues((value) => ({
+        ...value,
+        categoryId,
+      }));
+      closeBottomSheet();
+    };
+
+    const categories =
+      transactionValues.type === 'CREDIT' ? incomePresetCategories : expensePresetCategories;
+
+    const items: SelectionItem[] = categories.map((category) => ({
+      text: category.name,
+      renderIcon: () => <CategoryIcon category={category} />,
+      onPress: () => handleItemPressed(category.id),
+    }));
+
+    return <ListItemSelection title="Categoria" items={items} />;
   };
 
   const showTransactionDatePicker = () => {
@@ -203,7 +232,17 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionTypeSelector())}
             value={transactionName[transactionValues.type]}
-            disabled={isEditingAutomaticTransaction}
+            disabled={isEditing}
+            readOnly
+          />
+          <Divider />
+          <TextInput
+            placeholder="Categoria"
+            iconLeft="bookmark"
+            iconRight="navigate-next"
+            onPress={() => openBottomSheet(renderTransactionCategorySelector())}
+            value={selectedCategory?.name}
+            disabled={!transactionValues.type}
             readOnly
           />
           <Divider />
