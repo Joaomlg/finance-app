@@ -20,7 +20,7 @@ export declare global {
       manualConnect: undefined;
       transactions: undefined;
       transaction: { transactionId: string };
-      setTransaction: { transactionId?: string } | undefined;
+      setTransaction: { transactionType: string; transactionId?: string };
       history: undefined;
       settings: undefined;
       categories: undefined;

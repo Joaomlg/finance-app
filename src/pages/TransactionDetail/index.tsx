@@ -41,7 +41,10 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   };
 
   const handleEditTransaction = () => {
-    navigation.navigate('setTransaction', { transactionId: transaction.id });
+    navigation.navigate('setTransaction', {
+      transactionId: transaction.id,
+      transactionType: transaction.type,
+    });
   };
 
   const handleDeleteTransaction = async () => {

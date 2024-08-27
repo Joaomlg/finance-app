@@ -6,7 +6,7 @@ import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext2 from '../../contexts/AppContext2';
-import { Transaction } from '../../models';
+import { Transaction, TransactionType } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import TransactionList from './TransactionList';
 
@@ -69,8 +69,8 @@ const Transactions: React.FC = () => {
     ],
   );
 
-  const handleFloatingButtoPressed = () => {
-    navigation.navigate('setTransaction');
+  const handleFloatingButtoPressed = (transactionType: TransactionType) => {
+    navigation.navigate('setTransaction', { transactionType });
   };
 
   return (
@@ -79,7 +79,20 @@ const Transactions: React.FC = () => {
         <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
         <ScreenTabs tabs={tabs} renderScene={renderScene} />
       </ScreenContainer>
-      <ScreenFloatingButton onPress={handleFloatingButtoPressed} />
+      <ScreenFloatingButton
+        actions={[
+          {
+            text: 'Adicionar entrada',
+            icon: 'attach-money',
+            onPress: () => handleFloatingButtoPressed('CREDIT'),
+          },
+          {
+            text: 'Adicionar saída',
+            icon: 'shopping-cart',
+            onPress: () => handleFloatingButtoPressed('DEBIT'),
+          },
+        ]}
+      />
     </>
   );
 };

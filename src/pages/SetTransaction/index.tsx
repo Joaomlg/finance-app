@@ -18,7 +18,7 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { Transaction, TransactionType } from '../../models';
+import { Transaction } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import {
   expensePresetCategories,
@@ -27,7 +27,6 @@ import {
 } from '../../utils/category';
 import { formatDate } from '../../utils/date';
 import { getSvgComponent } from '../../utils/svg';
-import { transactionName } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 
 const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setTransaction'>> = ({
@@ -36,8 +35,13 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 }) => {
   const [transactionValues, setTransactionValues] = useState({} as Transaction);
 
-  const transactionId = route.params?.transactionId;
+  const transactionId = route.params.transactionId;
+  const transactionType = route.params.transactionType;
+
   const isEditing = transactionId !== undefined;
+
+  const screenTitle =
+    (isEditing ? 'Editar ' : 'Nova ') + (transactionType === 'CREDIT' ? 'entrada' : 'saída');
 
   const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext2);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
@@ -82,34 +86,6 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     return <ListItemSelection title="Carteira" items={items} />;
   };
 
-  const renderTransactionTypeSelector = () => {
-    const handleItemPressed = (type: TransactionType) => {
-      setTransactionValues((value) => ({
-        ...value,
-        type,
-      }));
-      closeBottomSheet();
-    };
-
-    return (
-      <ListItemSelection
-        title="Tipo de transação"
-        items={[
-          {
-            text: 'Entrada',
-            icon: 'attach-money',
-            onPress: () => handleItemPressed('CREDIT'),
-          },
-          {
-            text: 'Saída',
-            icon: 'shopping-cart',
-            onPress: () => handleItemPressed('DEBIT'),
-          },
-        ]}
-      />
-    );
-  };
-
   const renderTransactionCategorySelector = () => {
     const handleItemPressed = (categoryId: string) => {
       setTransactionValues((value) => ({
@@ -120,7 +96,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     };
 
     const categories =
-      transactionValues.type === 'CREDIT' ? incomePresetCategories : expensePresetCategories;
+      transactionType === 'CREDIT' ? incomePresetCategories : expensePresetCategories;
 
     const items: SelectionItem[] = categories.map((category) => ({
       text: category.name,
@@ -179,7 +155,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title={isEditing ? 'Editar transação' : 'Nova transação'} />
+        <ScreenHeader title={screenTitle} />
         <HeaderExtensionContainer>
           <BalanceValueContainer>
             <Text typography="light" color="textWhite">
@@ -227,22 +203,11 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           />
           <Divider />
           <TextInput
-            placeholder="Tipo"
-            iconLeft="paid"
-            iconRight="navigate-next"
-            onPress={() => openBottomSheet(renderTransactionTypeSelector())}
-            value={transactionName[transactionValues.type]}
-            disabled={isEditing}
-            readOnly
-          />
-          <Divider />
-          <TextInput
             placeholder="Categoria"
             iconLeft="bookmark"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionCategorySelector())}
             value={selectedCategory?.name}
-            disabled={!transactionValues.type}
             readOnly
           />
           <Divider />
