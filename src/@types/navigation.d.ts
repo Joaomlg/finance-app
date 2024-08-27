@@ -23,6 +23,7 @@ export declare global {
       setTransaction: { transactionId?: string } | undefined;
       history: undefined;
       settings: undefined;
+      categories: undefined;
     }
   }
 }

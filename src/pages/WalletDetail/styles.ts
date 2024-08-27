@@ -4,6 +4,7 @@ export const BottomHeader = styled.View`
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
+  gap: 12px;
 `;
 
 export const BottomHeaderContent = styled.View`

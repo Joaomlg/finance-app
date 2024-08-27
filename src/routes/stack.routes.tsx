@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import Categories from '../pages/Categories';
 import Connect from '../pages/Connect';
 import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
@@ -10,6 +11,7 @@ import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
 import SetTransaction from '../pages/SetTransaction';
 import SetWallet from '../pages/SetWallet';
+import TransactionDetail from '../pages/TransactionDetail';
 import Transactions from '../pages/Transactions';
 import WalletDetail from '../pages/WalletDetail';
 import Wallets from '../pages/Wallets';
@@ -30,6 +32,7 @@ export type StackRouteParamList = {
   setTransaction: { transactionId?: string } | undefined;
   history: undefined;
   settings: undefined;
+  categories: undefined;
 };
 
 const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamList>();
@@ -52,6 +55,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="setTransaction" component={SetTransaction} />
         <Screen name="history" component={History} />
         <Screen name="settings" component={Settings} />
+        <Screen name="categories" component={Categories} />
       </Group>
     </Navigator>
   );

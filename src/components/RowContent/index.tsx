@@ -7,19 +7,21 @@ import { Container, Content } from './styles';
 export interface RowContentProps extends TouchableOpacityProps {
   text?: string;
   leftIcon?: IconName;
+  renderLeftIcon?: () => React.ReactNode;
   rightIcon?: IconName;
 }
 
 const RowContent: React.FC<RowContentProps> = ({
   text,
   leftIcon,
+  renderLeftIcon,
   rightIcon,
   children,
   ...props
 }) => {
   return (
     <Container {...props}>
-      {leftIcon && <Icon name={leftIcon} size={24} />}
+      {renderLeftIcon ? renderLeftIcon() : leftIcon && <Icon name={leftIcon} size={24} />}
       <Content>
         {text && <Text>{text}</Text>}
         {children}
