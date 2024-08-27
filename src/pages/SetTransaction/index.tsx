@@ -18,7 +18,7 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { Transaction } from '../../models';
+import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import {
   expensePresetCategories,
@@ -27,6 +27,7 @@ import {
 } from '../../utils/category';
 import { formatDate } from '../../utils/date';
 import { getSvgComponent } from '../../utils/svg';
+import { transactionTypeText } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 
 const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setTransaction'>> = ({
@@ -36,12 +37,11 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const [transactionValues, setTransactionValues] = useState({} as Transaction);
 
   const transactionId = route.params.transactionId;
-  const transactionType = route.params.transactionType;
+  const transactionType = route.params.transactionType as TransactionType;
 
   const isEditing = transactionId !== undefined;
 
-  const screenTitle =
-    (isEditing ? 'Editar ' : 'Nova ') + (transactionType === 'CREDIT' ? 'entrada' : 'saída');
+  const screenTitle = (isEditing ? 'Editar ' : 'Nova ') + transactionTypeText[transactionType];
 
   const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext2);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
@@ -96,7 +96,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     };
 
     const categories =
-      transactionType === 'CREDIT' ? incomePresetCategories : expensePresetCategories;
+      transactionType === 'INCOME' ? incomePresetCategories : expensePresetCategories;
 
     const items: SelectionItem[] = categories.map((category) => ({
       text: category.name,

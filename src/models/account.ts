@@ -3,7 +3,7 @@ import { NewConnection } from './connection';
 import Provider from './provider';
 import { Wallet } from './wallet';
 
-export type AccountType = 'BANK' | 'CREDIT';
+export type AccountType = 'BANK' | 'INCOME';
 
 export type AccountSubType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
 

@@ -1,4 +1,4 @@
-import { Category, TransactionType } from '../models';
+import { Category, CategoryType } from '../models';
 
 const PRESET_CATEGORY_ID_PREFIX = 'finance-app-category-';
 
@@ -16,13 +16,22 @@ export const getCategoryById = (id?: string) => {
   }
 };
 
-export const getDefaultCategoryByType = (type: TransactionType) => {
+export const getDefaultCategoryByType = (type: CategoryType) => {
   return {
     name: '',
-    icon: type === 'DEBIT' ? 'shopping-cart' : 'attach-money',
-    color: type === 'DEBIT' ? 'expense' : 'income',
+    icon: type === 'EXPENSE' ? 'shopping-cart' : 'attach-money',
+    color: type === 'EXPENSE' ? 'expense' : 'income',
     type: type,
   } as Category;
+};
+
+export const getPresetCategoriesByType = (type: CategoryType) => {
+  switch (type) {
+    case 'INCOME':
+      return incomePresetCategories;
+    case 'EXPENSE':
+      return expensePresetCategories;
+  }
 };
 
 export const expensePresetCategories: Category[] = [
@@ -31,119 +40,119 @@ export const expensePresetCategories: Category[] = [
     name: 'Cartão de crédito',
     icon: 'credit-card',
     color: '#1f77b4',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-2',
     name: 'Casa',
     icon: 'home',
     color: '#aec7e8',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-3',
     name: 'Compras',
     icon: 'shopping-cart',
     color: '#ff7f0e',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-4',
     name: 'Educação',
     icon: 'menu-book',
     color: '#9edae5',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-5',
     name: 'Eletrônicos',
     icon: 'monitor',
     color: '#2ca02c',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-6',
     name: 'Lazer',
     icon: 'beach-access',
     color: '#98df8a',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-7',
     name: 'Outros',
     icon: 'more-horiz',
     color: '#7f7f7f',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-8',
     name: 'Pet',
     icon: 'pets',
     color: '#ff9896',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-9',
     name: 'Presente',
     icon: 'card-giftcard',
     color: '#9467bd',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-10',
     name: 'Restaurante',
     icon: 'restaurant',
     color: '#d62728',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-11',
     name: 'Saúde',
     icon: 'medical-services',
     color: '#8c564b',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-12',
     name: 'Serviços',
     icon: 'assignment',
     color: '#c49c94',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-13',
     name: 'Supermercado',
     icon: 'shopping-cart',
     color: '#e377c2',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-14',
     name: 'Transporte',
     icon: 'directions-car',
     color: '#f7b6d2',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-16',
     name: 'Vestuário',
     icon: 'checkroom',
     color: '#c5b0d5',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-17',
     name: 'Viagem',
     icon: 'airplanemode-active',
     color: '#c7c7c7',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-18',
     name: 'Pagamentos',
     icon: 'payments',
     color: '#bcbd22',
-    type: 'DEBIT',
+    type: 'EXPENSE',
   },
 ];
 
@@ -153,48 +162,48 @@ export const incomePresetCategories: Category[] = [
     name: 'Salário',
     icon: 'payments',
     color: '#2ca02c',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-2',
     name: 'Investimento',
     icon: 'trending-up',
     color: '#17becf',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-3',
     name: 'Presente',
     icon: 'card-giftcard',
     color: '#ffbb78',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-4',
     name: 'Prêmio',
     icon: 'military-tech',
     color: '#ff7f0e',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-5',
     name: 'Rendimento',
     icon: 'account-balance',
     color: '#98df8a',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-6',
     name: 'Reembolso',
     icon: 'assignment',
     color: '#aec7e8',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'income-7',
     name: 'Outros',
     icon: 'more-horiz',
     color: '#7f7f7f',
-    type: 'CREDIT',
+    type: 'INCOME',
   },
 ];

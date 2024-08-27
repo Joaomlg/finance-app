@@ -1,4 +1,6 @@
-export type TransactionType = 'DEBIT' | 'CREDIT';
+export const TransactionTypeList = ['EXPENSE', 'INCOME'] as const;
+
+export type TransactionType = typeof TransactionTypeList[number];
 
 export type Transaction = {
   id: string;

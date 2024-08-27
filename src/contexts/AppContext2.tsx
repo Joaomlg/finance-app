@@ -91,7 +91,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   );
 
   const incomeTransactions = useMemo(
-    () => transactions.filter(({ type }) => type === 'CREDIT'),
+    () => transactions.filter(({ type }) => type === 'INCOME'),
     [transactions],
   );
 
@@ -104,7 +104,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   );
 
   const expenseTransactions = useMemo(
-    () => transactions.filter(({ type }) => type === 'DEBIT'),
+    () => transactions.filter(({ type }) => type === 'EXPENSE'),
     [transactions],
   );
 
@@ -254,11 +254,11 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
 
     const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
       const incomes = transactions
-        .filter((transaction) => transaction.type === 'CREDIT' && !transaction.ignore)
+        .filter((transaction) => transaction.type === 'INCOME' && !transaction.ignore)
         .reduce((total, transaction) => total + transaction.amount, 0);
 
       const expenses = transactions
-        .filter((transaction) => transaction.type === 'DEBIT' && !transaction.ignore)
+        .filter((transaction) => transaction.type === 'EXPENSE' && !transaction.ignore)
         .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
 
       return { date: dates[index], incomes, expenses };

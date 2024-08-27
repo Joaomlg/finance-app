@@ -216,7 +216,9 @@ const Home: React.FC = () => {
                 ))}
             </BalanceWithTrending>
             <SubSectionContainer>
-              <Text typography="defaultBold">Entradas</Text>
+              <Text typography="defaultBold" transform="capitalize">
+                Entradas
+              </Text>
               <HorizontalBarContainer>
                 <HorizontalBar color="income" grow={incomesBarGrow} />
                 <Money value={totalIncomes} />

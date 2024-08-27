@@ -6,33 +6,26 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import Text from '../../components/Text';
-import { Category } from '../../models';
-import { expensePresetCategories, incomePresetCategories } from '../../utils/category';
+import { Category, CategoryType, CategoryTypeList } from '../../models';
+import { getPresetCategoriesByType } from '../../utils/category';
+import { transactionTypeText } from '../../utils/text';
 import { StyledFlatList } from './styles';
 
 const Categories: React.FC = () => {
-  const tabs: TabProps[] = [
-    { key: 'expense', title: 'Saída' },
-    { key: 'income', title: 'Entrada' },
-  ];
+  const tabs = CategoryTypeList.map(
+    (type) =>
+      ({
+        key: type,
+        title: transactionTypeText[type],
+      } as TabProps),
+  );
 
   const renderListItem = ({ item }: ListRenderItemInfo<Category>) => (
     <RowContent text={item.name} renderLeftIcon={() => <CategoryIcon category={item} />} />
   );
 
   const renderScene = (tabKey: string) => {
-    let data: Category[];
-
-    switch (tabKey) {
-      case 'income':
-        data = incomePresetCategories;
-        break;
-      case 'expense':
-        data = expensePresetCategories;
-        break;
-      default:
-        return;
-    }
+    const data = getPresetCategoriesByType(tabKey as CategoryType);
 
     const renderListHeader = () => (
       <Text typography="light" color="textLight">

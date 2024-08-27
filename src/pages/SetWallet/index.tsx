@@ -17,7 +17,7 @@ import useBottomSheet from '../../hooks/useBottomSheet';
 import { Wallet, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getSvgComponent } from '../../utils/svg';
-import { accountName } from '../../utils/text';
+import { walletTypeText } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 
@@ -168,7 +168,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             iconLeft="account-balance-wallet"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderWalletTypeSelector())}
-            value={accountName[walletValues.type]}
+            value={walletTypeText[walletValues.type]}
             disabled={isEditingAutomaticWallet}
             readOnly
           />

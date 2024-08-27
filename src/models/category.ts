@@ -1,9 +1,13 @@
-import { TransactionType } from './transaction';
+import { TransactionType, TransactionTypeList } from './transaction';
+
+export const CategoryTypeList = TransactionTypeList;
+
+export type CategoryType = TransactionType;
 
 export type Category = {
   id: string;
   name: string;
-  type: TransactionType;
+  type: CategoryType;
   icon: string;
   color: string;
 };

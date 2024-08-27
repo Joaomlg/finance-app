@@ -14,7 +14,7 @@ export interface TransactionListItemProps extends TouchableOpacityProps {
 }
 
 const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...props }) => {
-  const value = item.type === 'DEBIT' && item.amount > 0 ? -1 * item.amount : item.amount;
+  const value = item.type === 'EXPENSE' && item.amount > 0 ? -1 * item.amount : item.amount;
 
   const { wallets } = useContext(AppContext2);
   const navigation = useNavigation();

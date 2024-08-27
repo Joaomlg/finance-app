@@ -17,7 +17,7 @@ import AppContext2 from '../../contexts/AppContext2';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
 import { getSvgComponent } from '../../utils/svg';
-import { ConnectionStatusMessage, accountName, capitalize } from '../../utils/text';
+import { ConnectionStatusMessage, walletTypeText, capitalize } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
 import RowContent from '../../components/RowContent';
 
@@ -130,7 +130,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            <RowContent text={accountName[wallet.type]}>
+            <RowContent text={walletTypeText[wallet.type]}>
               <Money
                 typography="defaultBold"
                 value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}

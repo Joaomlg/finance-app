@@ -17,7 +17,7 @@ import AppContext2 from '../../contexts/AppContext2';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { formatDateHourFull } from '../../utils/date';
-import { transactionName } from '../../utils/text';
+import { transactionTypeText } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
 
 const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'transaction'>> = ({
@@ -89,7 +89,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
               <Text typography="defaultBold">{wallet?.name}</Text>
             </RowContent>
             <RowContent text="Tipo">
-              <Text typography="defaultBold">{transactionName[transaction.type]}</Text>
+              <Text typography="defaultBold">{transactionTypeText[transaction.type]}</Text>
             </RowContent>
           </InformationGroup>
           <Divider />
@@ -97,7 +97,9 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             <RowContent text="Valor">
               <Money
                 typography="defaultBold"
-                value={transaction.type === 'DEBIT' ? -1 * transaction.amount : transaction.amount}
+                value={
+                  transaction.type === 'EXPENSE' ? -1 * transaction.amount : transaction.amount
+                }
               />
             </RowContent>
           </InformationGroup>

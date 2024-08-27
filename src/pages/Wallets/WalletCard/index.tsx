@@ -15,7 +15,7 @@ import Banner from '../../../components/Banner';
 import Icon from '../../../components/Icon';
 import RowContent from '../../../components/RowContent';
 import { getSvgComponent } from '../../../utils/svg';
-import { ConnectionStatusMessage, accountName } from '../../../utils/text';
+import { ConnectionStatusMessage, walletTypeText } from '../../../utils/text';
 import { CardContainer, CardContent, CardHeader, CardHeaderContent } from './styles';
 
 export interface WalletCardProps extends ViewProps {
@@ -67,7 +67,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
           </CardHeader>
           <Divider />
           <CardContent>
-            <RowContent text={accountName[wallet.type]}>
+            <RowContent text={walletTypeText[wallet.type]}>
               <Money
                 typography="defaultBold"
                 value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}

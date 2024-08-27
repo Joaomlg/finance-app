@@ -8,6 +8,7 @@ import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext2 from '../../contexts/AppContext2';
 import { Transaction, TransactionType } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
+import { transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
 
 const Transactions: React.FC = () => {
@@ -82,14 +83,14 @@ const Transactions: React.FC = () => {
       <ScreenFloatingButton
         actions={[
           {
-            text: 'Adicionar entrada',
+            text: 'Adicionar ' + transactionTypeText['INCOME'],
             icon: 'attach-money',
-            onPress: () => handleFloatingButtoPressed('CREDIT'),
+            onPress: () => handleFloatingButtoPressed('INCOME'),
           },
           {
-            text: 'Adicionar saída',
+            text: 'Adicionar ' + transactionTypeText['EXPENSE'],
             icon: 'shopping-cart',
-            onPress: () => handleFloatingButtoPressed('DEBIT'),
+            onPress: () => handleFloatingButtoPressed('EXPENSE'),
           },
         ]}
       />
