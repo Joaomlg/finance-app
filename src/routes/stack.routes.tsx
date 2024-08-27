@@ -15,7 +15,6 @@ import TransactionDetail from '../pages/TransactionDetail';
 import Transactions from '../pages/Transactions';
 import WalletDetail from '../pages/WalletDetail';
 import Wallets from '../pages/Wallets';
-import TransactionDetail from '../pages/TransactionDetail';
 
 export type StackRouteParamList = {
   login: undefined;
