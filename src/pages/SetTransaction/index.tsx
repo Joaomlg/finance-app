@@ -13,6 +13,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
+import Svg from '../../components/Svg';
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
@@ -26,7 +27,6 @@ import {
   incomePresetCategories,
 } from '../../utils/category';
 import { formatDate } from '../../utils/date';
-import { getSvgComponent } from '../../utils/svg';
 import { transactionTypeText } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 
@@ -69,19 +69,18 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       closeBottomSheet();
     };
 
-    const items = wallets.map((wallet) => {
-      const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
-
-      return {
-        text: wallet.name,
-        renderIcon: () => (
-          <Avatar color={wallet.styles.primaryColor} size={32}>
-            <LogoSvgComponent height="100%" width="100%" />
-          </Avatar>
-        ),
-        onPress: () => handleItemPressed(wallet.id),
-      } as SelectionItem;
-    });
+    const items = wallets.map(
+      (wallet) =>
+        ({
+          text: wallet.name,
+          renderIcon: () => (
+            <Avatar color={wallet.styles.primaryColor} size={32}>
+              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
+            </Avatar>
+          ),
+          onPress: () => handleItemPressed(wallet.id),
+        } as SelectionItem),
+    );
 
     return <ListItemSelection title="Carteira" items={items} />;
   };

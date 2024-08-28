@@ -1,9 +1,17 @@
-import { SvgKey } from '../../../utils/svg';
+import {
+  BANCO_DO_BRASIL_LOGO_SVG_URL,
+  BANCO_INTER_LOGO_SVG_URL,
+  BRADESCO_LOGO_SVG_URL,
+  CAIXA_LOGO_SVG_URL,
+  ITAU_LOGO_SVG_URL,
+  NUBANK_LOGO_SVG_URL,
+  SANTANDER_LOGO_SVG_URL,
+} from '../../../utils/svg';
 
 export type PresetInstitution = {
   id: number;
   name: string;
-  logoSvg: SvgKey;
+  imageUrl: string;
   primaryColor: string;
 };
 
@@ -11,43 +19,43 @@ const presetInstitutions: PresetInstitution[] = [
   {
     id: 1,
     name: 'Nubank',
-    logoSvg: 'nubank_logo',
+    imageUrl: NUBANK_LOGO_SVG_URL,
     primaryColor: '#820AD1',
   },
   {
     id: 2,
     name: 'Banco do Brasil',
-    logoSvg: 'banco_do_brasil_logo',
+    imageUrl: BANCO_DO_BRASIL_LOGO_SVG_URL,
     primaryColor: '#fdf429',
   },
   {
     id: 3,
     name: 'Banco Inter',
-    logoSvg: 'banco_inter_logo',
+    imageUrl: BANCO_INTER_LOGO_SVG_URL,
     primaryColor: '#ea7100',
   },
   {
     id: 4,
     name: 'Bradesco',
-    logoSvg: 'bradesco_logo',
+    imageUrl: BRADESCO_LOGO_SVG_URL,
     primaryColor: '#cc092f',
   },
   {
     id: 5,
     name: 'Caixa Econômica Federal',
-    logoSvg: 'caixa_logo',
+    imageUrl: CAIXA_LOGO_SVG_URL,
     primaryColor: '#006bab',
   },
   {
     id: 6,
     name: 'Itaú',
-    logoSvg: 'itau_logo',
+    imageUrl: ITAU_LOGO_SVG_URL,
     primaryColor: '#33348e',
   },
   {
     id: 7,
     name: 'Santander',
-    logoSvg: 'santander_logo',
+    imageUrl: SANTANDER_LOGO_SVG_URL,
     primaryColor: '#ec0000',
   },
 ];

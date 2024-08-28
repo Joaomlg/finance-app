@@ -1,10 +1,9 @@
-import { SvgKey } from '../utils/svg';
 import { NewConnection } from './connection';
 
 export type WalletType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
 
 export type WalletStyles = {
-  logoSvg: SvgKey;
+  imageUrl: string;
   primaryColor: string;
 };
 

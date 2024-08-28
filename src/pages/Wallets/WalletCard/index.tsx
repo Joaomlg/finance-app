@@ -14,7 +14,7 @@ import Avatar from '../../../components/Avatar';
 import Banner from '../../../components/Banner';
 import Icon from '../../../components/Icon';
 import RowContent from '../../../components/RowContent';
-import { getSvgComponent } from '../../../utils/svg';
+import Svg from '../../../components/Svg';
 import { ConnectionStatusMessage, walletTypeText } from '../../../utils/text';
 import { CardContainer, CardContent, CardHeader, CardHeaderContent } from './styles';
 
@@ -24,8 +24,6 @@ export interface WalletCardProps extends ViewProps {
 
 const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
   const navigation = useNavigation();
-
-  const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
 
   const lastUpdateDate = wallet.connection?.lastUpdatedAt
     ? moment(wallet.connection?.lastUpdatedAt).format(LastUpdateDateFormat)
@@ -51,7 +49,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
         <CardContainer>
           <CardHeader>
             <Avatar color={wallet.styles.primaryColor}>
-              <LogoSvgComponent height="100%" width="100%" />
+              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
             </Avatar>
             <CardHeaderContent>
               <Text>{wallet.name}</Text>

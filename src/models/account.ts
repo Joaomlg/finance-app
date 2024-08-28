@@ -19,7 +19,7 @@ export type Account = {
 export type NewAccount = {
   id: string;
   name: string;
-  logoSvg: SvgKey;
+  imageUrl: SvgKey;
   primaryColor: string;
   createdAt: Date;
   connection?: NewConnection;

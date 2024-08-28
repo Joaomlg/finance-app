@@ -6,20 +6,20 @@ import Avatar from '../../components/Avatar';
 import Banner from '../../components/Banner';
 import Divider from '../../components/Divider';
 import Money from '../../components/Money';
+import RowContent from '../../components/RowContent';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
+import Svg from '../../components/Svg';
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import AppContext2 from '../../contexts/AppContext2';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatDateHourFull } from '../../utils/date';
-import { getSvgComponent } from '../../utils/svg';
-import { ConnectionStatusMessage, walletTypeText, capitalize } from '../../utils/text';
+import { capitalize, ConnectionStatusMessage, walletTypeText } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
-import RowContent from '../../components/RowContent';
 
 const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet'>> = ({
   route,
@@ -30,8 +30,6 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
   const wallet = wallets.find(({ id }) => id === route.params.walletId);
 
   if (!wallet) return;
-
-  const LogoSvgComponent = getSvgComponent(wallet.styles.logoSvg);
 
   const hasError =
     wallet.connection?.status !== 'UPDATED' && wallet.connection?.status !== 'UPDATING';
@@ -97,7 +95,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
           )}
           <BottomHeader>
             <Avatar color={wallet.styles.primaryColor} size={48}>
-              <LogoSvgComponent height="100%" width="100%" />
+              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
             </Avatar>
             <BottomHeaderContent>
               <Text typography="heading">{wallet.name}</Text>

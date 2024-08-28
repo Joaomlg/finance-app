@@ -6,18 +6,26 @@ import ItauLogo from '../assets/icon/itau_logo.svg';
 import NubankLogo from '../assets/icon/nubank_logo.svg';
 import SantanderLogo from '../assets/icon/santander_logo.svg';
 
-const svgCatalog = {
-  banco_do_brasil_logo: BancoDoBrasilLogo,
-  banco_inter_logo: BancoInterLogo,
-  bradesco_logo: BradescoLogo,
-  caixa_logo: CaixaLogo,
-  itau_logo: ItauLogo,
-  nubank_logo: NubankLogo,
-  santander_logo: SantanderLogo,
+const LOCAL_SVG_SCHEMA = 'finance.app.svg://';
+
+export const BANCO_DO_BRASIL_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'banco_do_brasil_logo';
+export const BANCO_INTER_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'banco_inter_logo';
+export const BRADESCO_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'bradesco_logo';
+export const CAIXA_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'caixa_logo';
+export const ITAU_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'itau_logo';
+export const NUBANK_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'nubank_logo';
+export const SANTANDER_LOGO_SVG_URL = LOCAL_SVG_SCHEMA + 'santander_logo';
+
+const localSvgRegistry = {
+  [BANCO_DO_BRASIL_LOGO_SVG_URL]: BancoDoBrasilLogo,
+  [BANCO_INTER_LOGO_SVG_URL]: BancoInterLogo,
+  [BRADESCO_LOGO_SVG_URL]: BradescoLogo,
+  [CAIXA_LOGO_SVG_URL]: CaixaLogo,
+  [ITAU_LOGO_SVG_URL]: ItauLogo,
+  [NUBANK_LOGO_SVG_URL]: NubankLogo,
+  [SANTANDER_LOGO_SVG_URL]: SantanderLogo,
 };
 
-export type SvgKey = keyof typeof svgCatalog;
+export const isLocalSvgComponent = (src: string) => src.startsWith(LOCAL_SVG_SCHEMA);
 
-export const getSvgComponent = (key: SvgKey) => {
-  return svgCatalog[key];
-};
+export const getLocalSvgComponent = (src: string) => localSvgRegistry[src];

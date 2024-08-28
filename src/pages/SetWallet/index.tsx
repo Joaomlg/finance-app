@@ -10,13 +10,13 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
+import Svg from '../../components/Svg';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext2 from '../../contexts/AppContext2';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Wallet, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
-import { getSvgComponent } from '../../utils/svg';
 import { walletTypeText } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
@@ -82,7 +82,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
         ...value,
         institutionId: institution.id,
         styles: {
-          logoSvg: institution.logoSvg,
+          imageUrl: institution.imageUrl,
           primaryColor: institution.primaryColor,
         },
       }));
@@ -90,14 +90,12 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
       closeBottomSheet();
     };
 
-    const renderItemIcon = (institution: PresetInstitution) => {
-      const Svg = getSvgComponent(institution.logoSvg);
-      return (
-        <Avatar color={institution.primaryColor}>
-          <Svg height="100%" width="100%" />
-        </Avatar>
-      );
-    };
+    const renderItemIcon = (institution: PresetInstitution) => (
+      <Avatar color={institution.primaryColor}>
+        <Svg height="100%" width="100%" src={institution.imageUrl} />
+      </Avatar>
+    );
+
     const items = presetInstituitions.map(
       (item) =>
         ({
