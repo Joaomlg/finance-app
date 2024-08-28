@@ -2,6 +2,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
+  BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import React, {
   useCallback,
@@ -13,7 +14,6 @@ import React, {
 } from 'react';
 import { BackHandler } from 'react-native';
 import { useTheme } from 'styled-components';
-import { Container } from './styles';
 
 export type Option = 'update' | 'delete';
 
@@ -34,7 +34,7 @@ const BottomSheet: React.ForwardRefRenderFunction<BottomSheetMethods, BottomShee
 
   const modalRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = useMemo(() => ['30%', '60%', '100%'], []);
+  const snapPoints = useMemo(() => ['50%', '75%', '100%'], []);
 
   const theme = useTheme();
 
@@ -86,7 +86,15 @@ const BottomSheet: React.ForwardRefRenderFunction<BottomSheetMethods, BottomShee
         setCurrentIndex(index);
       }}
     >
-      <Container>{children}</Container>
+      <BottomSheetScrollView
+        style={{
+          flex: 1,
+          padding: 24,
+          gap: 24,
+        }}
+      >
+        {children}
+      </BottomSheetScrollView>
     </BottomSheetModal>
   );
 };
