@@ -138,6 +138,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       createTransaction({
         ...transactionValues,
         id: uuid.v4().toString(),
+        type: transactionType,
       });
     }
 
