@@ -1,13 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
-import {
-  Alert,
-  LayoutAnimation,
-  LayoutChangeEvent,
-  RefreshControl,
-  ScrollView,
-} from 'react-native';
+import { LayoutAnimation, LayoutChangeEvent, RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import HorizontalBar from '../../components/HorizontalBar';
 import Icon from '../../components/Icon';
@@ -18,7 +12,6 @@ import ScreenContent from '../../components/ScreenContent';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
-import AppContext from '../../contexts/AppContext';
 import AppContext2 from '../../contexts/AppContext2';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
@@ -39,6 +32,7 @@ import {
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
+const MINIMUM_DATE = moment(new Date(0));
 
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
@@ -46,9 +40,6 @@ const Home: React.FC = () => {
 
   const theme = useTheme();
   const navigation = useNavigation();
-
-  const { minimumDateWithData, lastUpdateDate, updateConnections, fetchConnections } =
-    useContext(AppContext);
 
   const {
     isLoading,
@@ -59,6 +50,8 @@ const Home: React.FC = () => {
     totalBalance,
     totalIncomes,
     totalExpenses,
+    fetchWallets,
+    fetchTransactions,
   } = useContext(AppContext2);
 
   const totalInvestment = 0;
@@ -103,28 +96,8 @@ const Home: React.FC = () => {
     setMonthYearPickerOpened(false);
   };
 
-  const handleRefreshPage = () => {
-    Alert.alert(
-      'Deseja sincronizar as conexões?',
-      'Ao sincronizar as conexões, os dados mais recentes serão obtidos. Isso pode levar alguns minutos.\n\nAtualizar irá apenas obter o que já foi sincronizado previamente.',
-      [
-        {
-          text: 'Atualizar',
-          onPress: async () => {
-            await fetchConnections();
-          },
-        },
-        {
-          text: 'Sincronizar',
-          onPress: async () => {
-            await updateConnections();
-          },
-        },
-      ],
-      {
-        cancelable: true,
-      },
-    );
+  const handleRefreshPage = async () => {
+    await Promise.all([fetchWallets(), fetchTransactions()]);
   };
 
   return (
@@ -160,9 +133,6 @@ const Home: React.FC = () => {
           />
           {isCurrentMonth && (
             <BalanceContainer>
-              <Text typography="light" color="textWhite">
-                Atualizado em {lastUpdateDate}
-              </Text>
               <BalanceLine>
                 <Text color="textWhite">Saldo das contas</Text>
                 <BalanceFillLine />
@@ -251,7 +221,7 @@ const Home: React.FC = () => {
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
         selectedDate={date}
-        minimumDate={minimumDateWithData}
+        minimumDate={MINIMUM_DATE}
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />
