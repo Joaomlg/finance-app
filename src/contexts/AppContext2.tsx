@@ -178,7 +178,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
       const transactions = await transactionRepository.getTransactions(transactionQueryOptions);
       setTransactions(transactions);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das transações!' });
     }
 
     setFetchingTransactions(false);
@@ -190,7 +190,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       await transactionRepository.setTransaction(transaction);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível criar a carteira!' });
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a transação!' });
     }
 
     setFetchingTransactions(false);
@@ -204,7 +204,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Não foi possível atualizar as informações da carteira!',
+        text1: 'Não foi possível atualizar as informações da transação!',
       });
     }
 
@@ -219,7 +219,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     } catch (error) {
       Toast.show({
         type: 'info',
-        text1: 'Não foi possível apagar a carteira.',
+        text1: 'Não foi possível apagar a transação.',
       });
     }
 
