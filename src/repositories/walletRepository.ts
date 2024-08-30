@@ -4,7 +4,7 @@ import { RecursivePartial } from '../utils/type';
 
 const WALLETS_FIREBASE_COLLECTION = 'wallets';
 
-export const walletsCollection = firestore().collection(WALLETS_FIREBASE_COLLECTION);
+const walletsCollection = firestore().collection(WALLETS_FIREBASE_COLLECTION);
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
   const { createdAt, ...values } = data;
@@ -25,6 +25,10 @@ export const onWalletsChange = (callback: (wallets: Wallet[]) => void) => {
     callback(wallets);
   });
   return unsubscribe;
+};
+
+export const getWalletReference = (id: string) => {
+  return walletsCollection.doc(id);
 };
 
 export const setWallet = async (wallet: Wallet) => {

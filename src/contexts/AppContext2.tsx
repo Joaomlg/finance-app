@@ -164,7 +164,16 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     } catch (error) {
       Toast.show({
         type: 'info',
-        text1: 'Não foi possível apagar a carteira.',
+        text1: 'Não foi possível apagar a carteira!',
+      });
+    }
+
+    try {
+      transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
+    } catch (error) {
+      Toast.show({
+        type: 'info',
+        text1: 'Não foi possível apagar as transações da carteira!',
       });
     }
 

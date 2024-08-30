@@ -2,7 +2,7 @@ import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firest
 import { Transaction } from '../models';
 import { getTransactionSignedAmount } from '../utils/money';
 import { RecursivePartial } from '../utils/type';
-import { walletsCollection } from './walletRepository';
+import { getWalletReference } from './walletRepository';
 
 type DateInterval = {
   startDate: Date;
@@ -21,7 +21,7 @@ export type TransactionQueryOptions = {
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
-export const transactionsCollection = firestore().collection(TRANSACTIONS_FIREBASE_COLLECTION);
+const transactionsCollection = firestore().collection(TRANSACTIONS_FIREBASE_COLLECTION);
 
 const buildColletionQuery = (options?: TransactionQueryOptions) => {
   let query: FirebaseFirestoreTypes.Query = transactionsCollection;
@@ -47,6 +47,10 @@ const parseTransaction = (data: FirebaseFirestoreTypes.DocumentData) => {
   } as Transaction;
 };
 
+export const getTransactionReference = (id: string) => {
+  return transactionsCollection.doc(id);
+};
+
 export const getTransactions = async (options?: TransactionQueryOptions) => {
   const result = await buildColletionQuery(options).get();
   return result.docs.map((item) => parseTransaction(item.data()));
@@ -65,7 +69,7 @@ export const onTransactionsChange = (
 };
 
 export const setTransaction = async (transaction: Transaction) => {
-  const walletReference = walletsCollection.doc(transaction.walletId);
+  const walletReference = getWalletReference(transaction.walletId);
   const transactionReference = transactionsCollection.doc(transaction.id);
 
   await firestore().runTransaction(async (t) => {
@@ -101,7 +105,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
       throw 'Transaction does not exist!';
     }
 
-    const walletReference = walletsCollection.doc(transactionSnapshot.data()?.walletId);
+    const walletReference = getWalletReference(transactionSnapshot.data()?.walletId);
     const walletSnapshot = await t.get(walletReference);
 
     if (!walletSnapshot.exists) {
@@ -120,7 +124,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
 };
 
 export const deleteTransaction = async (transaction: Transaction) => {
-  const walletReference = walletsCollection.doc(transaction.walletId);
+  const walletReference = getWalletReference(transaction.walletId);
   const transactionReference = transactionsCollection.doc(transaction.id);
 
   await firestore().runTransaction(async (t) => {
@@ -140,4 +144,18 @@ export const deleteTransaction = async (transaction: Transaction) => {
       });
     }
   });
+};
+
+export const deleteAllTransactionsByWalletId = async (walletId: string) => {
+  const transactionsQuerySnapshot = await transactionsCollection
+    .where('walletId', '==', walletId)
+    .get();
+
+  const batch = firestore().batch();
+
+  transactionsQuerySnapshot.forEach((documentSnapshot) => {
+    batch.delete(documentSnapshot.ref);
+  });
+
+  return batch.commit();
 };
