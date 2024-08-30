@@ -1,4 +1,4 @@
-import { AccountSubType, ConnectionStatus } from '../models';
+import { ConnectionStatus, TransactionType, WalletType } from '../models';
 
 export const capitalize = (text: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -8,10 +8,15 @@ export const textCompare = (text1: string, text2: string) => {
   return text1.localeCompare(text2);
 };
 
-export const accountName: Record<AccountSubType, string> = {
+export const walletTypeText: Record<WalletType, string> = {
   CHECKING_ACCOUNT: 'Conta corrente',
   SAVINGS_ACCOUNT: 'Conta poupança',
   CREDIT_CARD: 'Cartão de crédito',
+};
+
+export const transactionTypeText: Record<TransactionType, string> = {
+  INCOME: 'Entrada',
+  EXPENSE: 'Saída',
 };
 
 export const ConnectionStatusMessage: Record<ConnectionStatus, string> = {

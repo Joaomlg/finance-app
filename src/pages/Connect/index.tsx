@@ -4,7 +4,7 @@ import BelvoLogo from '../../assets/icon/belvo_logo.svg';
 import PluggyLogo from '../../assets/icon/pluggy_logo.svg';
 import ScreenHeader from '../../components/ScreenHeader';
 import ScreenContainer from '../../components/ScreenContainer';
-import { ScreenContent } from '../../components/ScreenContent';
+import ScreenContent from '../../components/ScreenContent';
 import Text from '../../components/Text';
 import { CustomCard } from './styles';
 
@@ -15,7 +15,7 @@ const Connect: React.FC = () => {
     <ScreenContainer>
       <ScreenHeader title="Connectar" />
       <ScreenContent>
-        <Text variant="title">Selecione um provedor</Text>
+        <Text typography="title">Selecione um provedor</Text>
         <CustomCard onPress={() => navigation.navigate('connect/pluggy')}>
           <PluggyLogo height={36} width={130} />
         </CustomCard>

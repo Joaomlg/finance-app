@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import Button from '../../components/Button';
 import ScreenContainer from '../../components/ScreenContainer';
-import { ScreenContent } from '../../components/ScreenContent';
+import ScreenContent from '../../components/ScreenContent';
 import ScreenHeader from '../../components/ScreenHeader';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
@@ -42,12 +42,12 @@ const ManualConnect: React.FC = () => {
       <ScreenContent>
         <TextInput placeholder="Identificador" onChangeText={setId} value={id} />
         <Button onPress={saveConnection}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Adicionar
           </Text>
         </Button>
         <Button onPress={RemoveConnection}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Remover
           </Text>
         </Button>

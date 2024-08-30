@@ -3,8 +3,9 @@ export declare global {
     interface RootParamList {
       login: undefined;
       home: undefined;
-      connections: undefined;
-      'connection-detail': { connectionId: string };
+      wallets: undefined;
+      wallet: { walletId: string };
+      setWallet: { walletId?: string } | undefined;
       connect: undefined;
       'connect/pluggy':
         | {
@@ -18,8 +19,11 @@ export declare global {
         | undefined;
       manualConnect: undefined;
       transactions: undefined;
+      transaction: { transactionId: string };
+      setTransaction: { transactionType: string; transactionId?: string };
       history: undefined;
       settings: undefined;
+      categories: undefined;
     }
   }
 }

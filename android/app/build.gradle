@@ -89,7 +89,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.2.2"
+        versionName "1.3.0"
     }
     signingConfigs {
         debug {
@@ -116,6 +116,17 @@ android {
     packagingOptions {
         jniLibs {
             useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
+        }
+    }
+    flavorDimensions "env"
+    productFlavors {
+        production {
+            dimension "env"
+            applicationId 'com.joaomlg.financeapp'
+        }
+        development {
+            dimension "env"
+            applicationId 'com.joaomlg.financeapp.dev'
         }
     }
 }

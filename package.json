@@ -1,14 +1,14 @@
 {
   "name": "finance-app",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "dev": "expo start --dev-client",
+    "dev": "APP_VARIANT=development expo start --dev-client",
     "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 7 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
+    "prebuild": "expo prebuild",
     "build:development": "eas build --profile development",
-    "build:preview": "eas build --profile preview",
-    "update:preview": "eas update --channel staging",
+    "build:production": "eas build --profile production",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -22,6 +22,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-firebase/app": "^20.3.0",
     "@react-native-firebase/auth": "^20.3.0",
+    "@react-native-firebase/firestore": "^20.3.0",
     "@react-native-google-signin/google-signin": "^12.2.1",
     "@react-navigation/bottom-tabs": "^6.5.2",
     "@react-navigation/native": "^6.1.0",
@@ -51,9 +52,11 @@
     "react-native-svg-transformer": "^1.3.0",
     "react-native-tab-view": "^3.4.0",
     "react-native-toast-message": "^2.1.5",
+    "react-native-uuid": "^2.0.2",
     "react-native-web": "~0.19.10",
     "react-native-webview": "13.8.6",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "@react-native-community/datetimepicker": "8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

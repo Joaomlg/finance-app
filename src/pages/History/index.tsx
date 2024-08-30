@@ -8,7 +8,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
+import AppContext2, { MonthlyBalance } from '../../contexts/AppContext2';
 import { checkCurrentYear } from '../../utils/date';
 import {
   HorizontalBarContainer,
@@ -34,9 +34,8 @@ const History: React.FC = () => {
     fetchMonthlyBalancesPage,
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
-    minimumDateWithData,
     setDate,
-  } = useContext(AppContext);
+  } = useContext(AppContext2);
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -47,15 +46,6 @@ const History: React.FC = () => {
       0,
     );
   }, [monthlyBalances]);
-
-  const canLoadMore = useMemo(() => {
-    if (monthlyBalances.length === 0) {
-      return true;
-    }
-
-    const lastFetchedMonth = monthlyBalances[monthlyBalances.length - 1].date;
-    return lastFetchedMonth.isAfter(minimumDateWithData);
-  }, [minimumDateWithData, monthlyBalances]);
 
   const fetchPage = useCallback(
     async (page: number) => {
@@ -104,7 +94,7 @@ const History: React.FC = () => {
         <ItemContainer>
           <ItemHeader>
             <MonthTrendContainer>
-              <Text variant="heading-regular" transform="capitalize">
+              <Text typography="headingRegular" transform="capitalize">
                 {dateText}
               </Text>
               {showTrendingIcon &&
@@ -119,11 +109,15 @@ const History: React.FC = () => {
             </TouchableIconContainer>
           </ItemHeader>
           <Text>
-            Saldo: <Money value={balance} variant="default-bold" />
+            Saldo: <Money value={balance} typography="defaultBold" />
           </Text>
           <HorizontalBarContainer>
             <StyledHorizontalBar color="income" grow={incomesBarGrow} />
-            <Money value={incomes} variant="default-bold" color={hideValues ? 'text' : 'income'} />
+            <Money
+              value={incomes}
+              typography="defaultBold"
+              color={hideValues ? 'text' : 'income'}
+            />
           </HorizontalBarContainer>
           <HorizontalBarContainer>
             <StyledHorizontalBar
@@ -133,7 +127,7 @@ const History: React.FC = () => {
             />
             <Money
               value={expenses}
-              variant="default-bold"
+              typography="defaultBold"
               color={hideValues ? 'text' : balance < 0 ? 'error' : 'expense'}
             />
           </HorizontalBarContainer>
@@ -147,14 +141,14 @@ const History: React.FC = () => {
 
   const renderFooter = useCallback(
     () =>
-      monthlyBalances.length > 0 && canLoadMore ? (
+      monthlyBalances.length > 0 ? (
         <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
-          <Text variant="title" color="textWhite">
+          <Text typography="title" color="textWhite">
             Ver mais
           </Text>
         </StyledButton>
       ) : null,
-    [canLoadMore, handleLoadMore, isLoading, monthlyBalances],
+    [handleLoadMore, isLoading, monthlyBalances],
   );
 
   const handleRefresh = useCallback(async () => {

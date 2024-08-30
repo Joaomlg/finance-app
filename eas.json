@@ -4,16 +4,22 @@
   },
   "build": {
     "development": {
+      "channel": "development",
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
-    },
-    "preview": {
-      "distribution": "internal",
-      "channel": "staging"
+      "env": {
+        "APP_VARIANT": "development"
+      },
+      "android": {
+        "gradleCommand": ":app:assembleDevelopmentDebug"
+      }
     },
     "production": {
-      "channel": "production"
+      "channel": "production",
+      "android": {
+        "gradleCommand": ":app:assembleProductionRelease",
+        "buildType": "apk"
+      }
     }
   },
   "submit": {

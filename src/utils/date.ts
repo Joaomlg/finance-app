@@ -10,3 +10,5 @@ export const formatMonthYearDate = (date: Moment) =>
   checkCurrentYear(date) ? date.format('MMMM') : date.format('MMMM YYYY');
 
 export const formatDateHourFull = (date: Moment) => date.format('YYYY-MM-DD hh:mm:ss');
+
+export const formatDate = (date: Moment) => date.format('DD [de] MMMM [de] YYYY');

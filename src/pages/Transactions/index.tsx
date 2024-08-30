@@ -1,16 +1,21 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
+import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
-import AppContext from '../../contexts/AppContext';
-import { Transaction } from '../../models';
+import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
+import AppContext2 from '../../contexts/AppContext2';
+import { Transaction, TransactionType } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
+import { transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
-import TransactionTabs, { TransactionTabsRoute } from './TransactionTabs';
 
 const Transactions: React.FC = () => {
+  const navigation = useNavigation();
+
   const {
-    isLoading,
+    fetchingTransactions,
     transactions,
     fetchTransactions,
     date,
@@ -18,14 +23,20 @@ const Transactions: React.FC = () => {
     totalIncomes,
     expenseTransactions,
     totalExpenses,
-  } = useContext(AppContext);
+  } = useContext(AppContext2);
+
+  const tabs: TabProps[] = [
+    { key: 'default', title: 'Tudo' },
+    { key: 'incomes', title: 'Entradas' },
+    { key: 'expenses', title: 'Saídas' },
+  ];
 
   const renderScene = useCallback(
-    ({ route }: { route: TransactionTabsRoute }) => {
+    (tabKey: string) => {
       let data: Transaction[];
       let balance: number;
 
-      switch (route.key) {
+      switch (tabKey) {
         case 'incomes':
           data = incomeTransactions;
           balance = totalIncomes;
@@ -41,7 +52,7 @@ const Transactions: React.FC = () => {
 
       return (
         <TransactionList
-          isLoading={isLoading}
+          isLoading={fetchingTransactions}
           onRefresh={fetchTransactions}
           transactions={data}
           reducedValue={balance}
@@ -52,18 +63,38 @@ const Transactions: React.FC = () => {
       expenseTransactions,
       fetchTransactions,
       incomeTransactions,
-      isLoading,
+      fetchingTransactions,
       totalExpenses,
       totalIncomes,
       transactions,
     ],
   );
 
+  const handleFloatingButtoPressed = (transactionType: TransactionType) => {
+    navigation.navigate('setTransaction', { transactionType });
+  };
+
   return (
-    <ScreenContainer>
-      <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
-      <TransactionTabs renderScene={renderScene} />
-    </ScreenContainer>
+    <>
+      <ScreenContainer>
+        <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
+        <ScreenTabs tabs={tabs} renderScene={renderScene} />
+      </ScreenContainer>
+      <ScreenFloatingButton
+        actions={[
+          {
+            text: 'Adicionar ' + transactionTypeText['INCOME'],
+            icon: 'attach-money',
+            onPress: () => handleFloatingButtoPressed('INCOME'),
+          },
+          {
+            text: 'Adicionar ' + transactionTypeText['EXPENSE'],
+            icon: 'shopping-cart',
+            onPress: () => handleFloatingButtoPressed('EXPENSE'),
+          },
+        ]}
+      />
+    </>
   );
 };
 

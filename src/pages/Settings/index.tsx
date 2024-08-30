@@ -1,10 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import Divider from '../../components/Divider';
-import ScreenHeader from '../../components/ScreenHeader';
 import Icon from '../../components/Icon';
+import RowContent from '../../components/RowContent';
 import ScreenContainer from '../../components/ScreenContainer';
-import { ScreenContent } from '../../components/ScreenContent';
+import ScreenContent from '../../components/ScreenContent';
+import ScreenHeader from '../../components/ScreenHeader';
 import Text from '../../components/Text';
 import AuthContext from '../../contexts/AuthContext';
 import { Avatar, UserContainer, UserInfo } from './styles';
@@ -31,11 +32,17 @@ const Settings: React.FC = () => {
           )}
           <UserInfo>
             <Text>{user?.name}</Text>
-            <Text variant="extra-light">{user?.email}</Text>
+            <Text typography="extraLight">{user?.email}</Text>
           </UserInfo>
           <Icon name="logout" color="text" size={24} onPress={handleSignOut} />
         </UserContainer>
         <Divider />
+        <RowContent
+          leftIcon="bookmark"
+          text="Categorias"
+          rightIcon="chevron-right"
+          onPress={() => navigation.navigate('categories')}
+        />
       </ScreenContent>
     </ScreenContainer>
   );

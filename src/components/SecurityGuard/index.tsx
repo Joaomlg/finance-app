@@ -49,7 +49,7 @@ const SecurityGuard: React.FC<SecurityGuardProps> = ({ children }) => {
       <SpashImage source={require('../../assets/splash.png')} />
       <AuthButtonContainer>
         <AuthButton onPress={authenticationRoutine}>
-          <Text variant="title">Usar senha do telefone</Text>
+          <Text typography="title">Usar senha do telefone</Text>
         </AuthButton>
       </AuthButtonContainer>
     </Container>

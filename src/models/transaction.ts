@@ -1,14 +1,14 @@
-import Provider from './provider';
+export const TransactionTypeList = ['EXPENSE', 'INCOME'] as const;
 
-export type TransactionType = 'DEBIT' | 'CREDIT';
+export type TransactionType = typeof TransactionTypeList[number];
 
 export type Transaction = {
   id: string;
   type: TransactionType;
   description: string;
   amount: number;
-  category?: string;
   date: Date;
-  accountId: string;
-  provider: Provider;
+  walletId: string;
+  categoryId?: string;
+  ignore?: boolean;
 };

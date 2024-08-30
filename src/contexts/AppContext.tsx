@@ -123,7 +123,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const totalInvoice = useMemo(
     () =>
       accounts
-        .filter(({ type }) => type === 'CREDIT')
+        .filter(({ type }) => type === 'INCOME')
         .reduce((total, { balance }) => total + balance, 0),
     [accounts],
   );
@@ -134,7 +134,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const incomeTransactions = useMemo(
-    () => transactions.filter(({ type }) => type === 'CREDIT'),
+    () => transactions.filter(({ type }) => type === 'INCOME'),
     [transactions],
   );
 
@@ -145,7 +145,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 
   const expenseTransactions = useMemo(
-    () => transactions.filter(({ type }) => type === 'DEBIT'),
+    () => transactions.filter(({ type }) => type === 'EXPENSE'),
     [transactions],
   );
 
@@ -402,7 +402,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       const result = await Promise.all(
         accounts
-          .filter(({ type }) => type !== 'CREDIT')
+          .filter(({ type }) => type !== 'INCOME')
           .map((account) => {
             const providerService = getProviderService(account.provider);
             return providerService.fetchTransactions(account, {
@@ -455,11 +455,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
         const incomes = transactions
-          .filter((transaction) => transaction.type === 'CREDIT')
+          .filter((transaction) => transaction.type === 'INCOME')
           .reduce((total, transaction) => total + transaction.amount, 0);
 
         const expenses = transactions
-          .filter((transaction) => transaction.type === 'DEBIT')
+          .filter((transaction) => transaction.type === 'EXPENSE')
           .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
 
         return { date: dates[index], incomes, expenses };

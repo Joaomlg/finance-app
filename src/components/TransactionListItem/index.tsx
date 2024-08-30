@@ -1,30 +1,40 @@
-import React from 'react';
-import { ViewProps } from 'react-native';
+import React, { useContext } from 'react';
+import { TouchableOpacityProps } from 'react-native';
 import { Transaction } from '../../models';
 import Money from '../Money';
 import Text from '../Text';
 
-import Icon from '../Icon';
-import { ListItem, ListItemAmount, ListItemContent } from './styles';
+import { useNavigation } from '@react-navigation/native';
+import AppContext2 from '../../contexts/AppContext2';
+import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
+import { ListItem, ListItemAmount, ListItemContent, StyledCategoryIcon } from './styles';
 
-export interface TransactionListItemProps extends ViewProps {
+export interface TransactionListItemProps extends TouchableOpacityProps {
   item: Transaction;
 }
 
-const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...viewProps }) => {
-  const value = item.type === 'DEBIT' && item.amount > 0 ? -1 * item.amount : item.amount;
+const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...props }) => {
+  const value = item.type === 'EXPENSE' && item.amount > 0 ? -1 * item.amount : item.amount;
+
+  const { wallets } = useContext(AppContext2);
+  const navigation = useNavigation();
+
+  const wallet = wallets.find(({ id }) => id === item.walletId);
+  const category = getCategoryById(item.categoryId) || getDefaultCategoryByType(item.type);
+
+  const handleItemPressed = () => {
+    navigation.navigate('transaction', {
+      transactionId: item.id,
+    });
+  };
 
   return (
-    <ListItem {...viewProps}>
-      <Icon
-        name={item.type === 'DEBIT' ? 'shopping-cart' : 'attach-money'}
-        size={28}
-        color={item.type === 'DEBIT' ? 'expense' : 'income'}
-      />
+    <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
+      <StyledCategoryIcon category={category} ignored={item.ignore} />
       <ListItemContent>
-        {item.category && (
-          <Text variant="extra-light" color="textLight">
-            {item.category}
+        {category.name && (
+          <Text typography="extraLight" color="textLight">
+            {category.name}
           </Text>
         )}
         <Text numberOfLines={2} ellipsizeMode="tail">
@@ -32,7 +42,12 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...view
         </Text>
       </ListItemContent>
       <ListItemAmount>
-        <Money variant="default-bold" value={value} />
+        {wallet?.name && (
+          <Text typography="extraLight" color="textLight">
+            {wallet.name}
+          </Text>
+        )}
+        <Money typography="defaultBold" value={value} strike={item.ignore} />
       </ListItemAmount>
     </ListItem>
   );

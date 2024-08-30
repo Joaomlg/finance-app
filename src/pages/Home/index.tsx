@@ -1,26 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
-import {
-  Alert,
-  LayoutAnimation,
-  LayoutChangeEvent,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  UIManager,
-} from 'react-native';
+import { LayoutAnimation, LayoutChangeEvent, RefreshControl, ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import HorizontalBar from '../../components/HorizontalBar';
 import Icon from '../../components/Icon';
 import Money from '../../components/Money';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
-import { ScreenContent } from '../../components/ScreenContent';
+import ScreenContent from '../../components/ScreenContent';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
-import AppContext from '../../contexts/AppContext';
+import AppContext2 from '../../contexts/AppContext2';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
   BalanceContainer,
@@ -40,12 +32,7 @@ import {
 } from './styles';
 
 const TRANSACTION_LIST_MIN_CAPACITY = 3;
-
-if (Platform.OS === 'android') {
-  if (UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
-}
+const MINIMUM_DATE = moment(new Date(0));
 
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
@@ -59,17 +46,16 @@ const Home: React.FC = () => {
     hideValues,
     date,
     setDate,
-    minimumDateWithData,
-    lastUpdateDate,
-    updateConnections,
-    fetchConnections,
     transactions,
     totalBalance,
-    totalInvestment,
-    totalInvoice,
     totalIncomes,
     totalExpenses,
-  } = useContext(AppContext);
+    fetchWallets,
+    fetchTransactions,
+  } = useContext(AppContext2);
+
+  const totalInvestment = 0;
+  const totalInvoice = 0;
 
   const isCurrentMonth = checkCurrentMonth(date);
 
@@ -110,28 +96,8 @@ const Home: React.FC = () => {
     setMonthYearPickerOpened(false);
   };
 
-  const handleRefreshPage = () => {
-    Alert.alert(
-      'Deseja sincronizar as conexões?',
-      'Ao sincronizar as conexões, os dados mais recentes serão obtidos. Isso pode levar alguns minutos.\n\nAtualizar irá apenas obter o que já foi sincronizado previamente.',
-      [
-        {
-          text: 'Atualizar',
-          onPress: async () => {
-            await fetchConnections();
-          },
-        },
-        {
-          text: 'Sincronizar',
-          onPress: async () => {
-            await updateConnections();
-          },
-        },
-      ],
-      {
-        cancelable: true,
-      },
-    );
+  const handleRefreshPage = async () => {
+    await Promise.all([fetchWallets(), fetchTransactions()]);
   };
 
   return (
@@ -167,9 +133,6 @@ const Home: React.FC = () => {
           />
           {isCurrentMonth && (
             <BalanceContainer>
-              <Text variant="light" color="textWhite">
-                Atualizado em {lastUpdateDate}
-              </Text>
               <BalanceLine>
                 <Text color="textWhite">Saldo das contas</Text>
                 <BalanceFillLine />
@@ -186,21 +149,21 @@ const Home: React.FC = () => {
                 <Money value={totalInvestment} color="textWhite" />
               </BalanceLine>
               <BalanceLine>
-                <Text variant="title" color="textWhite">
+                <Text typography="title" color="textWhite">
                   Total
                 </Text>
                 <BalanceFillLine />
                 <Money
                   value={totalBalance + totalInvestment - totalInvoice}
-                  variant="title"
+                  typography="title"
                   color="textWhite"
                 />
               </BalanceLine>
               <ConnectionsButton
-                text="Ver minhas conexões"
+                text="Ver minhas carteiras"
                 color="secondary"
-                icon="account-balance"
-                onPress={() => navigation.navigate('connections')}
+                icon="account-balance-wallet"
+                onPress={() => navigation.navigate('wallets')}
               />
             </BalanceContainer>
           )}
@@ -208,12 +171,12 @@ const Home: React.FC = () => {
         <ScreenContent>
           <SummaryContainer>
             <SectionHeader>
-              <Text variant="title">Resumo do mês</Text>
+              <Text typography="title">Resumo do mês</Text>
               <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
             </SectionHeader>
             <BalanceWithTrending>
               <Text>
-                Saldo: <Money value={balance} variant="default-bold" />
+                Saldo: <Money value={balance} typography="defaultBold" />
               </Text>
               {showTrendingIcon &&
                 (balance > 0 ? (
@@ -223,14 +186,16 @@ const Home: React.FC = () => {
                 ))}
             </BalanceWithTrending>
             <SubSectionContainer>
-              <Text variant="default-bold">Entradas</Text>
+              <Text typography="defaultBold" transform="capitalize">
+                Entradas
+              </Text>
               <HorizontalBarContainer>
                 <HorizontalBar color="income" grow={incomesBarGrow} />
                 <Money value={totalIncomes} />
               </HorizontalBarContainer>
             </SubSectionContainer>
             <SubSectionContainer>
-              <Text variant="default-bold">Saídas</Text>
+              <Text typography="defaultBold">Saídas</Text>
               <HorizontalBarContainer>
                 <HorizontalBar
                   color="expense"
@@ -243,7 +208,7 @@ const Home: React.FC = () => {
           </SummaryContainer>
           <Divider />
           <SectionHeader>
-            <Text variant="title">Últimas transações</Text>
+            <Text typography="title">Últimas transações</Text>
             <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
           </SectionHeader>
           <TransactionListContainer onLayout={onTransactionListLayout}>
@@ -256,7 +221,7 @@ const Home: React.FC = () => {
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
         selectedDate={date}
-        minimumDate={minimumDateWithData}
+        minimumDate={MINIMUM_DATE}
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />

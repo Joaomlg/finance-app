@@ -1,8 +1,14 @@
 import styled from 'styled-components/native';
+import CategoryIcon from '../CategoryIcon';
 
-export const ListItem = styled.View`
+export const ListItem = styled.TouchableOpacity<{ ignored?: boolean }>`
   flex-direction: row;
   align-items: center;
+  opacity: ${(props) => (props.ignored ? 0.6 : 1)};
+`;
+
+export const StyledCategoryIcon = styled(CategoryIcon)<{ ignored?: boolean }>`
+  opacity: ${(props) => (props.ignored ? 0.6 : 1)};
 `;
 
 export const ListItemContent = styled.View`

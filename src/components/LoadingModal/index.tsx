@@ -37,7 +37,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ text }) => {
           />
         </Animated.View>
         {text && (
-          <StatusText variant="title" color="textWhite">
+          <StatusText typography="title" color="textWhite">
             {text}
           </StatusText>
         )}

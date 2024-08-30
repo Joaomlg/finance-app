@@ -4,19 +4,20 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import 'moment/locale/pt';
 import React, { useEffect } from 'react';
-import { SafeAreaView, useColorScheme } from 'react-native';
+import { Platform, SafeAreaView, UIManager, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import SecurityGuard from './src/components/SecurityGuard';
 import { AppContextProvider } from './src/contexts/AppContext';
+import { AppContextProvider2 } from './src/contexts/AppContext2';
 import { AuthContextProvider } from './src/contexts/AuthContext';
+import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
 import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
@@ -47,22 +48,30 @@ export default function App() {
     return null;
   }
 
+  if (Platform.OS === 'android') {
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <SecurityGuard>
           <AppContextProvider>
-            <HooksProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <BottomSheetModalProvider>
-                  <SafeAreaView style={{ flex: 1 }}>
-                    <StatusBar style="light" backgroundColor={theme.colors.primary} />
-                    <Routes />
-                    <Toast />
-                  </SafeAreaView>
-                </BottomSheetModalProvider>
-              </GestureHandlerRootView>
-            </HooksProvider>
+            <AppContextProvider2>
+              <HooksProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <BottomSheetContextProvider>
+                    <SafeAreaView style={{ flex: 1 }}>
+                      <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                      <Routes />
+                      <Toast />
+                    </SafeAreaView>
+                  </BottomSheetContextProvider>
+                </GestureHandlerRootView>
+              </HooksProvider>
+            </AppContextProvider2>
           </AppContextProvider>
         </SecurityGuard>
       </AuthContextProvider>

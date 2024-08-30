@@ -35,10 +35,10 @@ const TransactionList: React.FC<TransactionListProps> = ({
   const renderHeaderComponent = useCallback(() => {
     return (
       <ListHeaderContainer>
-        <Text variant="light" color="textLight">
+        <Text typography="light" color="textLight">
           {transactions.length} transações
         </Text>
-        <Money variant="heading" value={reducedValue} />
+        <Money typography="heading" value={reducedValue} />
       </ListHeaderContainer>
     );
   }, [transactions, reducedValue]);
@@ -50,10 +50,10 @@ const TransactionList: React.FC<TransactionListProps> = ({
       index === 0 || date.isBefore(ItemDividerPreviousDateRef.current, 'day') ? (
         <ListSeparatorContainer>
           <ListSeparatorDate>
-            <Text variant="title" color="textLight">
+            <Text typography="title" color="textLight">
               {date.format('DD')}
             </Text>
-            <Text variant="light" color="textLight">
+            <Text typography="light" color="textLight">
               {date.format('MMM')}
             </Text>
           </ListSeparatorDate>
