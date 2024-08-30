@@ -34,7 +34,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   route,
   navigation,
 }) => {
-  const [transactionValues, setTransactionValues] = useState({} as Transaction);
+  const [transactionValues, setTransactionValues] = useState({} as Partial<Transaction>);
 
   const transactionId = route.params.transactionId;
   const transactionType = route.params.transactionType as TransactionType;
@@ -52,7 +52,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
   const handleTransactionBalanceChange = (value: string) => {
-    const amount = parseFloat(value.replace(',', '.'));
+    const amount = value === '' ? undefined : parseFloat(value.replace(',', '.'));
     setTransactionValues((value) => ({ ...value, amount }));
   };
 
@@ -136,7 +136,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       await updateTransaction(transactionId, transactionValues);
     } else {
       createTransaction({
-        ...transactionValues,
+        ...(transactionValues as Transaction),
         id: uuid.v4().toString(),
         type: transactionType,
       });
@@ -168,7 +168,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
               color="textWhite"
               keyboardType="decimal-pad"
               iconRight={!isEditingAutomaticTransaction ? 'edit' : undefined}
-              defaultValue={transactionValues.amount?.toString()}
+              value={transactionValues.amount?.toString()}
               onChangeText={handleTransactionBalanceChange}
               readOnly={isEditingAutomaticTransaction}
             />
