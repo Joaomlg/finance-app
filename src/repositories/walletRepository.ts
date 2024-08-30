@@ -2,7 +2,9 @@ import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firest
 import { Wallet } from '../models';
 import { RecursivePartial } from '../utils/type';
 
-const walletsCollection = firestore().collection('wallets');
+const WALLETS_FIREBASE_COLLECTION = 'wallets';
+
+export const walletsCollection = firestore().collection(WALLETS_FIREBASE_COLLECTION);
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
   const { createdAt, ...values } = data;

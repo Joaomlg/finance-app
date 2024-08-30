@@ -1,6 +1,8 @@
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Transaction } from '../models';
+import { getTransactionSignedAmount } from '../utils/money';
 import { RecursivePartial } from '../utils/type';
+import { walletsCollection } from './walletRepository';
 
 type DateInterval = {
   startDate: Date;
@@ -17,7 +19,9 @@ export type TransactionQueryOptions = {
   order?: Order;
 };
 
-const transactionsCollection = firestore().collection('transactions');
+const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
+
+export const transactionsCollection = firestore().collection(TRANSACTIONS_FIREBASE_COLLECTION);
 
 const buildColletionQuery = (options?: TransactionQueryOptions) => {
   let query: FirebaseFirestoreTypes.Query = transactionsCollection;
@@ -61,13 +65,79 @@ export const onTransactionsChange = (
 };
 
 export const setTransaction = async (transaction: Transaction) => {
-  await transactionsCollection.doc(transaction.id).set(transaction);
+  const walletReference = walletsCollection.doc(transaction.walletId);
+  const transactionReference = transactionsCollection.doc(transaction.id);
+
+  await firestore().runTransaction(async (t) => {
+    const walletSnapshot = await t.get(walletReference);
+
+    if (!walletSnapshot.exists) {
+      throw 'Wallet does not exist!';
+    }
+
+    const transactionSnapshot = await t.get(transactionReference);
+
+    if (transactionSnapshot.exists) {
+      throw 'Transaction already exist!';
+    }
+
+    t.set(transactionReference, transaction).update(walletReference, {
+      balance: walletSnapshot.data()?.balance + getTransactionSignedAmount(transaction),
+    });
+  });
 };
 
 export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
-  await transactionsCollection.doc(id).update(values);
+  if (values.amount === undefined) {
+    return await transactionsCollection.doc(id).update(values);
+  }
+
+  const transactionReference = transactionsCollection.doc(id);
+
+  await firestore().runTransaction(async (t) => {
+    const transactionSnapshot = await t.get(transactionReference);
+
+    if (!transactionSnapshot.exists) {
+      throw 'Transaction does not exist!';
+    }
+
+    const walletReference = walletsCollection.doc(transactionSnapshot.data()?.walletId);
+    const walletSnapshot = await t.get(walletReference);
+
+    if (!walletSnapshot.exists) {
+      throw 'Wallet does not exist!';
+    }
+
+    t.update(transactionReference, values).update(walletReference, {
+      balance:
+        walletSnapshot.data()?.balance -
+        // @ts-expect-error transaction snapshot exists
+        getTransactionSignedAmount(transactionSnapshot.data()) +
+        // @ts-expect-error transaction has amount
+        getTransactionSignedAmount(values),
+    });
+  });
 };
 
 export const deleteTransaction = async (transaction: Transaction) => {
-  await transactionsCollection.doc(transaction.id).delete();
+  const walletReference = walletsCollection.doc(transaction.walletId);
+  const transactionReference = transactionsCollection.doc(transaction.id);
+
+  await firestore().runTransaction(async (t) => {
+    const walletSnapshot = await t.get(walletReference);
+
+    const transactionSnapshot = await t.get(transactionReference);
+
+    if (!transactionSnapshot.exists) {
+      throw 'Transaction does not exist!';
+    }
+
+    t.delete(transactionReference);
+
+    if (walletSnapshot.exists) {
+      t.update(walletReference, {
+        balance: walletSnapshot.data()?.balance - getTransactionSignedAmount(transaction),
+      });
+    }
+  });
 };
