@@ -1,14 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { PluggyConnect as PluggyConnectWidget } from 'react-native-pluggy-connect';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import usePluggyService from '../../../hooks/usePluggyService';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 import { Item } from '../../../services/pluggy';
 
 import AppContext2 from '../../../contexts/AppContext2';
+import { buildPluggyProviderService } from '../../../services/providerServiceFactory';
 import { Container } from './styles';
 
 const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/pluggy'>> = ({
@@ -22,15 +22,16 @@ const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'conne
 
   const { setupConnection } = useContext(AppContext2);
 
-  const pluggyService = usePluggyService();
   const theme = useTheme();
+
+  const pluggyService = useMemo(buildPluggyProviderService, []);
 
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
 
     // const forceUpdate = updateConnectionId !== undefined;
 
-    await setupConnection(item.id, pluggyService);
+    await setupConnection(item.id, 'PLUGGY');
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
 

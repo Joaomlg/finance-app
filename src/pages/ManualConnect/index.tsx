@@ -9,9 +9,7 @@ import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import TextInput from '../../components/TextInput';
 import AppContext2 from '../../contexts/AppContext2';
-import useBelvoService from '../../hooks/useBelvoService';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import usePluggyService from '../../hooks/usePluggyService';
 import Provider from '../../models/provider';
 
 const ManualConnect: React.FC = () => {
@@ -22,8 +20,6 @@ const ManualConnect: React.FC = () => {
 
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
   const navigation = useNavigation();
-  const pluggyService = usePluggyService();
-  const belvoService = useBelvoService();
 
   const renderWalletTypeSelector = () => {
     const handleItemPressed = (provider: Provider) => {
@@ -49,8 +45,12 @@ const ManualConnect: React.FC = () => {
   };
 
   const saveConnection = async () => {
+    if (!provider) {
+      return;
+    }
+
     try {
-      await setupConnection(id, provider === 'PLUGGY' ? pluggyService : belvoService);
+      await setupConnection(id, provider);
       Toast.show({ type: 'success', text1: 'Conexão adicionada com sucesso!' });
       navigation.navigate('wallets');
     } catch (err) {

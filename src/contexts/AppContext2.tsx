@@ -2,9 +2,10 @@ import moment, { Moment } from 'moment';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import { Transaction, Wallet } from '../models';
+import Provider from '../models/provider';
 import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
-import { IProviderService } from '../services/providerService.interface';
+import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
 import { RecursivePartial } from '../utils/type';
 
@@ -21,7 +22,7 @@ export type AppContextValue2 = {
   hideValues: boolean;
   setHideValues: (value: boolean) => void;
 
-  setupConnection: (connectionId: string, provider: IProviderService) => Promise<void>;
+  setupConnection: (connectionId: string, provider: Provider) => Promise<void>;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
@@ -119,8 +120,9 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     [expenseTransactions],
   );
 
-  const setupConnection = async (connectionId: string, provider: IProviderService) => {
-    await provider.fetchConnection(
+  const setupConnection = async (connectionId: string, provider: Provider) => {
+    const providerService = getProviderService(provider);
+    await providerService.fetchConnection(
       connectionId,
       walletRepository.setWalletsBatch,
       transactionRepository.setTransactionsBatch,

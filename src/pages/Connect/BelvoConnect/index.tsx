@@ -1,11 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
 import AppContext2 from '../../../contexts/AppContext2';
-import useBelvoService from '../../../hooks/useBelvoService';
 import { StackRouteParamList } from '../../../routes/stack.routes';
+import { buildBelvoProviderService } from '../../../services/providerServiceFactory';
 import BelvoWidget, { BelvoWidgetSuccess } from './BelvoWidget';
 import { Container } from './styles';
 
@@ -20,13 +20,14 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
 
   const { setupConnection } = useContext(AppContext2);
 
-  const belvoService = useBelvoService();
   const theme = useTheme();
+
+  const belvoService = useMemo(buildBelvoProviderService, []);
 
   const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
     // const forceUpdate = updateConnectionId !== undefined;
 
-    await setupConnection(link, belvoService);
+    await setupConnection(link, 'BELVO');
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
 
