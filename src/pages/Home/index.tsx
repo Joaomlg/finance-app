@@ -42,7 +42,8 @@ const Home: React.FC = () => {
   const navigation = useNavigation();
 
   const {
-    isLoading,
+    fetchingWallets,
+    fetchingTransactions,
     hideValues,
     date,
     setDate,
@@ -105,7 +106,7 @@ const Home: React.FC = () => {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={fetchingWallets || fetchingTransactions}
             onRefresh={handleRefreshPage}
             colors={[theme.colors.primary]}
           />

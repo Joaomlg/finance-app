@@ -28,10 +28,10 @@ const History: React.FC = () => {
   const [isLoadingMore, setLoadingMore] = useState(false);
 
   const {
-    isLoading,
     hideValues,
     monthlyBalances,
     fetchMonthlyBalancesPage,
+    fetchingMonthlyBalances,
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
     setDate,
@@ -142,13 +142,13 @@ const History: React.FC = () => {
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 ? (
-        <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
+        <StyledButton onPress={handleLoadMore} isLoading={fetchingMonthlyBalances}>
           <Text typography="title" color="textWhite">
             Ver mais
           </Text>
         </StyledButton>
       ) : null,
-    [handleLoadMore, isLoading, monthlyBalances],
+    [handleLoadMore, fetchingMonthlyBalances, monthlyBalances],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -161,7 +161,7 @@ const History: React.FC = () => {
       <StyledFlatList
         refreshControl={
           <RefreshControl
-            refreshing={isLoading && !isLoadingMore}
+            refreshing={fetchingMonthlyBalances && !isLoadingMore}
             onRefresh={handleRefresh}
             colors={[theme.colors.primary]}
           />

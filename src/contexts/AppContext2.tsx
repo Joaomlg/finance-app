@@ -1,6 +1,7 @@
 import moment, { Moment } from 'moment';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
+import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
 import * as transactionRepository from '../repositories/transactionRepository';
@@ -16,7 +17,6 @@ export type MonthlyBalance = {
 };
 
 export type AppContextValue2 = {
-  isLoading: boolean;
   date: Moment;
   setDate: (value: Moment) => void;
   hideValues: boolean;
@@ -59,6 +59,9 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   const [date, setDate] = useState(now);
   const [hideValues, setHideValues] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>();
+
   const [wallets, setWallets] = useState([] as Wallet[]);
   const [fetchingWallets, setFetchingWallets] = useState(false);
 
@@ -68,8 +71,6 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   const [monthlyBalances, setMonthlyBalances] = useState([] as MonthlyBalance[]);
   const [fetchingMonthlyBalances, setFetchingMonthlyBalances] = useState(false);
   const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
-
-  const isLoading = fetchingWallets || fetchingTransactions || fetchingMonthlyBalances;
 
   const transactionQueryOptions = useMemo(
     () =>
@@ -120,13 +121,23 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     [expenseTransactions],
   );
 
+  const setLoading = (status: boolean, message?: string) => {
+    setIsLoading(status);
+    setLoadingMessage(message);
+  };
+
   const setupConnection = async (connectionId: string, provider: Provider) => {
     const providerService = getProviderService(provider);
+
+    setLoading(true, 'Configurando nova conexão');
+
     await providerService.fetchConnection(
       connectionId,
       walletRepository.setWalletsBatch,
       transactionRepository.setTransactionsBatch,
     );
+
+    setLoading(false);
   };
 
   const fetchWallets = async () => {
@@ -336,7 +347,6 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   return (
     <AppContext2.Provider
       value={{
-        isLoading,
         date,
         setDate,
         hideValues,
@@ -367,6 +377,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
       }}
     >
       {children}
+      {isLoading && <LoadingModal text={loadingMessage} />}
     </AppContext2.Provider>
   );
 };
