@@ -17,10 +17,11 @@ const RowContent: React.FC<RowContentProps> = ({
   renderLeftIcon,
   rightIcon,
   children,
+  disabled,
   ...props
 }) => {
   return (
-    <Container {...props}>
+    <Container {...props} disabled={disabled || (!props.onPress && !props.onLongPress)}>
       {renderLeftIcon ? renderLeftIcon() : leftIcon && <Icon name={leftIcon} size={24} />}
       <Content>
         {text && <Text>{text}</Text>}
