@@ -149,7 +149,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
             text: 'Atualizar',
             icon: 'sync',
             onPress: handleUpdateConnection,
-            disabled: wallet.connection === undefined,
+            disabled: true,
           },
           { text: 'Editar', icon: 'edit', onPress: handleEditWallet },
           { text: 'Remover', icon: 'delete', onPress: handleDeleteWallet },

@@ -1,4 +1,4 @@
-import APISession from '../http';
+import APISession from '../client/http';
 
 /** Represents a Belvo API resource */
 abstract class Resource<T> {

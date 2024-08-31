@@ -1,9 +1,9 @@
 import APISession from './http';
-import AccountResource from './resources/accounts';
-import InstitutionResource from './resources/institutions';
-import LinkResource from './resources/links';
-import TransactionResource from './resources/transactions';
-import WidgetTokenResource from './resources/widgetToken';
+import AccountResource from '../resources/accounts';
+import InstitutionResource from '../resources/institutions';
+import LinkResource from '../resources/links';
+import TransactionResource from '../resources/transactions';
+import WidgetTokenResource from '../resources/widgetToken';
 import { Environment, urlResolver } from './utils';
 
 export class BelvoClient {

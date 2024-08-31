@@ -22,7 +22,6 @@ export type AppContextValue2 = {
   setHideValues: (value: boolean) => void;
 
   setupConnection: (connectionId: string, provider: IProviderService) => Promise<void>;
-  deleteConnection: (connectionId: string, provider: IProviderService) => Promise<void>;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
@@ -126,14 +125,6 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
       walletRepository.setWalletsBatch,
       transactionRepository.setTransactionsBatch,
     );
-  };
-
-  const deleteConnection = async (connectionId: string, provider: IProviderService) => {
-    await provider.deleteConnection(connectionId);
-
-    const walletsByConnection = wallets.filter((wallet) => wallet.connection?.id === connectionId);
-
-    await Promise.all(walletsByConnection.map((wallet) => deleteWallet(wallet)));
   };
 
   const fetchWallets = async () => {
@@ -322,7 +313,6 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         hideValues,
         setHideValues,
         setupConnection,
-        deleteConnection,
         wallets,
         fetchWallets,
         fetchingWallets,

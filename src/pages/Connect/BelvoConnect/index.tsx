@@ -3,12 +3,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import BelvoWidget, { BelvoWidgetSuccess } from '../../../components/BelvoWidget';
+import AppContext2 from '../../../contexts/AppContext2';
 import useBelvoService from '../../../hooks/useBelvoService';
 import { StackRouteParamList } from '../../../routes/stack.routes';
-
+import BelvoWidget, { BelvoWidgetSuccess } from './BelvoWidget';
 import { Container } from './styles';
-import AppContext from '../../../contexts/AppContext';
 
 const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/belvo'>> = ({
   route,
@@ -19,19 +18,19 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
   const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { storeConnection } = useContext(AppContext);
+  const { setupConnection } = useContext(AppContext2);
 
   const belvoService = useBelvoService();
   const theme = useTheme();
 
   const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
-    const forceUpdate = updateConnectionId !== undefined;
+    // const forceUpdate = updateConnectionId !== undefined;
 
-    await storeConnection(link, 'BELVO', forceUpdate);
+    await setupConnection(link, belvoService);
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
 
-    navigation.pop(2);
+    navigation.pop(1);
   };
 
   const handleOnError = async () => {

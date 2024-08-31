@@ -13,7 +13,7 @@ export type TransactionListProps = {
   limit?: number;
   filters: {
     link: string;
-    [key: string]: string | number;
+    [key: string]: number | number[] | string | string[] | boolean | undefined;
   };
 };
 
