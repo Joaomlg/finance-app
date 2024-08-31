@@ -70,7 +70,7 @@ export const onTransactionsChange = (
 
 export const setTransaction = async (transaction: Transaction) => {
   const walletReference = getWalletReference(transaction.walletId);
-  const transactionReference = transactionsCollection.doc(transaction.id);
+  const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
     const walletSnapshot = await t.get(walletReference);
@@ -89,6 +89,17 @@ export const setTransaction = async (transaction: Transaction) => {
       balance: walletSnapshot.data()?.balance + getTransactionSignedAmount(transaction),
     });
   });
+};
+
+export const setTransactionsBatch = async (transactions: Transaction[]) => {
+  const batch = firestore().batch();
+
+  transactions.forEach((transaction) => {
+    const transactionReference = getTransactionReference(transaction.id);
+    batch.set(transactionReference, transaction);
+  });
+
+  return batch.commit();
 };
 
 export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
@@ -125,7 +136,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
 
 export const deleteTransaction = async (transaction: Transaction) => {
   const walletReference = getWalletReference(transaction.walletId);
-  const transactionReference = transactionsCollection.doc(transaction.id);
+  const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
     const walletSnapshot = await t.get(walletReference);

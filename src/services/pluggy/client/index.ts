@@ -11,7 +11,7 @@ import {
   PageResponse,
   Transaction,
   TransactionFilters,
-} from './types';
+} from '../types';
 
 export class PluggyClient extends BaseApi {
   async createConnectToken(itemId?: string) {

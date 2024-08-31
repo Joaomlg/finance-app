@@ -41,6 +41,17 @@ export const setWallet = async (wallet: Wallet) => {
   await walletsCollection.doc(wallet.id).set(wallet);
 };
 
+export const setWalletsBatch = async (wallets: Wallet[]) => {
+  const batch = firestore().batch();
+
+  wallets.forEach((wallet) => {
+    const walletReference = getWalletReference(wallet.id);
+    batch.set(walletReference, wallet);
+  });
+
+  return batch.commit();
+};
+
 export const updateWallet = async (id: string, values: RecursivePartial<Wallet>) => {
   await walletsCollection.doc(id).update(values);
 };

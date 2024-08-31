@@ -1,18 +1,24 @@
-import { Account, Connection, Investment, Transaction } from '../models';
+import { Transaction, Wallet } from '../models';
 
 export interface IProviderService {
+  /** Create an access token to provider */
   createAccessToken: (connectionId?: string) => Promise<string>;
 
-  fetchConnectionById: (connectionId: string) => Promise<Connection>;
-  deleteConnectionById: (connectionId: string) => Promise<void>;
-  updateConnectionById: (connectionId: string, lastUpdateDate: string) => Promise<Connection>;
+  /** Fetch new connection wallets and transactions */
+  fetchConnection: (
+    connectionId: string,
+    createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => Promise<void>;
 
-  fetchAccounts: (connection: Connection) => Promise<Account[]>;
+  /** Fetch connection and new transactions in order to update wallet and create transactions */
+  updateConnection: (
+    connectionId: string,
+    lastUpdateDate: Date,
+    updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => Promise<void>;
 
-  fetchInvestments: (connection: Connection) => Promise<Investment[]>;
-
-  fetchTransactions: (
-    account: Account,
-    filters: { from: string; to: string },
-  ) => Promise<Transaction[]>;
+  /** Delete connection from provider */
+  deleteConnection: (connectionId: string) => Promise<void>;
 }

@@ -50,7 +50,6 @@ const Wallets: React.FC = () => {
             text: 'Conexão automática',
             onPress: () => navigation.navigate('connect'),
             onLongPress: () => navigation.navigate('manualConnect'),
-            disabled: true,
           },
           {
             icon: 'link-off',

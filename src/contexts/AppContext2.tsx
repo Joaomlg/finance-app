@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import { Transaction, Wallet } from '../models';
 import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
+import { IProviderService } from '../services/providerService.interface';
 import { range } from '../utils/array';
 import { RecursivePartial } from '../utils/type';
 
@@ -19,6 +20,9 @@ export type AppContextValue2 = {
   setDate: (value: Moment) => void;
   hideValues: boolean;
   setHideValues: (value: boolean) => void;
+
+  setupConnection: (connectionId: string, provider: IProviderService) => Promise<void>;
+  deleteConnection: (connectionId: string, provider: IProviderService) => Promise<void>;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
@@ -115,6 +119,22 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         .reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
     [expenseTransactions],
   );
+
+  const setupConnection = async (connectionId: string, provider: IProviderService) => {
+    await provider.fetchConnection(
+      connectionId,
+      walletRepository.setWalletsBatch,
+      transactionRepository.setTransactionsBatch,
+    );
+  };
+
+  const deleteConnection = async (connectionId: string, provider: IProviderService) => {
+    await provider.deleteConnection(connectionId);
+
+    const walletsByConnection = wallets.filter((wallet) => wallet.connection?.id === connectionId);
+
+    await Promise.all(walletsByConnection.map((wallet) => deleteWallet(wallet)));
+  };
 
   const fetchWallets = async () => {
     setFetchingWallets(true);
@@ -301,6 +321,8 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         setDate,
         hideValues,
         setHideValues,
+        setupConnection,
+        deleteConnection,
         wallets,
         fetchWallets,
         fetchingWallets,
