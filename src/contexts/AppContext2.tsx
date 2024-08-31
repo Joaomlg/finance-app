@@ -173,24 +173,51 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingWallets(true);
 
     try {
-      walletRepository.deleteWallet(wallet);
+      await walletRepository.deleteWallet(wallet);
     } catch (error) {
       Toast.show({
-        type: 'info',
+        type: 'error',
         text1: 'Não foi possível apagar a carteira!',
       });
     }
 
     try {
-      transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
+      await transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
     } catch (error) {
       Toast.show({
-        type: 'info',
+        type: 'error',
         text1: 'Não foi possível apagar as transações da carteira!',
       });
     }
 
+    try {
+      await deleteWalletConnectionIfNecessary(wallet);
+    } catch (error) {
+      Toast.show({
+        type: 'warn',
+        text1: 'Não foi possível apagar a conexão com o provedor!',
+      });
+    }
+
     setFetchingWallets(false);
+  };
+
+  const deleteWalletConnectionIfNecessary = async (wallet: Wallet) => {
+    if (!wallet.connection) {
+      return;
+    }
+
+    const hasOtherWalletWithSameConnection = wallets.find(
+      (item) => item.connection?.id === wallet.connection?.id && item.id !== wallet.id,
+    );
+
+    if (hasOtherWalletWithSameConnection) {
+      return;
+    }
+
+    const providerService = getProviderService(wallet.connection.provider);
+
+    await providerService.deleteConnection(wallet.connection.id);
   };
 
   const fetchTransactions = async () => {
@@ -237,10 +264,10 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     setFetchingTransactions(true);
 
     try {
-      transactionRepository.deleteTransaction(transaction);
+      await transactionRepository.deleteTransaction(transaction);
     } catch (error) {
       Toast.show({
-        type: 'info',
+        type: 'error',
         text1: 'Não foi possível apagar a transação.',
       });
     }
