@@ -8,6 +8,12 @@ const walletsCollection = firestore().collection(WALLETS_FIREBASE_COLLECTION);
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
   const { createdAt, ...values } = data;
+
+  const connection = values.connection;
+  if (connection) {
+    connection.lastUpdatedAt = connection.lastUpdatedAt.toDate();
+  }
+
   return {
     ...values,
     createdAt: createdAt.toDate(),
