@@ -14,7 +14,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import SecurityGuard from './src/components/SecurityGuard';
-import { AppContextProvider } from './src/contexts/AppContext';
 import { AppContextProvider2 } from './src/contexts/AppContext2';
 import { AuthContextProvider } from './src/contexts/AuthContext';
 import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
@@ -58,21 +57,19 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <SecurityGuard>
-          <AppContextProvider>
-            <AppContextProvider2>
-              <HooksProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <BottomSheetContextProvider>
-                    <SafeAreaView style={{ flex: 1 }}>
-                      <StatusBar style="light" backgroundColor={theme.colors.primary} />
-                      <Routes />
-                      <Toast />
-                    </SafeAreaView>
-                  </BottomSheetContextProvider>
-                </GestureHandlerRootView>
-              </HooksProvider>
-            </AppContextProvider2>
-          </AppContextProvider>
+          <AppContextProvider2>
+            <HooksProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <BottomSheetContextProvider>
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                    <Routes />
+                    <Toast />
+                  </SafeAreaView>
+                </BottomSheetContextProvider>
+              </GestureHandlerRootView>
+            </HooksProvider>
+          </AppContextProvider2>
         </SecurityGuard>
       </AuthContextProvider>
     </ThemeProvider>
