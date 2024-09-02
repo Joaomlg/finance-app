@@ -51,12 +51,12 @@ const Home: React.FC = () => {
     totalBalance,
     totalIncomes,
     totalExpenses,
+    totalInvoice,
     fetchWallets,
     fetchTransactions,
   } = useContext(AppContext);
 
   const totalInvestment = 0;
-  const totalInvoice = 0;
 
   const isCurrentMonth = checkCurrentMonth(date);
 

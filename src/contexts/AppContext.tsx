@@ -45,6 +45,8 @@ export type AppContextValue = {
   expenseTransactions: Transaction[];
   totalExpenses: number;
 
+  totalInvoice: number;
+
   monthlyBalances: MonthlyBalance[];
   fetchMonthlyBalancesPage: (itemsPerPage: number, currentPage: number) => Promise<void>;
   fetchingMonthlyBalances: boolean;
@@ -121,6 +123,14 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         .filter(({ ignore }) => !ignore)
         .reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
     [expenseTransactions],
+  );
+
+  const totalInvoice = useMemo(
+    () =>
+      wallets
+        .filter(({ type }) => type === 'CREDIT_CARD')
+        .reduce((total, { balance }) => total + balance, 0),
+    [wallets],
   );
 
   const setLoading = (status: boolean, message?: string) => {
@@ -426,6 +436,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         expenseTransactions,
         totalIncomes,
         totalExpenses,
+        totalInvoice,
         monthlyBalances,
         fetchMonthlyBalancesPage,
         fetchingMonthlyBalances,
