@@ -17,7 +17,7 @@ export type MonthlyBalance = {
   expenses: number;
 };
 
-export type AppContextValue2 = {
+export type AppContextValue = {
   date: Moment;
   setDate: (value: Moment) => void;
   hideValues: boolean;
@@ -52,12 +52,12 @@ export type AppContextValue2 = {
   setCurrentMonthlyBalancesPage: (value: number) => void;
 };
 
-const AppContext2 = createContext({} as AppContextValue2);
+const AppContext = createContext({} as AppContextValue);
 
 const now = moment();
 const currentMonth = moment(now).startOf('month');
 
-export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [date, setDate] = useState(now);
   const [hideValues, setHideValues] = useState(false);
 
@@ -401,7 +401,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   return (
-    <AppContext2.Provider
+    <AppContext.Provider
       value={{
         date,
         setDate,
@@ -435,8 +435,8 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
     >
       {children}
       {isLoading && <LoadingModal text={loadingMessage} />}
-    </AppContext2.Provider>
+    </AppContext.Provider>
   );
 };
 
-export default AppContext2;
+export default AppContext;

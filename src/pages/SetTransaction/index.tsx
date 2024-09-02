@@ -17,7 +17,7 @@ import Svg from '../../components/Svg';
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -43,7 +43,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const screenTitle = (isEditing ? 'Editar ' : 'Nova ') + transactionTypeText[transactionType];
 
-  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext2);
+  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const selectedWallet = wallets.find(({ id }) => id === transactionValues.walletId);

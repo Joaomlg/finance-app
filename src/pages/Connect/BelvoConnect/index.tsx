@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import AppContext2 from '../../../contexts/AppContext2';
+import AppContext from '../../../contexts/AppContext';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 import { buildBelvoProviderService } from '../../../services/providerServiceFactory';
 import BelvoWidget, { BelvoWidgetSuccess } from './BelvoWidget';
@@ -18,7 +18,7 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
   const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { setupConnection } = useContext(AppContext2);
+  const { setupConnection } = useContext(AppContext);
 
   const theme = useTheme();
 

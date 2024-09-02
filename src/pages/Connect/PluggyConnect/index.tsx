@@ -7,7 +7,7 @@ import { useTheme } from 'styled-components/native';
 import { StackRouteParamList } from '../../../routes/stack.routes';
 import { Item } from '../../../services/pluggy';
 
-import AppContext2 from '../../../contexts/AppContext2';
+import AppContext from '../../../contexts/AppContext';
 import { buildPluggyProviderService } from '../../../services/providerServiceFactory';
 import { Container } from './styles';
 
@@ -20,7 +20,7 @@ const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'conne
   const [connectToken, setConnectToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { setupConnection } = useContext(AppContext2);
+  const { setupConnection } = useContext(AppContext);
 
   const theme = useTheme();
 

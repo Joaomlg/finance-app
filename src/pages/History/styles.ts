@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
 import HorizontalBar from '../../components/HorizontalBar';
-import { MonthlyBalance } from '../../contexts/AppContext2';
+import { MonthlyBalance } from '../../contexts/AppContext';
 
 export const StyledFlatList = styled(
   FlatList as new (props: FlatListProps<MonthlyBalance>) => FlatList<MonthlyBalance>,

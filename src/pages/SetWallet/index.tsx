@@ -13,7 +13,7 @@ import ScreenHeader from '../../components/ScreenHeader';
 import Svg from '../../components/Svg';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Wallet, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -36,7 +36,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
     ({ id }) => id === walletValues.institutionId,
   );
 
-  const { wallets, createWallet, updateWallet } = useContext(AppContext2);
+  const { wallets, createWallet, updateWallet } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const handleWalletBalanceChange = (value: string) => {

@@ -8,7 +8,7 @@ import ScreenContent from '../../components/ScreenContent';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import TextInput from '../../components/TextInput';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import Provider from '../../models/provider';
 
@@ -16,7 +16,7 @@ const ManualConnect: React.FC = () => {
   const [id, setId] = useState('');
   const [provider, setProvider] = useState<Provider | undefined>();
 
-  const { setupConnection } = useContext(AppContext2);
+  const { setupConnection } = useContext(AppContext);
 
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
   const navigation = useNavigation();

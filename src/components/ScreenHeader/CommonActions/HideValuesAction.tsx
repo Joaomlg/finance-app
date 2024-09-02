@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { Action } from '..';
-import AppContext2 from '../../../contexts/AppContext2';
+import AppContext from '../../../contexts/AppContext';
 
 const HideValuesAction: () => Action = () => {
-  const { hideValues, setHideValues } = useContext(AppContext2);
+  const { hideValues, setHideValues } = useContext(AppContext);
 
   return {
     icon: hideValues ? 'visibility-off' : 'visibility',

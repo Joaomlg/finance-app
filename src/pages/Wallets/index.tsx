@@ -8,11 +8,11 @@ import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import WalletCard from './WalletCard';
 
 const Wallets: React.FC = () => {
-  const { wallets, fetchWallets, fetchingWallets } = useContext(AppContext2);
+  const { wallets, fetchWallets, fetchingWallets } = useContext(AppContext);
 
   const theme = useTheme();
   const navigation = useNavigation();

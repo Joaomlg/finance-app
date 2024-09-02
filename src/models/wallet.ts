@@ -1,4 +1,4 @@
-import { NewConnection } from './connection';
+import { Connection } from './connection';
 
 export type WalletType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
 
@@ -16,5 +16,5 @@ export type Wallet = {
   styles: WalletStyles;
   createdAt: Date;
   institutionId?: number;
-  connection?: NewConnection;
+  connection?: Connection;
 };

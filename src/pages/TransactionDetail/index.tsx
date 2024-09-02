@@ -13,7 +13,7 @@ import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { formatDateHourFull } from '../../utils/date';
@@ -24,7 +24,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   route,
   navigation,
 }) => {
-  const { wallets, transactions, updateTransaction, deleteTransaction } = useContext(AppContext2);
+  const { wallets, transactions, updateTransaction, deleteTransaction } = useContext(AppContext);
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 

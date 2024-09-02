@@ -14,7 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import SecurityGuard from './src/components/SecurityGuard';
-import { AppContextProvider2 } from './src/contexts/AppContext2';
+import { AppContextProvider } from './src/contexts/AppContext';
 import { AuthContextProvider } from './src/contexts/AuthContext';
 import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
 import HooksProvider from './src/hooks';
@@ -57,7 +57,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <SecurityGuard>
-          <AppContextProvider2>
+          <AppContextProvider>
             <HooksProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <BottomSheetContextProvider>
@@ -69,7 +69,7 @@ export default function App() {
                 </BottomSheetContextProvider>
               </GestureHandlerRootView>
             </HooksProvider>
-          </AppContextProvider2>
+          </AppContextProvider>
         </SecurityGuard>
       </AuthContextProvider>
     </ThemeProvider>

@@ -1,4 +1,3 @@
-export * from './account';
 export * from './category';
 export * from './connection';
 export * from './investment';

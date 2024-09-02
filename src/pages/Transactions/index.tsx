@@ -5,7 +5,7 @@ import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import { Transaction, TransactionType } from '../../models';
 import { formatMonthYearDate } from '../../utils/date';
 import { transactionTypeText } from '../../utils/text';

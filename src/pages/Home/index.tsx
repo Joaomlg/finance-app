@@ -12,7 +12,7 @@ import ScreenContent from '../../components/ScreenContent';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
   BalanceContainer,
@@ -53,7 +53,7 @@ const Home: React.FC = () => {
     totalExpenses,
     fetchWallets,
     fetchTransactions,
-  } = useContext(AppContext2);
+  } = useContext(AppContext);
 
   const totalInvestment = 0;
   const totalInvoice = 0;
