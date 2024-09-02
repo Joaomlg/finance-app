@@ -25,8 +25,6 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
   const belvoService = useMemo(buildBelvoProviderService, []);
 
   const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
-    // const forceUpdate = updateConnectionId !== undefined;
-
     await setupConnection(link, 'BELVO');
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });

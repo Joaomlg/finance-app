@@ -33,12 +33,17 @@ export class PluggyService implements IProviderService {
     );
   };
 
-  updateConnection = async (
+  syncConnection = async (
     connectionId: string,
     lastUpdateDate: Date,
+    shouldUpdate: boolean,
     updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
+    if (shouldUpdate) {
+      await this.client.updateItem(connectionId);
+    }
+
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
     await updateWalletsCallback(accounts.map((account) => this.buildWallet(item, account)));
@@ -71,7 +76,7 @@ export class PluggyService implements IProviderService {
     let transactions: PageResponse<PluggyTransaction>;
     let page = 1;
 
-    const from = startDate ? moment(startDate).format('YYYY-MM-dd') : undefined;
+    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
 
     do {
       transactions = await this.client.fetchTransactions(accountId, {

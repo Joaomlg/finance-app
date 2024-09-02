@@ -12,9 +12,10 @@ export interface IProviderService {
   ) => Promise<void>;
 
   /** Fetch connection and new transactions in order to update wallet and create transactions */
-  updateConnection: (
+  syncConnection: (
     connectionId: string,
     lastUpdateDate: Date,
+    shouldUpdate: boolean,
     updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => Promise<void>;

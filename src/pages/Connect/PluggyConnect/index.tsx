@@ -29,8 +29,6 @@ const PluggyConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'conne
   const handleOnSuccess = async (data: { item: Item }) => {
     const { item } = data;
 
-    // const forceUpdate = updateConnectionId !== undefined;
-
     await setupConnection(item.id, 'PLUGGY');
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });

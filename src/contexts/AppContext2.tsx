@@ -1,5 +1,5 @@
 import moment, { Moment } from 'moment';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
@@ -8,6 +8,7 @@ import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
+import { NOW } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
 
 export type MonthlyBalance = {
@@ -23,6 +24,7 @@ export type AppContextValue2 = {
   setHideValues: (value: boolean) => void;
 
   setupConnection: (connectionId: string, provider: Provider) => Promise<void>;
+  syncWalletConnection: (wallet: Wallet) => Promise<void>;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
@@ -139,6 +141,33 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
 
     setLoading(false);
   };
+
+  const syncWalletConnection = useCallback(async (wallet: Wallet, configureLoading = true) => {
+    if (wallet.connection === undefined) {
+      return;
+    }
+
+    const providerService = getProviderService(wallet.connection.provider);
+
+    configureLoading && setLoading(true, 'Sincronizando conexão');
+
+    try {
+      await providerService.syncConnection(
+        wallet.connection.id,
+        wallet.connection.lastUpdatedAt,
+        !wallet.connection.updateDisabled,
+        walletRepository.updateWalletsBatch,
+        transactionRepository.setTransactionsBatch,
+      );
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: `Erro ao sincronizar conexão "${wallet.name}"!`,
+      });
+    }
+
+    configureLoading && setLoading(false);
+  }, []);
 
   const fetchWallets = async () => {
     setFetchingWallets(true);
@@ -332,10 +361,32 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   useEffect(() => {
-    setMonthlyBalances([]);
-    setCurrentMonthlyBalancesPage(0);
     return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
   }, []);
+
+  useEffect(() => {
+    if (!wallets || wallets.length === 0) {
+      return;
+    }
+
+    const syncAllConnections = async () => {
+      setLoading(true, 'Sincronizando conexões');
+
+      await Promise.all(
+        wallets
+          .filter(
+            (wallet) =>
+              wallet.connection !== undefined &&
+              NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
+          )
+          .map((wallet) => syncWalletConnection(wallet, false)),
+      );
+
+      setLoading(false);
+    };
+
+    syncAllConnections();
+  }, [syncWalletConnection, wallets]);
 
   useEffect(() => {
     return transactionRepository.onTransactionsChange(
@@ -343,6 +394,11 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
       transactionQueryOptions,
     );
   }, [transactionQueryOptions]);
+
+  useEffect(() => {
+    setMonthlyBalances([]);
+    setCurrentMonthlyBalancesPage(0);
+  }, []);
 
   return (
     <AppContext2.Provider
@@ -352,6 +408,7 @@ export const AppContextProvider2: React.FC<{ children: React.ReactNode }> = ({ c
         hideValues,
         setHideValues,
         setupConnection,
+        syncWalletConnection,
         wallets,
         fetchWallets,
         fetchingWallets,

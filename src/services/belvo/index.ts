@@ -54,12 +54,17 @@ export class BelvoService implements IProviderService {
     );
   };
 
-  updateConnection = async (
+  syncConnection = async (
     connectionId: string,
     lastUpdateDate: Date,
+    shouldUpdate: boolean,
     updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
+    if (shouldUpdate) {
+      await this.updateAccountAndTransactions(connectionId, lastUpdateDate);
+    }
+
     const wallets = await this.fetchWallets(connectionId);
 
     await updateWalletsCallback(wallets);
@@ -104,7 +109,7 @@ export class BelvoService implements IProviderService {
     return filteredAccounts.map((account) => this.buildWallet(link, institution, account));
   };
 
-  fetchAndCreateTransactions = async (
+  private fetchAndCreateTransactions = async (
     connectionId: string,
     accountId: string,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
@@ -113,7 +118,7 @@ export class BelvoService implements IProviderService {
     let transactions: BelvoTransaction[];
     let page = 1;
 
-    const from = startDate ? moment(startDate).format('YYYY-MM-dd') : undefined;
+    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
 
     do {
       transactions = await this.client.transactions.list({
@@ -190,5 +195,19 @@ export class BelvoService implements IProviderService {
       default:
         return 'EXPENSE';
     }
+  };
+
+  private updateAccountAndTransactions = async (connectionId: string, lastUpdateDate: Date) => {
+    const accountRetrievePromise = this.client.accounts.retrieve(connectionId, {
+      saveData: true,
+    });
+
+    const dateFrom = moment(lastUpdateDate).format('YYYY-MM-DD');
+
+    const transactionRetrievePromise = this.client.transactions.retrieve(connectionId, dateFrom, {
+      saveData: true,
+    });
+
+    await Promise.all([accountRetrievePromise, transactionRetrievePromise]);
   };
 }
