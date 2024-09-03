@@ -1,6 +1,8 @@
-import { NewConnection } from './connection';
+import { Connection } from './connection';
 
-export type WalletType = 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'CREDIT_CARD';
+export const WalletTypeList = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT'] as const; // CREDIT_CARD
+
+export type WalletType = typeof WalletTypeList[number];
 
 export type WalletStyles = {
   imageUrl: string;
@@ -16,5 +18,5 @@ export type Wallet = {
   styles: WalletStyles;
   createdAt: Date;
   institutionId?: number;
-  connection?: NewConnection;
+  connection?: Connection;
 };

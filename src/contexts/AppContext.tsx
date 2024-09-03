@@ -1,29 +1,15 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
-import useBelvoService from '../hooks/useBelvoService';
-import usePluggyService from '../hooks/usePluggyService';
-import { Account, Connection, Investment, Transaction } from '../models';
+import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
+import * as transactionRepository from '../repositories/transactionRepository';
+import * as walletRepository from '../repositories/walletRepository';
+import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
-import {
-  ConnectionsAsyncStorageKey,
-  ItemsAsyncStorageKey,
-  LastUpdateDateFormat,
-  LastUpdateDateStorageKey,
-} from '../utils/contants';
-import { cloneObject } from '../utils/object';
-import { sleep } from '../utils/time';
-
-const NUBANK_IGNORED_TRANSACTIONS = ['Dinheiro guardado', 'Dinheiro resgatado'];
-
-export type ConnectionContext = {
-  id: string;
-  provider: Provider;
-  syncDisabled?: boolean;
-};
+import { NOW } from '../utils/date';
+import { RecursivePartial } from '../utils/type';
 
 export type MonthlyBalance = {
   date: Moment;
@@ -32,43 +18,40 @@ export type MonthlyBalance = {
 };
 
 export type AppContextValue = {
-  isLoading: boolean;
-  hideValues: boolean;
-  setHideValues: (value: boolean) => void;
   date: Moment;
   setDate: (value: Moment) => void;
-  minimumDateWithData: Moment;
-  lastUpdateDate: string;
-  isConnectionSyncDisabled: (id: string) => boolean;
-  toogleConnectionSyncDisabled: (id: string) => Promise<void>;
-  connections: Connection[];
-  storeConnection: (id: string, provider: Provider, forceUpdate?: boolean) => Promise<void>;
-  deleteConnection: (id: string) => Promise<void>;
-  fetchConnections: () => Promise<void>;
-  fetchingConnections: boolean;
-  updateConnections: () => Promise<boolean>;
-  updatingConnections: boolean;
-  accounts: Account[];
-  fetchAccounts: () => Promise<void>;
-  fetchingAccounts: boolean;
-  investments: Investment[];
-  fetchInvestments: () => Promise<void>;
-  fetchingInvestments: boolean;
+  hideValues: boolean;
+  setHideValues: (value: boolean) => void;
+
+  setupConnection: (connectionId: string, provider: Provider) => Promise<void>;
+  syncWalletConnection: (wallet: Wallet) => Promise<void>;
+
+  wallets: Wallet[];
+  fetchWallets: () => Promise<void>;
+  fetchingWallets: boolean;
+  createWallet: (wallet: Wallet) => Promise<void>;
+  updateWallet: (id: string, values: RecursivePartial<Wallet>) => Promise<void>;
+  deleteWallet: (wallet: Wallet) => Promise<void>;
+  totalBalance: number;
+
   transactions: Transaction[];
   fetchTransactions: () => Promise<void>;
   fetchingTransactions: boolean;
+  createTransaction: (transaction: Transaction) => Promise<void>;
+  updateTransaction: (id: string, values: RecursivePartial<Transaction>) => Promise<void>;
+  deleteTransaction: (transaction: Transaction) => Promise<void>;
+  incomeTransactions: Transaction[];
+  totalIncomes: number;
+  expenseTransactions: Transaction[];
+  totalExpenses: number;
+
+  totalInvoice: number;
+
   monthlyBalances: MonthlyBalance[];
   fetchMonthlyBalancesPage: (itemsPerPage: number, currentPage: number) => Promise<void>;
   fetchingMonthlyBalances: boolean;
   currentMonthlyBalancesPage: number;
   setCurrentMonthlyBalancesPage: (value: number) => void;
-  totalBalance: number;
-  totalInvoice: number;
-  totalInvestment: number;
-  incomeTransactions: Transaction[];
-  totalIncomes: number;
-  expenseTransactions: Transaction[];
-  totalExpenses: number;
 };
 
 const AppContext = createContext({} as AppContextValue);
@@ -77,22 +60,14 @@ const now = moment();
 const currentMonth = moment(now).startOf('month');
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [hideValues, setHideValues] = useState(false);
   const [date, setDate] = useState(now);
-  const [lastUpdateDate, setLastUpdateDate] = useState('');
+  const [hideValues, setHideValues] = useState(false);
 
-  const [connectionsContext, setConnectionsContext] = useState([] as ConnectionContext[]);
-  const [loadingConnectionsId, setLoadingConnectionsId] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>();
 
-  const [connections, setConnections] = useState([] as Connection[]);
-  const [fetchingConnections, setFetchingConnections] = useState(false);
-  const [updatingConnections, setUpdatingConnections] = useState(false);
-
-  const [accounts, setAccounts] = useState([] as Account[]);
-  const [fetchingAccounts, setFetchingAccounts] = useState(false);
-
-  const [investments, setInvestments] = useState([] as Investment[]);
-  const [fetchingInvestments, setFetchingInvestments] = useState(false);
+  const [wallets, setWallets] = useState([] as Wallet[]);
+  const [fetchingWallets, setFetchingWallets] = useState(false);
 
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
@@ -101,36 +76,27 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [fetchingMonthlyBalances, setFetchingMonthlyBalances] = useState(false);
   const [currentMonthlyBalancesPage, setCurrentMonthlyBalancesPage] = useState(0);
 
-  const pluggyService = usePluggyService();
-  const belvoService = useBelvoService();
-
-  const isLoading =
-    loadingConnectionsId ||
-    fetchingConnections ||
-    fetchingAccounts ||
-    fetchingInvestments ||
-    fetchingTransactions ||
-    fetchingMonthlyBalances;
+  const transactionQueryOptions = useMemo(
+    () =>
+      ({
+        interval: {
+          startDate: date.startOf('month').toDate(),
+          endDate: date.endOf('month').toDate(),
+        },
+        order: {
+          by: 'date',
+          direction: 'desc',
+        },
+      } as transactionRepository.TransactionQueryOptions),
+    [date],
+  );
 
   const totalBalance = useMemo(
     () =>
-      accounts
-        .filter(({ type }) => type === 'BANK')
+      wallets
+        .filter(({ type }) => type === 'CHECKING_ACCOUNT' || type === 'SAVINGS_ACCOUNT')
         .reduce((total, { balance }) => total + balance, 0),
-    [accounts],
-  );
-
-  const totalInvoice = useMemo(
-    () =>
-      accounts
-        .filter(({ type }) => type === 'INCOME')
-        .reduce((total, { balance }) => total + balance, 0),
-    [accounts],
-  );
-
-  const totalInvestment = useMemo(
-    () => investments.reduce((total, { balance }) => total + balance, 0),
-    [investments],
+    [wallets],
   );
 
   const incomeTransactions = useMemo(
@@ -140,7 +106,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const totalIncomes = useMemo(
     () =>
-      incomeTransactions.reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
+      incomeTransactions
+        .filter(({ ignore }) => !ignore)
+        .reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
     [incomeTransactions],
   );
 
@@ -151,453 +119,327 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const totalExpenses = useMemo(
     () =>
-      expenseTransactions.reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
+      expenseTransactions
+        .filter(({ ignore }) => !ignore)
+        .reduce((total, transaction) => total + Math.abs(transaction.amount), 0),
     [expenseTransactions],
   );
 
-  const minimumDateWithData = useMemo(() => {
-    const firstConnectionCreatedAt = connections.reduce((minDate, connection) => {
-      const createdAt = moment(new Date(connection.createdAt));
-      return createdAt.isBefore(minDate) ? createdAt : minDate;
-    }, now.clone());
+  const totalInvoice = 0;
 
-    return firstConnectionCreatedAt.subtract(1, 'year');
-  }, [connections]);
+  const setLoading = (status: boolean, message?: string) => {
+    setIsLoading(status);
+    setLoadingMessage(message);
+  };
 
-  const getProviderService = useCallback(
-    (provider: Provider) => {
-      switch (provider) {
-        case 'PLUGGY':
-          return pluggyService;
-        case 'BELVO':
-          return belvoService;
-        default:
-          throw new Error(`Unknown provider: ${provider}`);
-      }
-    },
-    [belvoService, pluggyService],
-  );
+  const setupConnection = async (connectionId: string, provider: Provider) => {
+    const providerService = getProviderService(provider);
 
-  const storeConnection = useCallback(
-    async (id: string, provider: Provider, forceUpdate = false) => {
-      try {
-        const alreadyExists = connectionsContext.find(
-          (item) => item.id === id && item.provider === provider,
-        );
+    setLoading(true, 'Configurando nova conexão');
 
-        if (alreadyExists !== undefined) {
-          if (forceUpdate) {
-            const newConnectionsContext = cloneObject(connectionsContext);
-            setConnectionsContext(newConnectionsContext);
-          }
-          return;
-        }
+    await providerService.fetchConnection(
+      connectionId,
+      walletRepository.setWalletsBatch,
+      transactionRepository.setTransactionsBatch,
+    );
 
-        const newConnectionsContext: ConnectionContext[] = [
-          ...connectionsContext,
-          { id, provider },
-        ];
+    setLoading(false);
+  };
 
-        await AsyncStorage.setItem(
-          ConnectionsAsyncStorageKey,
-          JSON.stringify(newConnectionsContext),
-        );
-
-        setConnectionsContext(newConnectionsContext);
-      } catch (error) {
-        Toast.show({ type: 'error', text1: 'Não foi possível armazenar a nova conexão!' });
-      }
-    },
-    [connectionsContext],
-  );
-
-  const deleteConnection = useCallback(
-    async (id: string) => {
-      const connectionContext = connectionsContext.find((item) => item.id === id);
-
-      try {
-        if (connectionContext === undefined) {
-          throw new Error('Connection not found!');
-        }
-
-        const newConnectionsContext = connectionsContext.filter((item) => item.id !== id);
-
-        await AsyncStorage.setItem(
-          ConnectionsAsyncStorageKey,
-          JSON.stringify(newConnectionsContext),
-        );
-
-        setConnectionsContext(newConnectionsContext);
-      } catch (error) {
-        Toast.show({ type: 'error', text1: 'Não foi possível apagar a conexão!' });
-        return;
-      }
-
-      const providerService = getProviderService(connectionContext.provider);
-
-      try {
-        await providerService.deleteConnectionById(id);
-      } catch (error) {
-        Toast.show({
-          type: 'info',
-          text1: 'Não foi possível apagar a conexão no respectivo provedor.',
-        });
-      }
-    },
-    [connectionsContext, getProviderService],
-  );
-
-  const isConnectionSyncDisabled = useCallback(
-    (id: string) => {
-      const connection = connectionsContext.find((item) => item.id === id);
-      return connection?.syncDisabled === true;
-    },
-    [connectionsContext],
-  );
-
-  const toogleConnectionSyncDisabled = useCallback(
-    async (id: string) => {
-      const newConnectionsContext = connectionsContext.map((item) =>
-        item.id === id
-          ? ({ ...item, syncDisabled: !item.syncDisabled } as ConnectionContext)
-          : item,
-      );
-
-      await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(newConnectionsContext));
-
-      setConnectionsContext(newConnectionsContext);
-    },
-    [connectionsContext],
-  );
-
-  const fetchConnections = useCallback(async () => {
-    if (connectionsContext.length === 0) {
+  const syncWalletConnection = useCallback(async (wallet: Wallet, configureLoading = true) => {
+    if (wallet.connection === undefined) {
       return;
     }
 
-    setFetchingConnections(true);
+    const providerService = getProviderService(wallet.connection.provider);
+
+    configureLoading && setLoading(true, 'Sincronizando conexão');
 
     try {
-      const connectionList = await Promise.all(
-        connectionsContext.map(({ id, provider }) => {
-          const providerService = getProviderService(provider);
-          return providerService.fetchConnectionById(id);
-        }),
+      await providerService.syncConnection(
+        wallet.connection.id,
+        wallet.connection.lastUpdatedAt,
+        !wallet.connection.updateDisabled,
+        walletRepository.updateWalletsBatch,
+        transactionRepository.setTransactionsBatch,
       );
-      setConnections(connectionList);
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter informação das conexões!' });
-    }
-
-    setFetchingConnections(false);
-  }, [connectionsContext, getProviderService]);
-
-  const updateConnections = useCallback(async () => {
-    if (connectionsContext.length === 0) {
-      return true;
-    }
-
-    setUpdatingConnections(true);
-
-    const commonLastUpdateDate = moment(lastUpdateDate, LastUpdateDateFormat).toISOString();
-
-    let success = true;
-
-    try {
-      const connectionList = await Promise.all(
-        connectionsContext.map(async ({ id, provider, syncDisabled }) => {
-          const providerService = getProviderService(provider);
-
-          if (syncDisabled) {
-            return await providerService.fetchConnectionById(id);
-          }
-
-          let connection = await providerService.updateConnectionById(id, commonLastUpdateDate);
-
-          while (connection.status === 'UPDATING') {
-            await sleep(2000);
-            connection = await providerService.fetchConnectionById(id);
-          }
-
-          return connection;
-        }),
-      );
-
-      setConnections(connectionList);
-
-      const updateDate = now.format(LastUpdateDateFormat);
-      await AsyncStorage.setItem(LastUpdateDateStorageKey, updateDate);
-
-      setLastUpdateDate(updateDate);
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível sincronizar as conexões!' });
-      success = false;
-    }
-
-    setUpdatingConnections(false);
-
-    return success;
-  }, [connectionsContext, getProviderService, lastUpdateDate]);
-
-  const fetchAccounts = useCallback(async () => {
-    if (connections.length === 0) {
-      return;
-    }
-
-    setFetchingAccounts(true);
-
-    try {
-      const result = await Promise.all(
-        connections.map((connection) => {
-          const providerService = getProviderService(connection.provider);
-          return providerService.fetchAccounts(connection);
-        }),
-      );
-
-      const accountList = result.reduce((list, account) => [...list, ...account], [] as Account[]);
-
-      setAccounts(accountList);
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das contas!' });
-    }
-
-    setFetchingAccounts(false);
-  }, [connections, getProviderService]);
-
-  const fetchInvestments = useCallback(async () => {
-    if (connections.length === 0) {
-      return;
-    }
-
-    setFetchingInvestments(true);
-
-    try {
-      const result = await Promise.all(
-        connections.map((connection) => {
-          const providerService = getProviderService(connection.provider);
-          return providerService.fetchInvestments(connection);
-        }),
-      );
-
-      const investmentList = result.reduce(
-        (list, investment) => [...list, ...investment],
-        [] as Investment[],
-      );
-
-      setInvestments(investmentList);
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Não foi possível obter informações sobre investimentos!',
+        text1: `Erro ao sincronizar conexão "${wallet.name}"!`,
       });
     }
 
-    setFetchingInvestments(false);
-  }, [connections, getProviderService]);
+    configureLoading && setLoading(false);
+  }, []);
 
-  const fetchMonthTransactions = useCallback(
-    async (monthDate: Moment) => {
-      const startDate = moment(monthDate).startOf('month');
-      const endDate = moment(monthDate).endOf('month');
+  const fetchWallets = async () => {
+    setFetchingWallets(true);
 
-      const result = await Promise.all(
-        accounts
-          .filter(({ type }) => type !== 'INCOME')
-          .map((account) => {
-            const providerService = getProviderService(account.provider);
-            return providerService.fetchTransactions(account, {
-              from: startDate.format('YYYY-MM-DD'),
-              to: endDate.format('YYYY-MM-DD'),
-            });
-          }),
-      );
+    try {
+      const wallets = await walletRepository.getWallets();
+      setWallets(wallets);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
+    }
 
-      const transactionsList = result
-        .reduce((list, transaction) => [...list, ...transaction], [] as Transaction[])
-        .filter(({ description }) => !NUBANK_IGNORED_TRANSACTIONS.includes(description))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    setFetchingWallets(false);
+  };
 
-      return transactionsList;
-    },
-    [accounts, getProviderService],
-  );
+  const createWallet = async (wallet: Wallet) => {
+    setFetchingWallets(true);
 
-  const fetchTransactions = useCallback(async () => {
-    if (accounts.length === 0) {
+    try {
+      await walletRepository.setWallet(wallet);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a carteira!' });
+    }
+
+    setFetchingWallets(false);
+  };
+
+  const updateWallet = async (id: string, values: RecursivePartial<Wallet>) => {
+    setFetchingWallets(true);
+
+    try {
+      await walletRepository.updateWallet(id, values);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da carteira!',
+      });
+    }
+
+    setFetchingWallets(false);
+  };
+
+  const deleteWallet = async (wallet: Wallet) => {
+    setFetchingWallets(true);
+
+    try {
+      await walletRepository.deleteWallet(wallet);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível apagar a carteira!',
+      });
+    }
+
+    try {
+      await transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível apagar as transações da carteira!',
+      });
+    }
+
+    try {
+      await deleteWalletConnectionIfNecessary(wallet);
+    } catch (error) {
+      Toast.show({
+        type: 'warn',
+        text1: 'Não foi possível apagar a conexão com o provedor!',
+      });
+    }
+
+    setFetchingWallets(false);
+  };
+
+  const deleteWalletConnectionIfNecessary = async (wallet: Wallet) => {
+    if (!wallet.connection) {
       return;
     }
 
+    const hasOtherWalletWithSameConnection = wallets.find(
+      (item) => item.connection?.id === wallet.connection?.id && item.id !== wallet.id,
+    );
+
+    if (hasOtherWalletWithSameConnection) {
+      return;
+    }
+
+    const providerService = getProviderService(wallet.connection.provider);
+
+    await providerService.deleteConnection(wallet.connection.id);
+  };
+
+  const fetchTransactions = async () => {
     setFetchingTransactions(true);
 
     try {
-      const transactionsList = await fetchMonthTransactions(date);
-      setTransactions(transactionsList);
+      const transactions = await transactionRepository.getTransactions(transactionQueryOptions);
+      setTransactions(transactions);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter as transações!' });
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das transações!' });
     }
 
     setFetchingTransactions(false);
-  }, [fetchMonthTransactions, date, accounts]);
+  };
 
-  const fetchMonthlyBalancesPage = useCallback(
-    async (itemsPerPage: number, currentPage: number) => {
-      if (accounts.length === 0) {
-        return;
-      }
+  const createTransaction = async (transaction: Transaction) => {
+    setFetchingTransactions(true);
 
-      setFetchingMonthlyBalances(true);
+    try {
+      await transactionRepository.setTransaction(transaction);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a transação!' });
+    }
 
-      const dates = range(itemsPerPage)
-        .map((i) => currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'))
-        .filter((date) => date.isSameOrAfter(minimumDateWithData, 'month'));
+    setFetchingTransactions(false);
+  };
 
-      const results = await Promise.all(dates.map((date) => fetchMonthTransactions(date)));
+  const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+    setFetchingTransactions(true);
 
-      const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
-        const incomes = transactions
-          .filter((transaction) => transaction.type === 'INCOME')
-          .reduce((total, transaction) => total + transaction.amount, 0);
-
-        const expenses = transactions
-          .filter((transaction) => transaction.type === 'EXPENSE')
-          .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
-
-        return { date: dates[index], incomes, expenses };
+    try {
+      await transactionRepository.updateTransaction(id, values);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da transação!',
       });
+    }
 
-      setMonthlyBalances((current) =>
-        currentPage === 0 ? newBalances : [...current, ...newBalances],
-      );
+    setFetchingTransactions(false);
+  };
 
-      setFetchingMonthlyBalances(false);
-    },
-    [accounts, fetchMonthTransactions, minimumDateWithData],
-  );
+  const deleteTransaction = async (transaction: Transaction) => {
+    setFetchingTransactions(true);
+
+    try {
+      await transactionRepository.deleteTransaction(transaction);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível apagar a transação.',
+      });
+    }
+
+    setFetchingTransactions(false);
+  };
+
+  const fetchMonthlyBalancesPage = async (itemsPerPage: number, currentPage: number) => {
+    if (wallets.length === 0) {
+      return;
+    }
+
+    setFetchingMonthlyBalances(true);
+
+    const dates = range(itemsPerPage).map((i) =>
+      currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'),
+    );
+
+    const results = await Promise.all(
+      dates.map((date) =>
+        transactionRepository.getTransactions({
+          interval: {
+            startDate: date.startOf('month').toDate(),
+            endDate: date.endOf('month').toDate(),
+          },
+          order: {
+            by: 'date',
+            direction: 'desc',
+          },
+        }),
+      ),
+    );
+
+    const newBalances: MonthlyBalance[] = results.map((transactions, index) => {
+      const incomes = transactions
+        .filter((transaction) => transaction.type === 'INCOME' && !transaction.ignore)
+        .reduce((total, transaction) => total + transaction.amount, 0);
+
+      const expenses = transactions
+        .filter((transaction) => transaction.type === 'EXPENSE' && !transaction.ignore)
+        .reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+
+      return { date: dates[index], incomes, expenses };
+    });
+
+    setMonthlyBalances((current) =>
+      currentPage === 0 ? newBalances : [...current, ...newBalances],
+    );
+
+    setFetchingMonthlyBalances(false);
+  };
 
   useEffect(() => {
-    const loadConnectionsContext = async () => {
-      setLoadingConnectionsId(true);
-
-      const serializedConnectionsContext = await AsyncStorage.getItem(ConnectionsAsyncStorageKey);
-      let connectionsContext: ConnectionContext[] = serializedConnectionsContext
-        ? JSON.parse(serializedConnectionsContext)
-        : [];
-
-      // This is necessary to be compatible with previous versions
-      const serializedIds = await AsyncStorage.getItem(ItemsAsyncStorageKey);
-      if (serializedIds) {
-        const ids: string[] = JSON.parse(serializedIds);
-
-        connectionsContext = [
-          ...connectionsContext,
-          ...ids.map(
-            (id) =>
-              ({
-                id,
-                provider: 'PLUGGY',
-              } as ConnectionContext),
-          ),
-        ] as ConnectionContext[];
-
-        await AsyncStorage.setItem(ConnectionsAsyncStorageKey, JSON.stringify(connectionsContext));
-        await AsyncStorage.removeItem(ItemsAsyncStorageKey);
-      }
-
-      setConnectionsContext(connectionsContext);
-
-      setLoadingConnectionsId(false);
-    };
-
-    loadConnectionsContext();
+    return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
   }, []);
 
   useEffect(() => {
-    const fetchOrUpdateConnections = async () => {
-      if (connectionsContext.length === 0) {
-        return;
-      }
+    if (!wallets || wallets.length === 0) {
+      return;
+    }
 
-      const updateDate = await AsyncStorage.getItem(LastUpdateDateStorageKey);
+    const syncAllConnections = async () => {
+      setLoading(true, 'Sincronizando conexões');
 
-      const shouldUpdate = updateDate
-        ? now.isAfter(moment(updateDate, LastUpdateDateFormat), 'day')
-        : true;
+      await Promise.all(
+        wallets
+          .filter(
+            (wallet) =>
+              wallet.connection !== undefined &&
+              NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
+          )
+          .map((wallet) => syncWalletConnection(wallet, false)),
+      );
 
-      let updatedSuccess = true;
-
-      if (shouldUpdate) {
-        updatedSuccess = await updateConnections();
-      }
-
-      const shouldFetchConnections = !shouldUpdate || !updatedSuccess;
-
-      if (shouldFetchConnections) {
-        setLastUpdateDate(updateDate as string);
-        await fetchConnections();
-      }
+      setLoading(false);
     };
 
-    fetchOrUpdateConnections();
-  }, [connectionsContext, fetchConnections, updateConnections]);
+    syncAllConnections();
+  }, [syncWalletConnection, wallets]);
 
   useEffect(() => {
-    fetchAccounts();
-    fetchInvestments();
-  }, [connections, fetchAccounts, fetchInvestments]);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [accounts, fetchTransactions]);
+    return transactionRepository.onTransactionsChange(
+      (transactions) => setTransactions(transactions),
+      transactionQueryOptions,
+    );
+  }, [transactionQueryOptions]);
 
   useEffect(() => {
     setMonthlyBalances([]);
     setCurrentMonthlyBalancesPage(0);
-  }, [accounts]);
+  }, []);
 
   return (
     <AppContext.Provider
       value={{
-        isLoading,
-        hideValues,
-        setHideValues,
         date,
         setDate,
-        minimumDateWithData,
-        lastUpdateDate,
-        isConnectionSyncDisabled,
-        toogleConnectionSyncDisabled,
-        connections,
-        storeConnection,
-        deleteConnection,
-        fetchConnections,
-        fetchingConnections,
-        updateConnections,
-        updatingConnections,
-        accounts,
-        fetchAccounts,
-        fetchingAccounts,
-        investments,
-        fetchInvestments,
-        fetchingInvestments,
+        hideValues,
+        setHideValues,
+        setupConnection,
+        syncWalletConnection,
+        wallets,
+        fetchWallets,
+        fetchingWallets,
+        createWallet,
+        updateWallet,
+        deleteWallet,
+        totalBalance,
         transactions,
         fetchTransactions,
         fetchingTransactions,
+        createTransaction,
+        updateTransaction,
+        deleteTransaction,
+        incomeTransactions,
+        expenseTransactions,
+        totalIncomes,
+        totalExpenses,
+        totalInvoice,
         monthlyBalances,
         fetchMonthlyBalancesPage,
         fetchingMonthlyBalances,
         currentMonthlyBalancesPage,
         setCurrentMonthlyBalancesPage,
-        totalBalance,
-        totalInvoice,
-        totalInvestment,
-        incomeTransactions,
-        totalIncomes,
-        expenseTransactions,
-        totalExpenses,
       }}
     >
       {children}
-      {updatingConnections && <LoadingModal text="Sincronizando conexões" />}
+      {isLoading && <LoadingModal text={loadingMessage} />}
     </AppContext.Provider>
   );
 };

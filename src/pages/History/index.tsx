@@ -8,7 +8,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext2, { MonthlyBalance } from '../../contexts/AppContext2';
+import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
 import {
   HorizontalBarContainer,
@@ -28,14 +28,14 @@ const History: React.FC = () => {
   const [isLoadingMore, setLoadingMore] = useState(false);
 
   const {
-    isLoading,
     hideValues,
     monthlyBalances,
     fetchMonthlyBalancesPage,
+    fetchingMonthlyBalances,
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
     setDate,
-  } = useContext(AppContext2);
+  } = useContext(AppContext);
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -142,13 +142,13 @@ const History: React.FC = () => {
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 ? (
-        <StyledButton onPress={handleLoadMore} isLoading={isLoading}>
+        <StyledButton onPress={handleLoadMore} isLoading={fetchingMonthlyBalances}>
           <Text typography="title" color="textWhite">
             Ver mais
           </Text>
         </StyledButton>
       ) : null,
-    [handleLoadMore, isLoading, monthlyBalances],
+    [handleLoadMore, fetchingMonthlyBalances, monthlyBalances],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -161,7 +161,7 @@ const History: React.FC = () => {
       <StyledFlatList
         refreshControl={
           <RefreshControl
-            refreshing={isLoading && !isLoadingMore}
+            refreshing={fetchingMonthlyBalances && !isLoadingMore}
             onRefresh={handleRefresh}
             colors={[theme.colors.primary]}
           />

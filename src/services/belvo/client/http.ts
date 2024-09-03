@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import base64 from 'react-native-base64';
-import { PageResponse } from './types';
+import { PageResponse } from '../types';
 
 type Parameters = {
   [key: string]: number | number[] | string | string[] | boolean | undefined;

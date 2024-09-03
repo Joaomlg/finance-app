@@ -3,6 +3,7 @@ import { Transaction } from '../models';
 import { getTransactionSignedAmount } from '../utils/money';
 import { RecursivePartial } from '../utils/type';
 import { getWalletReference } from './walletRepository';
+import { flattenObject } from '../utils/object';
 
 type DateInterval = {
   startDate: Date;
@@ -70,7 +71,7 @@ export const onTransactionsChange = (
 
 export const setTransaction = async (transaction: Transaction) => {
   const walletReference = getWalletReference(transaction.walletId);
-  const transactionReference = transactionsCollection.doc(transaction.id);
+  const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
     const walletSnapshot = await t.get(walletReference);
@@ -91,9 +92,22 @@ export const setTransaction = async (transaction: Transaction) => {
   });
 };
 
+export const setTransactionsBatch = async (transactions: Transaction[]) => {
+  const batch = firestore().batch();
+
+  transactions.forEach((transaction) => {
+    const transactionReference = getTransactionReference(transaction.id);
+    batch.set(transactionReference, transaction);
+  });
+
+  return batch.commit();
+};
+
 export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+  const data = flattenObject(values);
+
   if (values.amount === undefined) {
-    return await transactionsCollection.doc(id).update(values);
+    return await transactionsCollection.doc(id).update(data);
   }
 
   const transactionReference = transactionsCollection.doc(id);
@@ -112,7 +126,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
       throw 'Wallet does not exist!';
     }
 
-    t.update(transactionReference, values).update(walletReference, {
+    t.update(transactionReference, data).update(walletReference, {
       balance:
         walletSnapshot.data()?.balance -
         // @ts-expect-error transaction snapshot exists
@@ -125,7 +139,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
 
 export const deleteTransaction = async (transaction: Transaction) => {
   const walletReference = getWalletReference(transaction.walletId);
-  const transactionReference = transactionsCollection.doc(transaction.id);
+  const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
     const walletSnapshot = await t.get(walletReference);

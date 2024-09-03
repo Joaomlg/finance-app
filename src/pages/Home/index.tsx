@@ -12,7 +12,7 @@ import ScreenContent from '../../components/ScreenContent';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import {
   BalanceContainer,
@@ -42,7 +42,8 @@ const Home: React.FC = () => {
   const navigation = useNavigation();
 
   const {
-    isLoading,
+    fetchingWallets,
+    fetchingTransactions,
     hideValues,
     date,
     setDate,
@@ -50,12 +51,12 @@ const Home: React.FC = () => {
     totalBalance,
     totalIncomes,
     totalExpenses,
+    totalInvoice,
     fetchWallets,
     fetchTransactions,
-  } = useContext(AppContext2);
+  } = useContext(AppContext);
 
   const totalInvestment = 0;
-  const totalInvoice = 0;
 
   const isCurrentMonth = checkCurrentMonth(date);
 
@@ -105,7 +106,7 @@ const Home: React.FC = () => {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={fetchingWallets || fetchingTransactions}
             onRefresh={handleRefreshPage}
             colors={[theme.colors.primary]}
           />

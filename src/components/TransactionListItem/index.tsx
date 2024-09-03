@@ -5,7 +5,7 @@ import Money from '../Money';
 import Text from '../Text';
 
 import { useNavigation } from '@react-navigation/native';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { ListItem, ListItemAmount, ListItemContent, StyledCategoryIcon } from './styles';
 
@@ -16,7 +16,7 @@ export interface TransactionListItemProps extends TouchableOpacityProps {
 const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...props }) => {
   const value = item.type === 'EXPENSE' && item.amount > 0 ? -1 * item.amount : item.amount;
 
-  const { wallets } = useContext(AppContext2);
+  const { wallets } = useContext(AppContext);
   const navigation = useNavigation();
 
   const wallet = wallets.find(({ id }) => id === item.walletId);

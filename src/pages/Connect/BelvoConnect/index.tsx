@@ -1,14 +1,13 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTheme } from 'styled-components/native';
-import BelvoWidget, { BelvoWidgetSuccess } from '../../../components/BelvoWidget';
-import useBelvoService from '../../../hooks/useBelvoService';
-import { StackRouteParamList } from '../../../routes/stack.routes';
-
-import { Container } from './styles';
 import AppContext from '../../../contexts/AppContext';
+import { StackRouteParamList } from '../../../routes/stack.routes';
+import { buildBelvoProviderService } from '../../../services/providerServiceFactory';
+import BelvoWidget, { BelvoWidgetSuccess } from './BelvoWidget';
+import { Container } from './styles';
 
 const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connect/belvo'>> = ({
   route,
@@ -19,19 +18,18 @@ const BelvoConnect: React.FC<NativeStackScreenProps<StackRouteParamList, 'connec
   const [widgetToken, setWidgetToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const { storeConnection } = useContext(AppContext);
+  const { setupConnection } = useContext(AppContext);
 
-  const belvoService = useBelvoService();
   const theme = useTheme();
 
-  const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
-    const forceUpdate = updateConnectionId !== undefined;
+  const belvoService = useMemo(buildBelvoProviderService, []);
 
-    await storeConnection(link, 'BELVO', forceUpdate);
+  const handleOnSuccess = async ({ link }: BelvoWidgetSuccess) => {
+    await setupConnection(link, 'BELVO');
 
     Toast.show({ type: 'success', text1: 'Conexão criada com sucesso!' });
 
-    navigation.pop(2);
+    navigation.pop(1);
   };
 
   const handleOnError = async () => {

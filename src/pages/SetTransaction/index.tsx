@@ -17,7 +17,7 @@ import Svg from '../../components/Svg';
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
-import AppContext2 from '../../contexts/AppContext2';
+import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
@@ -43,7 +43,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const screenTitle = (isEditing ? 'Editar ' : 'Nova ') + transactionTypeText[transactionType];
 
-  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext2);
+  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const selectedWallet = wallets.find(({ id }) => id === transactionValues.walletId);
@@ -57,7 +57,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   };
 
   const handleTransactionDescriptionChange = (description: string) => {
-    setTransactionValues((value) => ({ ...value, description }));
+    setTransactionValues((value) => ({ ...value, description: description.trim() }));
   };
 
   const renderTransactionWalletSelector = () => {
@@ -69,18 +69,20 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       closeBottomSheet();
     };
 
-    const items = wallets.map(
-      (wallet) =>
-        ({
-          text: wallet.name,
-          renderIcon: () => (
-            <Avatar color={wallet.styles.primaryColor} size={32}>
-              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
-            </Avatar>
-          ),
-          onPress: () => handleItemPressed(wallet.id),
-        } as SelectionItem),
-    );
+    const items = wallets
+      .filter((wallet) => !wallet.connection)
+      .map(
+        (wallet) =>
+          ({
+            text: wallet.name,
+            renderIcon: () => (
+              <Avatar color={wallet.styles.primaryColor} size={32}>
+                <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
+              </Avatar>
+            ),
+            onPress: () => handleItemPressed(wallet.id),
+          } as SelectionItem),
+      );
 
     return <ListItemSelection title="Carteira" items={items} />;
   };
@@ -135,7 +137,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     if (isEditing) {
       await updateTransaction(transactionId, transactionValues);
     } else {
-      createTransaction({
+      await createTransaction({
         ...(transactionValues as Transaction),
         id: uuid.v4().toString(),
         type: transactionType,

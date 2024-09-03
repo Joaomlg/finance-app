@@ -2,21 +2,25 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React from 'react';
 import { ViewProps } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Card from '../../../components/Card';
-import Divider from '../../../components/Divider';
-import Money from '../../../components/Money';
-import Text from '../../../components/Text';
-import { Wallet } from '../../../models';
-import { LastUpdateDateFormat } from '../../../utils/contants';
-
 import Avatar from '../../../components/Avatar';
 import Banner from '../../../components/Banner';
+import Card from '../../../components/Card';
+import Divider from '../../../components/Divider';
 import Icon from '../../../components/Icon';
+import Money from '../../../components/Money';
 import RowContent from '../../../components/RowContent';
 import Svg from '../../../components/Svg';
+import Text from '../../../components/Text';
+import { Wallet } from '../../../models';
+import { formatDateHourFull } from '../../../utils/date';
 import { ConnectionStatusMessage, walletTypeText } from '../../../utils/text';
-import { CardContainer, CardContent, CardHeader, CardHeaderContent } from './styles';
+import {
+  CardContainer,
+  CardContent,
+  CardHeader,
+  CardHeaderContent,
+  CardHeaderContentName,
+} from './styles';
 
 export interface WalletCardProps extends ViewProps {
   wallet: Wallet;
@@ -26,7 +30,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
   const navigation = useNavigation();
 
   const lastUpdateDate = wallet.connection?.lastUpdatedAt
-    ? moment(wallet.connection?.lastUpdatedAt).format(LastUpdateDateFormat)
+    ? formatDateHourFull(moment(wallet.connection?.lastUpdatedAt))
     : 'nunca';
 
   const hasError =
@@ -52,16 +56,17 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
               <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
             </Avatar>
             <CardHeaderContent>
-              <Text>{wallet.name}</Text>
+              <CardHeaderContentName>
+                <Text>{wallet.name}</Text>
+                <Icon name={wallet.connection ? 'link' : 'link-off'} size={18} />
+              </CardHeaderContentName>
               {wallet.connection && (
                 <Text typography="extraLight" color="textLight">
                   Sincronizado em: {lastUpdateDate}
                 </Text>
               )}
             </CardHeaderContent>
-            <TouchableOpacity>
-              <Icon name="navigate-next" size={24} />
-            </TouchableOpacity>
+            <Icon name="navigate-next" size={24} />
           </CardHeader>
           <Divider />
           <CardContent>

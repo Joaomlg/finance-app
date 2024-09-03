@@ -55,7 +55,6 @@ export const BelvoWidget: React.FC<BelvoWidgetProps> = ({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleBelvoEvent = (event: any) => {
-    console.log({ event });
     const webviewEvent = new URL(event.url);
 
     if (webviewEvent.protocol === 'belvowidget:') {

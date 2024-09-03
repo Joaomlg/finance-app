@@ -1,12 +1,13 @@
-import { Account, Connection, Investment, Transaction } from '../../models';
+import moment from 'moment';
+import { Transaction, Wallet, WalletTypeList } from '../../models';
 import { IProviderService } from '../providerService.interface';
 import { PluggyClient } from './client';
-import { Item } from './types';
+import { Account, Item, PageResponse, Transaction as PluggyTransaction } from './types';
 
 export * from './client';
 export * from './types';
 
-const DEFAULT_PAGE_SIZE = 500;
+const DEFAULT_PAGE_SIZE = 100;
 
 export class PluggyService implements IProviderService {
   constructor(private client: PluggyClient) {}
@@ -16,81 +17,125 @@ export class PluggyService implements IProviderService {
     return accessToken;
   };
 
-  fetchConnectionById = async (connectionId: string) => {
-    const item = await this.client.fetchItem(connectionId);
-    return this.itemToConnection(item);
+  fetchConnection = async (
+    connectionId: string,
+    createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => {
+    const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
+
+    await createWalletsCallback(accounts.map((account) => this.buildWallet(item, account)));
+
+    await Promise.all(
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
+      ),
+    );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  updateConnectionById = async (connectionId: string, lastUpdateDate: string) => {
-    const item = await this.client.updateItem(connectionId);
-    return this.itemToConnection(item);
+  syncConnection = async (
+    connectionId: string,
+    lastUpdateDate: Date,
+    shouldUpdate: boolean,
+    updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => {
+    if (shouldUpdate) {
+      await this.client.updateItem(connectionId);
+    }
+
+    const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
+
+    await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
+
+    await Promise.all(
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
+      ),
+    );
   };
 
-  deleteConnectionById = async (connectionId: string) => {
+  deleteConnection = async (connectionId: string) => {
     await this.client.deleteItem(connectionId);
   };
 
-  fetchAccounts = async (connection: Connection) => {
-    const accounts = await this.client.fetchAccounts(connection.id);
-    return accounts.results.map(
-      (account) =>
-        ({
-          id: account.id,
-          type: account.type,
-          subtype: account.subtype,
-          balance: account.balance,
-          connectionId: connection.id,
-          provider: 'PLUGGY',
-        } as Account),
+  private fetchItemAndAccounts = async (connectionId: string) => {
+    const [item, accounts] = await Promise.all([
+      this.client.fetchItem(connectionId),
+      this.client.fetchAccounts(connectionId),
+    ]);
+
+    const filteredAccounts = accounts.results.filter((account) =>
+      //@ts-expect-error WalletTypeList is a string list
+      WalletTypeList.includes(account.subtype),
     );
+
+    return [item, filteredAccounts] as [Item, Account[]];
   };
 
-  fetchInvestments = async (connection: Connection) => {
-    const investments = await this.client.fetchInvestments(connection.id);
-    return investments.results.map(
-      (investment) =>
-        ({
-          id: investment.id,
-          balance: investment.balance,
-          provider: 'PLUGGY',
-        } as Investment),
-    );
+  private fetchAndCreateTransactions = async (
+    accountId: string,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+    startDate?: Date,
+  ) => {
+    let transactions: PageResponse<PluggyTransaction>;
+    let page = 1;
+
+    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
+
+    do {
+      transactions = await this.client.fetchTransactions(accountId, {
+        pageSize: DEFAULT_PAGE_SIZE,
+        page,
+        from,
+      });
+
+      await createTransactionsCallback(
+        transactions.results.map((transaction) => this.buildTransaction(transaction, accountId)),
+      );
+
+      page++;
+    } while (transactions.results.length !== 0);
   };
 
-  fetchTransactions = async (account: Account, filters: { from: string; to: string }) => {
-    const transactions = await this.client.fetchTransactions(account.id, {
-      pageSize: DEFAULT_PAGE_SIZE,
-      from: filters.from,
-      to: filters.to,
-    });
-    return transactions.results.map(
-      (transaction) =>
-        ({
-          id: transaction.id,
-          description: transaction.description,
-          type: transaction.type,
-          amount: transaction.amount,
-          category: transaction.category,
-          date: transaction.date,
-          accountId: account.id,
-          provider: 'PLUGGY',
-        } as Transaction),
-    );
-  };
-
-  private itemToConnection = (item: Item) => {
-    return {
-      id: item.id,
-      connector: {
-        name: item.connector.name,
+  private buildNewWallet = (item: Item, account: Account) =>
+    ({
+      id: account.id,
+      name: item.connector.name,
+      type: account.subtype,
+      balance: account.balance,
+      initialBalance: account.balance,
+      createdAt: new Date(item.createdAt),
+      styles: {
         imageUrl: item.connector.imageUrl,
-        primaryColor: item.connector.primaryColor,
+        primaryColor: '#' + item.connector.primaryColor,
       },
-      status: item.status,
-      createdAt: item.createdAt,
-      lastUpdatedAt: item.lastUpdatedAt,
-      provider: 'PLUGGY',
-    } as Connection;
-  };
+      connection: {
+        id: item.id,
+        status: item.status,
+        provider: 'PLUGGY',
+        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+      },
+    } as Wallet);
+
+  private buildUpdateWallet = (item: Item, account: Account) =>
+    ({
+      id: account.id,
+      balance: account.balance,
+      connection: {
+        id: item.id,
+        status: item.status,
+        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+      },
+    } as Wallet);
+
+  private buildTransaction = (transaction: PluggyTransaction, accountId: string) =>
+    ({
+      id: transaction.id,
+      description: transaction.description,
+      date: new Date(transaction.date),
+      amount: transaction.amount,
+      type: transaction.type === 'CREDIT' ? 'INCOME' : 'EXPENSE',
+      walletId: accountId,
+    } as Transaction);
 }

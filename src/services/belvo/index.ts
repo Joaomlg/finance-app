@@ -1,24 +1,26 @@
 import moment from 'moment';
 import {
-  Account,
-  Connection,
-  ConnectionStatus,
-  Investment,
-  Transaction,
   TransactionType as CommonTransactionType,
+  ConnectionStatus,
+  Transaction,
+  Wallet,
+  WalletTypeList,
 } from '../../models';
 import { IProviderService } from '../providerService.interface';
 import { BelvoClient } from './client';
-import { AccountCategory, Institution, Link, LinkStatus, TransactionType } from './types';
+import {
+  Account,
+  Transaction as BelvoTransaction,
+  Institution,
+  Link,
+  LinkStatus,
+  TransactionType,
+} from './types';
 
 export * from './client';
 export * from './types';
 
-const ALLOWED_ACCOUNT_CATEGORIES: AccountCategory[] = [
-  'CHECKING_ACCOUNT',
-  'CREDIT_CARD',
-  'SAVINGS_ACCOUNT',
-];
+const DEFAULT_PAGE_SIZE = 100;
 
 export class BelvoService implements IProviderService {
   constructor(private client: BelvoClient) {}
@@ -30,7 +32,57 @@ export class BelvoService implements IProviderService {
     return accessToken;
   };
 
-  fetchConnectionById = async (connectionId: string) => {
+  fetchConnection = async (
+    connectionId: string,
+    createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => {
+    const wallets = await this.fetchWallets(connectionId, this.buildNewWallet);
+
+    await createWalletsCallback(wallets);
+
+    await Promise.all(
+      wallets.map(({ id }) =>
+        this.fetchAndCreateTransactions(connectionId, id, createTransactionsCallback),
+      ),
+    );
+  };
+
+  syncConnection = async (
+    connectionId: string,
+    lastUpdateDate: Date,
+    shouldUpdate: boolean,
+    updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+  ) => {
+    if (shouldUpdate) {
+      await this.updateAccountAndTransactions(connectionId, lastUpdateDate);
+    }
+
+    const wallets = await this.fetchWallets(connectionId, this.buildUpdateWallet);
+
+    await updateWalletsCallback(wallets);
+
+    await Promise.all(
+      wallets.map(({ id }) =>
+        this.fetchAndCreateTransactions(
+          connectionId,
+          id,
+          createTransactionsCallback,
+          lastUpdateDate,
+        ),
+      ),
+    );
+  };
+
+  deleteConnection = async (connectionId: string) => {
+    await this.client.links.delete(connectionId);
+  };
+
+  private fetchWallets = async (
+    connectionId: string,
+    walletFactory: (link: Link, institution: Institution, account: Account) => Wallet,
+  ) => {
     const link = await this.client.links.detail(connectionId);
 
     const institution = (
@@ -41,94 +93,78 @@ export class BelvoService implements IProviderService {
       })
     )[0];
 
-    return this.linkAndInstitutionToConnection(link, institution);
-  };
-
-  updateConnectionById = async (connectionId: string, lastUpdateDate: string) => {
-    const accountRetrievePromise = this.client.accounts.retrieve(connectionId, {
-      saveData: true,
-    });
-
-    const dateFrom = moment(lastUpdateDate).format('YYYY-MM-DD');
-
-    const transactionRetrievePromise = this.client.transactions.retrieve(connectionId, dateFrom, {
-      saveData: true,
-    });
-
-    await Promise.all([accountRetrievePromise, transactionRetrievePromise]);
-
-    return this.fetchConnectionById(connectionId);
-  };
-
-  deleteConnectionById = async (connectionId: string) => {
-    await this.client.links.delete(connectionId);
-  };
-
-  fetchAccounts = async (connection: Connection) => {
     const accounts = await this.client.accounts.list({
       filters: {
-        link: connection.id,
+        link: connectionId,
       },
     });
 
-    return accounts
-      .filter(({ category }) => ALLOWED_ACCOUNT_CATEGORIES.includes(category))
-      .map(
-        (account) =>
-          ({
-            id: account.id,
-            type: account.category === 'CREDIT_CARD' ? 'CREDIT' : 'BANK',
-            subtype: account.category,
-            balance: account.balance.available,
-            connectionId: connection.id,
-            provider: 'BELVO',
-          } as Account),
+    //@ts-expect-error WalletTypeList is a string list
+    const filteredAccounts = accounts.filter(({ category }) => WalletTypeList.includes(category));
+
+    return filteredAccounts.map((account) => walletFactory(link, institution, account));
+  };
+
+  private fetchAndCreateTransactions = async (
+    connectionId: string,
+    accountId: string,
+    createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
+    startDate?: Date,
+  ) => {
+    let transactions: BelvoTransaction[];
+    let page = 1;
+
+    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
+
+    do {
+      transactions = await this.client.transactions.list({
+        filters: {
+          link: connectionId,
+          page_size: DEFAULT_PAGE_SIZE,
+          page,
+          account: accountId,
+          accounting_date__gt: from,
+        },
+      });
+
+      await createTransactionsCallback(
+        transactions.map((transaction) => this.buildTransaction(transaction)),
       );
+
+      page++;
+    } while (transactions.length !== 0);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetchInvestments = async (connection: Connection) => {
-    return [] as Investment[];
-  };
-
-  fetchTransactions = async (account: Account, filters: { from: string; to: string }) => {
-    const transactions = await this.client.transactions.list({
-      filters: {
-        link: account.connectionId,
-        account: account.id,
-        accounting_date__range: `${filters.from},${filters.to}`,
-      },
-    });
-
-    return transactions.map(
-      (transaction) =>
-        ({
-          id: transaction.id,
-          description: transaction.description,
-          type: this.transactionTypeMap(transaction.type),
-          amount: transaction.amount,
-          category: transaction.category,
-          date: new Date(transaction.value_date),
-          accountId: account.id,
-          provider: 'BELVO',
-        } as Transaction),
-    );
-  };
-
-  private linkAndInstitutionToConnection = (link: Link, institution: Institution) => {
-    return {
-      id: link.id,
-      connector: {
-        name: institution.display_name || link.institution,
-        imageUrl: institution.icon_logo,
-        primaryColor: institution.primary_color.slice(1),
-      },
-      status: this.linkStatusToConnectionStatus(link.status),
+  private buildNewWallet = (link: Link, institution: Institution, account: Account) =>
+    ({
+      id: account.id,
+      name: institution.display_name || link.institution,
+      type: account.category,
+      balance: account.balance.available,
+      initialBalance: account.balance.available,
       createdAt: new Date(link.created_at),
-      lastUpdatedAt: new Date(link.last_accessed_at),
-      provider: 'BELVO',
-    } as Connection;
-  };
+      styles: {
+        imageUrl: institution.icon_logo,
+        primaryColor: institution.primary_color,
+      },
+      connection: {
+        id: link.id,
+        status: this.linkStatusToConnectionStatus(link.status),
+        provider: 'BELVO',
+        lastUpdatedAt: new Date(link.last_accessed_at),
+      },
+    } as Wallet);
+
+  private buildUpdateWallet = (link: Link, institution: Institution, account: Account) =>
+    ({
+      id: account.id,
+      balance: account.balance.available,
+      connection: {
+        id: link.id,
+        status: this.linkStatusToConnectionStatus(link.status),
+        lastUpdatedAt: new Date(link.last_accessed_at),
+      },
+    } as Wallet);
 
   private linkStatusToConnectionStatus: (status: LinkStatus) => ConnectionStatus = (
     status: LinkStatus,
@@ -145,16 +181,40 @@ export class BelvoService implements IProviderService {
     }
   };
 
+  private buildTransaction = (transaction: BelvoTransaction) =>
+    ({
+      id: transaction.id,
+      description: transaction.description,
+      date: new Date(transaction.value_date),
+      amount: transaction.amount,
+      type: this.transactionTypeMap(transaction.type),
+      walletId: transaction.account.id,
+    } as Transaction);
+
   private transactionTypeMap: (type: TransactionType) => CommonTransactionType = (
     type: TransactionType,
   ) => {
     switch (type) {
       case 'INFLOW':
-        return 'CREDIT';
+        return 'INCOME';
       case 'OUTFLOW':
-        return 'DEBIT';
+        return 'EXPENSE';
       default:
-        return 'DEBIT';
+        return 'EXPENSE';
     }
+  };
+
+  private updateAccountAndTransactions = async (connectionId: string, lastUpdateDate: Date) => {
+    const accountRetrievePromise = this.client.accounts.retrieve(connectionId, {
+      saveData: true,
+    });
+
+    const dateFrom = moment(lastUpdateDate).format('YYYY-MM-DD');
+
+    const transactionRetrievePromise = this.client.transactions.retrieve(connectionId, dateFrom, {
+      saveData: true,
+    });
+
+    await Promise.all([accountRetrievePromise, transactionRetrievePromise]);
   };
 }
