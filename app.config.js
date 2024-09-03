@@ -4,7 +4,7 @@ export default {
   expo: {
     name: IS_DEV ? 'Finans (Dev)' : 'Finans',
     slug: 'finance-app',
-    version: '1.3.0',
+    version: '2.0.0',
     orientation: 'portrait',
     icon: IS_DEV ? './src/assets/dev-icon.png' : './src/assets/icon.png',
     userInterfaceStyle: 'automatic',
