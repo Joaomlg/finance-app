@@ -125,13 +125,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [expenseTransactions],
   );
 
-  const totalInvoice = useMemo(
-    () =>
-      wallets
-        .filter(({ type }) => type === 'CREDIT_CARD')
-        .reduce((total, { balance }) => total + balance, 0),
-    [wallets],
-  );
+  const totalInvoice = 0;
 
   const setLoading = (status: boolean, message?: string) => {
     setIsLoading(status);
