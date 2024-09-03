@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React from 'react';
 import { ViewProps } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import Avatar from '../../../components/Avatar';
 import Banner from '../../../components/Banner';
 import Card from '../../../components/Card';
@@ -15,7 +14,13 @@ import Text from '../../../components/Text';
 import { Wallet } from '../../../models';
 import { formatDateHourFull } from '../../../utils/date';
 import { ConnectionStatusMessage, walletTypeText } from '../../../utils/text';
-import { CardContainer, CardContent, CardHeader, CardHeaderContent } from './styles';
+import {
+  CardContainer,
+  CardContent,
+  CardHeader,
+  CardHeaderContent,
+  CardHeaderContentName,
+} from './styles';
 
 export interface WalletCardProps extends ViewProps {
   wallet: Wallet;
@@ -51,16 +56,17 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
               <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
             </Avatar>
             <CardHeaderContent>
-              <Text>{wallet.name}</Text>
+              <CardHeaderContentName>
+                <Text>{wallet.name}</Text>
+                <Icon name={wallet.connection ? 'link' : 'link-off'} size={18} />
+              </CardHeaderContentName>
               {wallet.connection && (
                 <Text typography="extraLight" color="textLight">
                   Sincronizado em: {lastUpdateDate}
                 </Text>
               )}
             </CardHeaderContent>
-            <TouchableOpacity>
-              <Icon name="navigate-next" size={24} />
-            </TouchableOpacity>
+            <Icon name="navigate-next" size={24} />
           </CardHeader>
           <Divider />
           <CardContent>

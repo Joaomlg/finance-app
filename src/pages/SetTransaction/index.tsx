@@ -57,7 +57,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   };
 
   const handleTransactionDescriptionChange = (description: string) => {
-    setTransactionValues((value) => ({ ...value, description }));
+    setTransactionValues((value) => ({ ...value, description: description.trim() }));
   };
 
   const renderTransactionWalletSelector = () => {

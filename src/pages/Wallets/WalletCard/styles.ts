@@ -15,6 +15,12 @@ export const CardHeaderContent = styled.View`
   flex-grow: 1;
 `;
 
+export const CardHeaderContentName = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
 export const CardContent = styled.View`
   gap: 16px;
 `;

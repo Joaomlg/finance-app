@@ -45,7 +45,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   };
 
   const handleWalletNameChange = (name: string) => {
-    setWalletValues((value) => ({ ...value, name }));
+    setWalletValues((value) => ({ ...value, name: name.trim() }));
   };
 
   const renderWalletTypeSelector = () => {
