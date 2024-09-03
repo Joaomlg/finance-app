@@ -37,7 +37,7 @@ export class BelvoService implements IProviderService {
     createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
-    const wallets = await this.fetchWallets(connectionId);
+    const wallets = await this.fetchWallets(connectionId, this.buildNewWallet);
 
     await createWalletsCallback(wallets);
 
@@ -59,7 +59,7 @@ export class BelvoService implements IProviderService {
       await this.updateAccountAndTransactions(connectionId, lastUpdateDate);
     }
 
-    const wallets = await this.fetchWallets(connectionId);
+    const wallets = await this.fetchWallets(connectionId, this.buildUpdateWallet);
 
     await updateWalletsCallback(wallets);
 
@@ -79,7 +79,10 @@ export class BelvoService implements IProviderService {
     await this.client.links.delete(connectionId);
   };
 
-  private fetchWallets = async (connectionId: string) => {
+  private fetchWallets = async (
+    connectionId: string,
+    walletFactory: (link: Link, institution: Institution, account: Account) => Wallet,
+  ) => {
     const link = await this.client.links.detail(connectionId);
 
     const institution = (
@@ -99,7 +102,7 @@ export class BelvoService implements IProviderService {
     //@ts-expect-error WalletTypeList is a string list
     const filteredAccounts = accounts.filter(({ category }) => WalletTypeList.includes(category));
 
-    return filteredAccounts.map((account) => this.buildWallet(link, institution, account));
+    return filteredAccounts.map((account) => walletFactory(link, institution, account));
   };
 
   private fetchAndCreateTransactions = async (
@@ -132,7 +135,7 @@ export class BelvoService implements IProviderService {
     } while (transactions.length !== 0);
   };
 
-  private buildWallet = (link: Link, institution: Institution, account: Account) =>
+  private buildNewWallet = (link: Link, institution: Institution, account: Account) =>
     ({
       id: account.id,
       name: institution.display_name || link.institution,
@@ -148,6 +151,17 @@ export class BelvoService implements IProviderService {
         id: link.id,
         status: this.linkStatusToConnectionStatus(link.status),
         provider: 'BELVO',
+        lastUpdatedAt: new Date(link.last_accessed_at),
+      },
+    } as Wallet);
+
+  private buildUpdateWallet = (link: Link, institution: Institution, account: Account) =>
+    ({
+      id: account.id,
+      balance: account.balance.available,
+      connection: {
+        id: link.id,
+        status: this.linkStatusToConnectionStatus(link.status),
         lastUpdatedAt: new Date(link.last_accessed_at),
       },
     } as Wallet);

@@ -46,7 +46,7 @@ export class PluggyService implements IProviderService {
 
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
-    await updateWalletsCallback(accounts.map((account) => this.buildWallet(item, account)));
+    await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
@@ -98,7 +98,7 @@ export class PluggyService implements IProviderService {
     } while (transactions.results.length !== 0);
   };
 
-  private buildWallet = (item: Item, account: Account) =>
+  private buildNewWallet = (item: Item, account: Account) =>
     ({
       id: account.id,
       name: item.connector.name,
@@ -114,6 +114,17 @@ export class PluggyService implements IProviderService {
         id: item.id,
         status: item.status,
         provider: 'PLUGGY',
+        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+      },
+    } as Wallet);
+
+  private buildUpdateWallet = (item: Item, account: Account) =>
+    ({
+      id: account.id,
+      balance: account.balance,
+      connection: {
+        id: item.id,
+        status: item.status,
         lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
       },
     } as Wallet);
