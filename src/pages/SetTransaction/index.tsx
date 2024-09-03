@@ -69,18 +69,20 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       closeBottomSheet();
     };
 
-    const items = wallets.map(
-      (wallet) =>
-        ({
-          text: wallet.name,
-          renderIcon: () => (
-            <Avatar color={wallet.styles.primaryColor} size={32}>
-              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
-            </Avatar>
-          ),
-          onPress: () => handleItemPressed(wallet.id),
-        } as SelectionItem),
-    );
+    const items = wallets
+      .filter((wallet) => !wallet.connection)
+      .map(
+        (wallet) =>
+          ({
+            text: wallet.name,
+            renderIcon: () => (
+              <Avatar color={wallet.styles.primaryColor} size={32}>
+                <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
+              </Avatar>
+            ),
+            onPress: () => handleItemPressed(wallet.id),
+          } as SelectionItem),
+      );
 
     return <ListItemSelection title="Carteira" items={items} />;
   };
