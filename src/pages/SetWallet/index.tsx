@@ -112,7 +112,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
     if (isEditing) {
       await updateWallet(walletId, walletValues);
     } else {
-      createWallet({
+      await createWallet({
         ...walletValues,
         id: uuid.v4().toString(),
         createdAt: new Date(),

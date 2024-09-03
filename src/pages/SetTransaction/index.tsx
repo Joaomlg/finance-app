@@ -135,7 +135,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     if (isEditing) {
       await updateTransaction(transactionId, transactionValues);
     } else {
-      createTransaction({
+      await createTransaction({
         ...(transactionValues as Transaction),
         id: uuid.v4().toString(),
         type: transactionType,
