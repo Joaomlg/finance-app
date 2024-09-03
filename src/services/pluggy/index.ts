@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Transaction, Wallet } from '../../models';
+import { Transaction, Wallet, WalletTypeList } from '../../models';
 import { IProviderService } from '../providerService.interface';
 import { PluggyClient } from './client';
 import { Account, Item, PageResponse, Transaction as PluggyTransaction } from './types';
@@ -65,7 +65,12 @@ export class PluggyService implements IProviderService {
       this.client.fetchAccounts(connectionId),
     ]);
 
-    return [item, accounts.results] as [Item, Account[]];
+    const filteredAccounts = accounts.results.filter((account) =>
+      //@ts-expect-error WalletTypeList is a string list
+      WalletTypeList.includes(account.subtype),
+    );
+
+    return [item, filteredAccounts] as [Item, Account[]];
   };
 
   private fetchAndCreateTransactions = async (

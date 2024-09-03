@@ -4,12 +4,12 @@ import {
   ConnectionStatus,
   Transaction,
   Wallet,
+  WalletTypeList,
 } from '../../models';
 import { IProviderService } from '../providerService.interface';
 import { BelvoClient } from './client';
 import {
   Account,
-  AccountCategory,
   Transaction as BelvoTransaction,
   Institution,
   Link,
@@ -21,12 +21,6 @@ export * from './client';
 export * from './types';
 
 const DEFAULT_PAGE_SIZE = 100;
-
-const ALLOWED_ACCOUNT_CATEGORIES: AccountCategory[] = [
-  'CHECKING_ACCOUNT',
-  'CREDIT_CARD',
-  'SAVINGS_ACCOUNT',
-];
 
 export class BelvoService implements IProviderService {
   constructor(private client: BelvoClient) {}
@@ -102,9 +96,8 @@ export class BelvoService implements IProviderService {
       },
     });
 
-    const filteredAccounts = accounts.filter(({ category }) =>
-      ALLOWED_ACCOUNT_CATEGORIES.includes(category),
-    );
+    //@ts-expect-error WalletTypeList is a string list
+    const filteredAccounts = accounts.filter(({ category }) => WalletTypeList.includes(category));
 
     return filteredAccounts.map((account) => this.buildWallet(link, institution, account));
   };
