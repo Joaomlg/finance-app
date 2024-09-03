@@ -23,7 +23,7 @@ const Transactions: React.FC = () => {
     totalIncomes,
     expenseTransactions,
     totalExpenses,
-  } = useContext(AppContext2);
+  } = useContext(AppContext);
 
   const tabs: TabProps[] = [
     { key: 'default', title: 'Tudo' },

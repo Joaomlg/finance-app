@@ -8,7 +8,7 @@ import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext2, { MonthlyBalance } from '../../contexts/AppContext';
+import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
 import { checkCurrentYear } from '../../utils/date';
 import {
   HorizontalBarContainer,
@@ -35,7 +35,7 @@ const History: React.FC = () => {
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
     setDate,
-  } = useContext(AppContext2);
+  } = useContext(AppContext);
 
   const theme = useTheme();
   const navigation = useNavigation();
