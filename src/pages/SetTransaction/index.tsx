@@ -4,7 +4,7 @@ import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
-import CategoryIcon from '../../components/CategoryIcon';
+import CategoryPicker from '../../components/CategoryPicker';
 import Divider from '../../components/Divider';
 import ListItemSelection, {
   SelectionItem,
@@ -19,13 +19,9 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { Transaction, TransactionType } from '../../models';
+import { Category, Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
-import {
-  expensePresetCategories,
-  getCategoryById,
-  incomePresetCategories,
-} from '../../utils/category';
+import { getCategoryById } from '../../utils/category';
 import { formatDate } from '../../utils/date';
 import { transactionTypeText } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
@@ -88,24 +84,15 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   };
 
   const renderTransactionCategorySelector = () => {
-    const handleItemPressed = (categoryId: string) => {
+    const handleItemPressed = ({ id }: Category) => {
       setTransactionValues((value) => ({
         ...value,
-        categoryId,
+        categoryId: id,
       }));
       closeBottomSheet();
     };
 
-    const categories =
-      transactionType === 'INCOME' ? incomePresetCategories : expensePresetCategories;
-
-    const items: SelectionItem[] = categories.map((category) => ({
-      text: category.name,
-      renderIcon: () => <CategoryIcon category={category} />,
-      onPress: () => handleItemPressed(category.id),
-    }));
-
-    return <ListItemSelection title="Categoria" items={items} />;
+    return <CategoryPicker type={transactionType} onPress={handleItemPressed} />;
   };
 
   const showTransactionDatePicker = () => {
