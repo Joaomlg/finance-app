@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
-import { TouchableOpacityProps } from 'react-native';
-import { Transaction } from '../../models';
+import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { Category, Transaction } from '../../models';
 import Money from '../Money';
 import Text from '../Text';
 
 import { useNavigation } from '@react-navigation/native';
 import AppContext from '../../contexts/AppContext';
+import useBottomSheet from '../../hooks/useBottomSheet';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
+import CategoryPicker from '../CategoryPicker';
 import { ListItem, ListItemAmount, ListItemContent, StyledCategoryIcon } from './styles';
 
 export interface TransactionListItemProps extends TouchableOpacityProps {
@@ -16,7 +18,9 @@ export interface TransactionListItemProps extends TouchableOpacityProps {
 const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...props }) => {
   const value = item.type === 'EXPENSE' && item.amount > 0 ? -1 * item.amount : item.amount;
 
-  const { wallets } = useContext(AppContext);
+  const { wallets, updateTransaction } = useContext(AppContext);
+  const { openBottomSheet, closeBottomSheet } = useBottomSheet();
+
   const navigation = useNavigation();
 
   const wallet = wallets.find(({ id }) => id === item.walletId);
@@ -28,9 +32,24 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
     });
   };
 
+  const handleCategoryAvatarPressed = () => {
+    openBottomSheet(renderTransactionCategorySelector());
+  };
+
+  const renderTransactionCategorySelector = () => {
+    const handleItemPressed = async ({ id }: Category) => {
+      await updateTransaction(item.id, { categoryId: id });
+      closeBottomSheet();
+    };
+
+    return <CategoryPicker type={item.type} onPress={handleItemPressed} />;
+  };
+
   return (
     <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
-      <StyledCategoryIcon category={category} ignored={item.ignore} />
+      <TouchableOpacity onPress={handleCategoryAvatarPressed}>
+        <StyledCategoryIcon category={category} ignored={item.ignore} />
+      </TouchableOpacity>
       <ListItemContent>
         {category.name && (
           <Text typography="extraLight" color="textLight">

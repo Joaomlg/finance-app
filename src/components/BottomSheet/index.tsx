@@ -87,8 +87,7 @@ const BottomSheet: React.ForwardRefRenderFunction<BottomSheetMethods, BottomShee
       }}
     >
       <BottomSheetScrollView
-        style={{
-          flex: 1,
+        contentContainerStyle={{
           padding: 24,
           gap: 24,
         }}

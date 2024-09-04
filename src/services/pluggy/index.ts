@@ -24,7 +24,7 @@ export class PluggyService implements IProviderService {
   ) => {
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
-    await createWalletsCallback(accounts.map((account) => this.buildWallet(item, account)));
+    await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>

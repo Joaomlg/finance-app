@@ -35,7 +35,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
     getCategoryById(transaction.categoryId) || getDefaultCategoryByType(transaction.type);
 
   const toggleIgnore = async () => {
-    updateTransaction(transaction.id, {
+    await updateTransaction(transaction.id, {
       ignore: !transaction.ignore,
     });
   };
