@@ -39,7 +39,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
       return;
     }
 
-    updateWallet(wallet.id, {
+    await updateWallet(wallet.id, {
       connection: {
         updateDisabled: !wallet.connection.updateDisabled,
       },
