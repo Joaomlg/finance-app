@@ -4,11 +4,10 @@ import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
-import * as transactionRepository from '../repositories/transactionRepository';
-import * as walletRepository from '../repositories/walletRepository';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
 import { RecursivePartial } from '../utils/type';
+import { transactionRepository, walletRepository } from '../repositories';
 
 export type MonthlyBalance = {
   date: Moment;
