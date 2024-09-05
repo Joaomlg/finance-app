@@ -1,11 +1,12 @@
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Wallet } from '../models';
-import { RecursivePartial } from '../utils/type';
 import { flattenObject } from '../utils/object';
+import { getRepositoryName } from '../utils/repository';
+import { RecursivePartial } from '../utils/type';
 
 const WALLETS_FIREBASE_COLLECTION = 'wallets';
 
-const walletsCollection = firestore().collection(WALLETS_FIREBASE_COLLECTION);
+const walletsCollection = firestore().collection(getRepositoryName(WALLETS_FIREBASE_COLLECTION));
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
   const { createdAt, ...values } = data;

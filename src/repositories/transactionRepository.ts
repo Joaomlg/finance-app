@@ -1,9 +1,10 @@
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Transaction } from '../models';
 import { getTransactionSignedAmount } from '../utils/money';
+import { flattenObject } from '../utils/object';
+import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
 import { getWalletReference } from './walletRepository';
-import { flattenObject } from '../utils/object';
 
 type DateInterval = {
   startDate: Date;
@@ -22,7 +23,9 @@ export type TransactionQueryOptions = {
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
-const transactionsCollection = firestore().collection(TRANSACTIONS_FIREBASE_COLLECTION);
+const transactionsCollection = firestore().collection(
+  getRepositoryName(TRANSACTIONS_FIREBASE_COLLECTION),
+);
 
 const buildColletionQuery = (options?: TransactionQueryOptions) => {
   let query: FirebaseFirestoreTypes.Query = transactionsCollection;
