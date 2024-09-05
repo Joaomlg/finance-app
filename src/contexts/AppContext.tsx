@@ -189,6 +189,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       await walletRepository.setWallet(wallet);
+      Toast.show({ type: 'success', text1: 'Carteira criada com sucesso!' });
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível criar a carteira!' });
     }
@@ -201,6 +202,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       await walletRepository.updateWallet(id, values);
+      Toast.show({ type: 'success', text1: 'Carteira atualizada com sucesso!' });
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -214,6 +216,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const deleteWallet = async (wallet: Wallet) => {
     setFetchingWallets(true);
 
+    let hasError = false;
+
     try {
       await walletRepository.deleteWallet(wallet);
     } catch (error) {
@@ -221,6 +225,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         type: 'error',
         text1: 'Não foi possível apagar a carteira!',
       });
+      return;
     }
 
     try {
@@ -230,6 +235,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         type: 'error',
         text1: 'Não foi possível apagar as transações da carteira!',
       });
+      hasError = true;
     }
 
     try {
@@ -239,6 +245,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         type: 'warn',
         text1: 'Não foi possível apagar a conexão com o provedor!',
       });
+      hasError = true;
+    }
+
+    if (!hasError) {
+      Toast.show({ type: 'success', text1: 'Carteira removida com sucesso!' });
     }
 
     setFetchingWallets(false);
@@ -280,6 +291,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       await transactionRepository.setTransaction(transaction);
+      Toast.show({ type: 'success', text1: 'Transação criada com sucesso!' });
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Não foi possível criar a transação!' });
     }
@@ -292,6 +304,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       await transactionRepository.updateTransaction(id, values);
+      Toast.show({ type: 'success', text1: 'Transação alterada com sucesso!' });
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -307,6 +320,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       await transactionRepository.deleteTransaction(transaction);
+      Toast.show({ type: 'success', text1: 'Transação removida com sucesso!' });
     } catch (error) {
       Toast.show({
         type: 'error',
