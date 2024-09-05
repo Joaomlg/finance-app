@@ -13,7 +13,12 @@ export const flattenObject = (
   for (const key in obj) {
     const newKey = parentKey ? `${parentKey}.${key}` : key;
 
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+    if (
+      typeof obj[key] === 'object' &&
+      obj[key] !== null &&
+      !Array.isArray(obj[key]) &&
+      !(obj[key] instanceof Date)
+    ) {
       flattenObject(obj[key], newKey, result);
     } else {
       result[newKey] = obj[key];

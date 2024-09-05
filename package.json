@@ -1,6 +1,6 @@
 {
   "name": "finance-app",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -9,6 +9,7 @@
     "prebuild": "expo prebuild",
     "build:development": "eas build --profile development",
     "build:production": "eas build --profile production",
+    "update:production": "eas update --channel production",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",

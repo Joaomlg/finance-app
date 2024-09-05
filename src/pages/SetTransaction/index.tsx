@@ -157,7 +157,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
               color="textWhite"
               keyboardType="decimal-pad"
               iconRight={!isEditingAutomaticTransaction ? 'edit' : undefined}
-              value={transactionValues.amount?.toString()}
+              defaultValue={transactionValues.amount?.toString()}
               onChangeText={handleTransactionBalanceChange}
               readOnly={isEditingAutomaticTransaction}
             />

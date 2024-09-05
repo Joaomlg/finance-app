@@ -1,9 +1,10 @@
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Transaction } from '../models';
 import { getTransactionSignedAmount } from '../utils/money';
+import { flattenObject } from '../utils/object';
+import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
 import { getWalletReference } from './walletRepository';
-import { flattenObject } from '../utils/object';
 
 type DateInterval = {
   startDate: Date;
@@ -22,7 +23,9 @@ export type TransactionQueryOptions = {
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
-const transactionsCollection = firestore().collection(TRANSACTIONS_FIREBASE_COLLECTION);
+const transactionsCollection = firestore().collection(
+  getRepositoryName(TRANSACTIONS_FIREBASE_COLLECTION),
+);
 
 const buildColletionQuery = (options?: TransactionQueryOptions) => {
   let query: FirebaseFirestoreTypes.Query = transactionsCollection;
@@ -87,7 +90,7 @@ export const setTransaction = async (transaction: Transaction) => {
     }
 
     t.set(transactionReference, transaction).update(walletReference, {
-      balance: walletSnapshot.data()?.balance + getTransactionSignedAmount(transaction),
+      balance: firestore.FieldValue.increment(getTransactionSignedAmount(transaction)),
     });
   });
 };
@@ -127,12 +130,10 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
     }
 
     t.update(transactionReference, data).update(walletReference, {
-      balance:
-        walletSnapshot.data()?.balance -
-        // @ts-expect-error transaction snapshot exists
-        getTransactionSignedAmount(transactionSnapshot.data()) +
-        // @ts-expect-error transaction has amount
-        getTransactionSignedAmount(values),
+      balance: firestore.FieldValue.increment(
+        // @ts-expect-error transaction and transactionSnapshot has amount
+        getTransactionSignedAmount(values) - getTransactionSignedAmount(transactionSnapshot.data()),
+      ),
     });
   });
 };
@@ -154,7 +155,7 @@ export const deleteTransaction = async (transaction: Transaction) => {
 
     if (walletSnapshot.exists) {
       t.update(walletReference, {
-        balance: walletSnapshot.data()?.balance - getTransactionSignedAmount(transaction),
+        balance: firestore.FieldValue.increment(-1 * getTransactionSignedAmount(transaction)),
       });
     }
   });
