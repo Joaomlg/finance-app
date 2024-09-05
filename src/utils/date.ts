@@ -1,6 +1,8 @@
 import moment, { Moment } from 'moment';
 
-export const NOW = moment();
+moment.locale('pt-BR');
+
+export const NOW = moment.utc().add(moment().utcOffset(), 'minutes');
 
 export const getMonthStartDay = (date: Moment) => date.startOf('month');
 

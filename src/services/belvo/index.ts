@@ -114,8 +114,6 @@ export class BelvoService implements IProviderService {
     let transactions: BelvoTransaction[];
     let page = 1;
 
-    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
-
     do {
       transactions = await this.client.transactions.list({
         filters: {
@@ -123,12 +121,17 @@ export class BelvoService implements IProviderService {
           page_size: DEFAULT_PAGE_SIZE,
           page,
           account: accountId,
-          accounting_date__gt: from,
+          collected_at__gt: startDate?.toISOString(),
         },
       });
 
       await createTransactionsCallback(
-        transactions.map((transaction) => this.buildTransaction(transaction)),
+        transactions
+          .filter(
+            (transaction) =>
+              startDate === undefined || new Date(transaction.value_date) > startDate,
+          )
+          .map((transaction) => this.buildTransaction(transaction)),
       );
 
       page++;

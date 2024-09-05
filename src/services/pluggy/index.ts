@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Transaction, Wallet, WalletTypeList } from '../../models';
 import { IProviderService } from '../providerService.interface';
 import { PluggyClient } from './client';
@@ -81,17 +80,19 @@ export class PluggyService implements IProviderService {
     let transactions: PageResponse<PluggyTransaction>;
     let page = 1;
 
-    const from = startDate ? moment(startDate).format('YYYY-MM-DD') : undefined;
-
     do {
       transactions = await this.client.fetchTransactions(accountId, {
         pageSize: DEFAULT_PAGE_SIZE,
         page,
-        from,
+        from: startDate?.toISOString(),
       });
 
       await createTransactionsCallback(
-        transactions.results.map((transaction) => this.buildTransaction(transaction, accountId)),
+        transactions.results
+          .filter(
+            (transaction) => startDate === undefined || new Date(transaction.date) > startDate,
+          )
+          .map((transaction) => this.buildTransaction(transaction, accountId)),
       );
 
       page++;

@@ -6,7 +6,6 @@ import {
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import moment from 'moment';
 import 'moment/locale/pt';
 import React, { useEffect } from 'react';
 import { Platform, SafeAreaView, UIManager, useColorScheme } from 'react-native';
@@ -21,8 +20,6 @@ import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
 import light from './src/theme/light';
-
-moment.locale('pt-BR');
 
 SplashScreen.preventAutoHideAsync();
 

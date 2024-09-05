@@ -8,7 +8,6 @@ import * as transactionRepository from '../repositories/transactionRepository';
 import * as walletRepository from '../repositories/walletRepository';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
-import { NOW } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
 
 export type MonthlyBalance = {
@@ -373,19 +372,19 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
+    const now = new Date();
+
+    const walletsToSync = wallets.filter(
+      (wallet) => wallet.connection !== undefined && now > wallet.connection.lastUpdatedAt,
+    );
+
+    if (!walletsToSync.length) {
+      return;
+    }
+
     const syncAllConnections = async () => {
       setLoading(true, 'Sincronizando conexões');
-
-      await Promise.all(
-        wallets
-          .filter(
-            (wallet) =>
-              wallet.connection !== undefined &&
-              NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
-          )
-          .map((wallet) => syncWalletConnection(wallet, false)),
-      );
-
+      await Promise.all(walletsToSync.map((wallet) => syncWalletConnection(wallet, false)));
       setLoading(false);
     };
 
