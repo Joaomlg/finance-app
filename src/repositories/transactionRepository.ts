@@ -90,7 +90,7 @@ export const setTransaction = async (transaction: Transaction) => {
     }
 
     t.set(transactionReference, transaction).update(walletReference, {
-      balance: walletSnapshot.data()?.balance + getTransactionSignedAmount(transaction),
+      balance: firestore.FieldValue.increment(getTransactionSignedAmount(transaction)),
     });
   });
 };
@@ -130,12 +130,10 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
     }
 
     t.update(transactionReference, data).update(walletReference, {
-      balance:
-        walletSnapshot.data()?.balance -
-        // @ts-expect-error transaction snapshot exists
-        getTransactionSignedAmount(transactionSnapshot.data()) +
-        // @ts-expect-error transaction has amount
-        getTransactionSignedAmount(values),
+      balance: firestore.FieldValue.increment(
+        // @ts-expect-error transaction and transactionSnapshot has amount
+        getTransactionSignedAmount(values) - getTransactionSignedAmount(transactionSnapshot.data()),
+      ),
     });
   });
 };
@@ -157,7 +155,7 @@ export const deleteTransaction = async (transaction: Transaction) => {
 
     if (walletSnapshot.exists) {
       t.update(walletReference, {
-        balance: walletSnapshot.data()?.balance - getTransactionSignedAmount(transaction),
+        balance: firestore.FieldValue.increment(-1 * getTransactionSignedAmount(transaction)),
       });
     }
   });
