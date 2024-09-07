@@ -74,11 +74,9 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             <CategoryIcon category={category} size={48} />
             <BottomHeaderContent>
               <Text typography="heading">{transaction.description}</Text>
-              {category.name && (
-                <Text typography="extraLight" color="textLight" selectable={true}>
-                  {category.name}
-                </Text>
-              )}
+              <Text typography="extraLight" color="textLight" selectable={true}>
+                {transaction.id}
+              </Text>
             </BottomHeaderContent>
           </BottomHeader>
           <InformationGroup>
@@ -90,6 +88,9 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             </RowContent>
             <RowContent text="Tipo">
               <Text typography="defaultBold">{transactionTypeText[transaction.type]}</Text>
+            </RowContent>
+            <RowContent text="Categoria">
+              <Text typography="defaultBold">{category.name}</Text>
             </RowContent>
           </InformationGroup>
           <Divider />
