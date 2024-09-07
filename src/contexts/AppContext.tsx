@@ -4,10 +4,11 @@ import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
+import { transactionRepository, walletRepository } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
+import { NOW } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
-import { transactionRepository, walletRepository } from '../repositories';
 
 export type MonthlyBalance = {
   date: Moment;
@@ -385,10 +386,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    const now = new Date();
-
     const walletsToSync = wallets.filter(
-      (wallet) => wallet.connection !== undefined && now > wallet.connection.lastUpdatedAt,
+      (wallet) =>
+        wallet.connection !== undefined && NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
     );
 
     if (!walletsToSync.length) {
