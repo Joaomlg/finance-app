@@ -18,7 +18,7 @@ export const getCategoryById = (id?: string) => {
 
 export const getDefaultCategoryByType = (type: CategoryType) => {
   return {
-    name: '',
+    name: 'Sem categoria',
     icon: type === 'EXPENSE' ? 'shopping-cart' : 'attach-money',
     color: type === 'EXPENSE' ? 'expense' : 'income',
     type: type,
