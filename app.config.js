@@ -46,6 +46,7 @@ export default {
       '@react-native-firebase/app',
       '@react-native-firebase/auth',
       '@react-native-google-signin/google-signin',
+      'expo-font',
     ],
   },
 };
