@@ -14,12 +14,9 @@ import Text from '../../components/Text';
 import TransactionListItem from '../../components/TransactionListItem';
 import AppContext from '../../contexts/AppContext';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
+import BalanceSection from './components/BalanceSection';
 import {
-  BalanceContainer,
-  BalanceFillLine,
-  BalanceLine,
   BalanceWithTrending,
-  ConnectionsButton,
   Divider,
   HorizontalBarContainer,
   SectionHeader,
@@ -48,15 +45,11 @@ const Home: React.FC = () => {
     date,
     setDate,
     transactions,
-    totalBalance,
     totalIncomes,
     totalExpenses,
-    totalInvoice,
     fetchWallets,
     fetchTransactions,
   } = useContext(AppContext);
-
-  const totalInvestment = 0;
 
   const isCurrentMonth = checkCurrentMonth(date);
 
@@ -132,42 +125,7 @@ const Home: React.FC = () => {
             ]}
             hideGoBackIcon={true}
           />
-          {isCurrentMonth && (
-            <BalanceContainer>
-              <BalanceLine>
-                <Text color="textWhite">Saldo das contas</Text>
-                <BalanceFillLine />
-                <Money value={totalBalance} color="textWhite" />
-              </BalanceLine>
-              <BalanceLine>
-                <Text color="textWhite">Fatura dos cartões</Text>
-                <BalanceFillLine />
-                <Money value={-1 * totalInvoice} color="textWhite" />
-              </BalanceLine>
-              <BalanceLine>
-                <Text color="textWhite">Investimentos</Text>
-                <BalanceFillLine />
-                <Money value={totalInvestment} color="textWhite" />
-              </BalanceLine>
-              <BalanceLine>
-                <Text typography="title" color="textWhite">
-                  Total
-                </Text>
-                <BalanceFillLine />
-                <Money
-                  value={totalBalance + totalInvestment - totalInvoice}
-                  typography="title"
-                  color="textWhite"
-                />
-              </BalanceLine>
-              <ConnectionsButton
-                text="Ver minhas carteiras"
-                color="secondary"
-                icon="account-balance-wallet"
-                onPress={() => navigation.navigate('wallets')}
-              />
-            </BalanceContainer>
-          )}
+          {isCurrentMonth && <BalanceSection />}
         </TopContainer>
         <ScreenContent>
           <SummaryContainer>
