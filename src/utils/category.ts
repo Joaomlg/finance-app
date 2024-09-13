@@ -1,4 +1,5 @@
 import { Category, CategoryType } from '../models';
+import light from '../theme/light';
 
 const PRESET_CATEGORY_ID_PREFIX = 'finance-app-category-';
 
@@ -20,7 +21,7 @@ export const getDefaultCategoryByType = (type: CategoryType) => {
   return {
     name: 'Sem categoria',
     icon: type === 'EXPENSE' ? 'shopping-cart' : 'attach-money',
-    color: type === 'EXPENSE' ? 'expense' : 'income',
+    color: type === 'EXPENSE' ? light.colors.expense : light.colors.income,
     type: type,
   } as Category;
 };
