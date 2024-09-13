@@ -1,6 +1,7 @@
 import React, { useContext, useMemo, useState } from 'react';
+import { TouchableWithoutFeedback, View } from 'react-native';
 import { useTheme } from 'styled-components';
-import { Data, VictoryChart, VictoryContainer, VictoryPie } from 'victory-native';
+import { Data, VictoryPie } from 'victory-native';
 import Avatar from '../../../../components/Avatar';
 import Money from '../../../../components/Money';
 import RowContent from '../../../../components/RowContent';
@@ -8,8 +9,7 @@ import Text from '../../../../components/Text';
 import AppContext from '../../../../contexts/AppContext';
 import { getCategoryById, getDefaultCategoryByType } from '../../../../utils/category';
 import { SectionHeader } from '../commonStyles';
-import { ChardContainer, Container, LegendContainer } from './styles';
-import { TouchableWithoutFeedback, View } from 'react-native';
+import { ChardContainer, LegendContainer } from './styles';
 
 export type CategorySectionProps = {
   numberOfCategories?: number;
@@ -59,7 +59,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({ numberOfCategories })
     return [
       {
         target: 'data',
-        mutation: ({ datum }) => {
+        mutation: ({ datum }: { datum: Data }) => {
           setSelected((prev) => (prev === datum.x ? '' : datum.x));
         },
       },
@@ -73,38 +73,34 @@ const CategorySection: React.FC<CategorySectionProps> = ({ numberOfCategories })
           <Text typography="title">Despesas por categoria</Text>
         </SectionHeader>
         <ChardContainer>
-          <VictoryChart
+          <VictoryPie
+            data={data}
             height={300}
-            containerComponent={<VictoryContainer disableContainerEvents />}
-          >
-            <VictoryPie
-              data={data}
-              innerRadius={50}
-              cornerRadius={5}
-              labels={({ datum }) => `${((datum.y * 100) / totalExpenses).toFixed(0)}%`}
-              padAngle={2}
-              style={{
-                data: {
-                  fill: ({ datum }) => datum.color,
-                  fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
+            innerRadius={50}
+            cornerRadius={5}
+            labels={({ datum }) => `${((datum.y * 100) / totalExpenses).toFixed(0)}%`}
+            padAngle={2}
+            style={{
+              data: {
+                fill: ({ datum }) => datum.color,
+                fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
+              },
+              labels: {
+                opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
+                fill: theme.colors.text,
+                fontSize: theme.text.default,
+                fontWeight: 'bold',
+              },
+            }}
+            events={[
+              {
+                target: 'data',
+                eventHandlers: {
+                  onPressIn: handleSlicePressed,
                 },
-                labels: {
-                  opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
-                  fill: theme.colors.text,
-                  fontSize: theme.text.default,
-                  fontWeight: 'bold',
-                },
-              }}
-              events={[
-                {
-                  target: 'data',
-                  eventHandlers: {
-                    onPressIn: handleSlicePressed,
-                  },
-                },
-              ]}
-            />
-          </VictoryChart>
+              },
+            ]}
+          />
         </ChardContainer>
         <LegendContainer>
           {data
