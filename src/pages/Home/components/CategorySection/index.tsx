@@ -30,23 +30,25 @@ const CategorySection: React.FC<CategorySectionProps> = ({ numberOfCategories })
   const data = useMemo(() => {
     const result = [] as Data[];
 
-    expenseTransactions.reduce((res, transaction) => {
-      const category =
-        getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
+    expenseTransactions
+      .filter((transaction) => !transaction.ignore)
+      .reduce((res, transaction) => {
+        const category =
+          getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
 
-      if (!res[category.id]) {
-        res[category.id] = {
-          x: category.name,
-          y: 0,
-          color: category.color,
-        };
-        result.push(res[category.id]);
-      }
+        if (!res[category.id]) {
+          res[category.id] = {
+            x: category.name,
+            y: 0,
+            color: category.color,
+          };
+          result.push(res[category.id]);
+        }
 
-      res[category.id].y += Math.abs(transaction.amount);
+        res[category.id].y += Math.abs(transaction.amount);
 
-      return res;
-    }, {} as Record<string, Data>);
+        return res;
+      }, {} as Record<string, Data>);
 
     return result;
   }, [expenseTransactions]);
