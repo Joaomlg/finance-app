@@ -49,7 +49,7 @@ export class PluggyService implements IProviderService {
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
-        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, true),
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
       ),
     );
   };
@@ -75,39 +75,28 @@ export class PluggyService implements IProviderService {
   private fetchAndCreateTransactions = async (
     accountId: string,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
-    fromLastTransactionDate?: boolean,
+    startDate?: Date,
   ) => {
     let transactions: PageResponse<PluggyTransaction>;
     let page = 1;
-    let from: Date | undefined;
-
-    if (fromLastTransactionDate) {
-      const lastTransaction = await this.getLastTransaction(accountId);
-      if (lastTransaction) {
-        from = new Date(lastTransaction.date);
-      }
-    }
 
     do {
       transactions = await this.client.fetchTransactions(accountId, {
         pageSize: DEFAULT_PAGE_SIZE,
         page,
-        from: from?.toISOString(),
+        from: startDate?.toISOString(),
       });
 
       await createTransactionsCallback(
         transactions.results
-          .filter((transaction) => from === undefined || new Date(transaction.date) > from)
+          .filter(
+            (transaction) => startDate === undefined || new Date(transaction.date) > startDate,
+          )
           .map((transaction) => this.buildTransaction(transaction, accountId)),
       );
 
       page++;
     } while (transactions.results.length !== 0);
-  };
-
-  private getLastTransaction = async (accountId: string) => {
-    const transactions = await this.client.fetchTransactions(accountId, { pageSize: 1 });
-    return transactions.results.length > 0 ? transactions.results[0] : null;
   };
 
   private buildNewWallet = (item: Item, account: Account) =>
