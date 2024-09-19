@@ -19,6 +19,8 @@ type Order = {
 export type TransactionQueryOptions = {
   interval?: DateInterval;
   order?: Order;
+  count?: number;
+  walletId?: string;
 };
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
@@ -36,8 +38,16 @@ const buildColletionQuery = (options?: TransactionQueryOptions) => {
       .where('date', '<=', options.interval.endDate);
   }
 
+  if (options?.walletId) {
+    query.where('walletId', '==', options.walletId);
+  }
+
   if (options?.order) {
     query = query.orderBy(options.order.by, options.order.direction);
+  }
+
+  if (options?.count) {
+    query = query.limit(options.count);
   }
 
   return query;
@@ -173,4 +183,19 @@ export const deleteAllTransactionsByWalletId = async (walletId: string) => {
   });
 
   return batch.commit();
+};
+
+export const getLastWalletTransaction = async (walletId: string) => {
+  const result = await getTransactions({
+    walletId,
+    order: {
+      by: 'date',
+      direction: 'desc',
+    },
+    count: 1,
+  });
+
+  if (result.length > 0) {
+    return result[0];
+  }
 };
