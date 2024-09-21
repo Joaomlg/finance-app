@@ -204,7 +204,10 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Ignorar transação"
             iconLeft="do-not-disturb-on"
             renderIconRight={() => (
-              <Switch value={transactionValues.ignore} onChange={handleTransactionIgnoreToggle} />
+              <Switch
+                value={transactionValues.ignore}
+                onValueChange={handleTransactionIgnoreToggle}
+              />
             )}
             onPress={showTransactionDatePicker}
             readOnly
