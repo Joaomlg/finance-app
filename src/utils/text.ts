@@ -15,8 +15,8 @@ export const walletTypeText: Record<WalletType, string> = {
 };
 
 export const transactionTypeText: Record<TransactionType, string> = {
-  INCOME: 'Entrada',
-  EXPENSE: 'Saída',
+  INCOME: 'Receita',
+  EXPENSE: 'Despesa',
 };
 
 export const ConnectionStatusMessage: Record<ConnectionStatus, string> = {

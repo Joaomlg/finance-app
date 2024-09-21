@@ -45,7 +45,7 @@ const SummarySection: React.FC = () => {
       </BalanceWithTrending>
       <SubSectionContainer>
         <Text typography="defaultBold" transform="capitalize">
-          Entradas
+          Receitas
         </Text>
         <HorizontalBarContainer>
           <HorizontalBar color="income" grow={incomesBarGrow} />
@@ -53,7 +53,7 @@ const SummarySection: React.FC = () => {
         </HorizontalBarContainer>
       </SubSectionContainer>
       <SubSectionContainer>
-        <Text typography="defaultBold">Saídas</Text>
+        <Text typography="defaultBold">Despesas</Text>
         <HorizontalBarContainer>
           <HorizontalBar color="expense" grow={expensesBarGrow} surplusGrow={expensesSurplusGrow} />
           <Money value={totalExpenses} />

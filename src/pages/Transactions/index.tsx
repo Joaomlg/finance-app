@@ -27,8 +27,8 @@ const Transactions: React.FC = () => {
 
   const tabs: TabProps[] = [
     { key: 'default', title: 'Tudo' },
-    { key: 'incomes', title: 'Entradas' },
-    { key: 'expenses', title: 'Saídas' },
+    { key: 'incomes', title: 'Receitas' },
+    { key: 'expenses', title: 'Despesas' },
   ];
 
   const renderScene = useCallback(
