@@ -1,6 +1,10 @@
 import styled from 'styled-components/native';
 import TextButton from '../../../components/TextButton';
 
+export const SectionContainer = styled.View`
+  gap: 16px;
+`;
+
 export const SectionHeader = styled.View`
   flex-direction: row;
   justify-content: space-between;

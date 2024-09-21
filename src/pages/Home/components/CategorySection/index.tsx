@@ -1,128 +1,23 @@
-import React, { useContext, useMemo, useState } from 'react';
-import { TouchableWithoutFeedback, View } from 'react-native';
-import { useTheme } from 'styled-components';
-import { Data, VictoryPie } from 'victory-native';
-import Avatar from '../../../../components/Avatar';
-import Money from '../../../../components/Money';
-import RowContent from '../../../../components/RowContent';
+import { useNavigation } from '@react-navigation/native';
+import React, { useContext } from 'react';
+import CategoryPieChart from '../../../../components/CategoryPieChart';
 import Text from '../../../../components/Text';
 import AppContext from '../../../../contexts/AppContext';
-import { getCategoryById, getDefaultCategoryByType } from '../../../../utils/category';
-import { SectionHeader } from '../commonStyles';
-import { ChardContainer, LegendContainer } from './styles';
+import { SectionContainer, SectionHeader, SeeMoreButton } from '../commonStyles';
 
-export type CategorySectionProps = {
-  numberOfCategories?: number;
-};
+const CategorySection: React.FC = () => {
+  const { expenseTransactions } = useContext(AppContext);
 
-type Data = {
-  x: string;
-  y: number;
-  color: string;
-};
-
-const CategorySection: React.FC<CategorySectionProps> = ({ numberOfCategories }) => {
-  const [selected, setSelected] = useState('');
-
-  const { expenseTransactions, totalExpenses } = useContext(AppContext);
-  const theme = useTheme();
-
-  const data = useMemo(() => {
-    const result = [] as Data[];
-
-    expenseTransactions
-      .filter((transaction) => !transaction.ignore)
-      .reduce((res, transaction) => {
-        const category =
-          getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
-
-        if (!res[category.id]) {
-          res[category.id] = {
-            x: category.name,
-            y: 0,
-            color: category.color,
-          };
-          result.push(res[category.id]);
-        }
-
-        res[category.id].y += Math.abs(transaction.amount);
-
-        return res;
-      }, {} as Record<string, Data>);
-
-    return result;
-  }, [expenseTransactions]);
-
-  const handleWhiteSpacePressed = () => {
-    setSelected('');
-  };
-
-  const handleSlicePressed = () => {
-    return [
-      {
-        target: 'data',
-        mutation: ({ datum }: { datum: Data }) => {
-          setSelected((prev) => (prev === datum.x ? '' : datum.x));
-        },
-      },
-    ];
-  };
+  const nevigation = useNavigation();
 
   return (
-    <TouchableWithoutFeedback onPress={handleWhiteSpacePressed}>
-      <View>
-        <SectionHeader>
-          <Text typography="title">Despesas por categoria</Text>
-        </SectionHeader>
-        <ChardContainer>
-          <VictoryPie
-            data={data}
-            height={300}
-            innerRadius={50}
-            cornerRadius={5}
-            labels={({ datum }) => `${((datum.y * 100) / totalExpenses).toFixed(0)}%`}
-            padAngle={2}
-            style={{
-              data: {
-                fill: ({ datum }) => datum.color,
-                fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
-              },
-              labels: {
-                opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
-                fill: theme.colors.text,
-                fontSize: theme.text.default,
-                fontWeight: 'bold',
-              },
-            }}
-            events={[
-              {
-                target: 'data',
-                eventHandlers: {
-                  onPressIn: handleSlicePressed,
-                },
-              },
-            ]}
-          />
-        </ChardContainer>
-        <LegendContainer>
-          {data
-            .sort((a, b) => b.y - a.y)
-            .map((item, index) => (
-              <RowContent
-                key={index}
-                renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
-                text={item.x}
-                style={{
-                  opacity: item.x === selected || selected === '' ? 1 : 0.5,
-                }}
-                onPress={() => setSelected((prev) => (prev === item.x ? '' : item.x))}
-              >
-                <Money value={-item.y} typography="defaultBold" />
-              </RowContent>
-            ))}
-        </LegendContainer>
-      </View>
-    </TouchableWithoutFeedback>
+    <SectionContainer>
+      <SectionHeader>
+        <Text typography="title">Despesas por categoria</Text>
+        <SeeMoreButton text="Ver mais" onPress={() => nevigation.navigate('insights')} />
+      </SectionHeader>
+      <CategoryPieChart transactions={expenseTransactions} variant="inline" />
+    </SectionContainer>
   );
 };
 

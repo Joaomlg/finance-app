@@ -24,6 +24,7 @@ export declare global {
       history: undefined;
       settings: undefined;
       categories: undefined;
+      insights: undefined;
     }
   }
 }

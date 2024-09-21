@@ -5,7 +5,7 @@ export const ChardContainer = styled.View`
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  gap: 16px;
+  gap: 20px;
 `;
 
 export const LegendContainer = styled.View`

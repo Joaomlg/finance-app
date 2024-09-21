@@ -6,6 +6,7 @@ import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
 import History from '../pages/History';
 import Home from '../pages/Home';
+import Insights from '../pages/Insights';
 import Login from '../pages/Login';
 import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
@@ -32,6 +33,7 @@ export type StackRouteParamList = {
   history: undefined;
   settings: undefined;
   categories: undefined;
+  insights: undefined;
 };
 
 const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamList>();
@@ -55,6 +57,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="history" component={History} />
         <Screen name="settings" component={Settings} />
         <Screen name="categories" component={Categories} />
+        <Screen name="insights" component={Insights} />
       </Group>
     </Navigator>
   );

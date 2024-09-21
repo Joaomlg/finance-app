@@ -1,9 +1,5 @@
 import styled from 'styled-components/native';
 
-export const SummaryContainer = styled.View`
-  gap: 16px;
-`;
-
 export const SubSectionContainer = styled.View`
   gap: 12px;
 `;

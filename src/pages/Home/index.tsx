@@ -87,9 +87,9 @@ const Home: React.FC = () => {
         <ScreenContent>
           <SummarySection />
           <Divider />
-          <TransactionsSection numberOfTransactions={numberOfTransactions} />
+          <CategorySection />
           <Divider />
-          <CategorySection numberOfCategories={3} />
+          <TransactionsSection numberOfTransactions={numberOfTransactions} />
         </ScreenContent>
       </ScrollView>
       <MonthYearPicker

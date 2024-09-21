@@ -5,13 +5,8 @@ import Icon from '../../../../components/Icon';
 import Money from '../../../../components/Money';
 import Text from '../../../../components/Text';
 import AppContext from '../../../../contexts/AppContext';
-import { SectionHeader, SeeMoreButton } from '../commonStyles';
-import {
-  BalanceWithTrending,
-  HorizontalBarContainer,
-  SubSectionContainer,
-  SummaryContainer,
-} from './styles';
+import { SectionContainer, SectionHeader, SeeMoreButton } from '../commonStyles';
+import { BalanceWithTrending, HorizontalBarContainer, SubSectionContainer } from './styles';
 
 const SummarySection: React.FC = () => {
   const { hideValues, totalIncomes, totalExpenses } = useContext(AppContext);
@@ -27,7 +22,7 @@ const SummarySection: React.FC = () => {
     totalIncomes >= totalExpenses ? 0 : (totalExpenses - totalIncomes) / totalExpenses;
 
   return (
-    <SummaryContainer>
+    <SectionContainer>
       <SectionHeader>
         <Text typography="title">Resumo do mês</Text>
         <SeeMoreButton text="Ver histórico" onPress={() => navigation.navigate('history')} />
@@ -59,7 +54,7 @@ const SummarySection: React.FC = () => {
           <Money value={totalExpenses} />
         </HorizontalBarContainer>
       </SubSectionContainer>
-    </SummaryContainer>
+    </SectionContainer>
   );
 };
 
