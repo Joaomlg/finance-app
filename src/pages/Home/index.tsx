@@ -11,16 +11,15 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import AppContext from '../../contexts/AppContext';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
 import BalanceSection from './components/BalanceSection';
+import CategorySection from './components/CategorySection';
 import SummarySection from './components/SummarySection/indes';
 import TransactionsSection from './components/TransactionsSection';
 import { StyledHeader, TopContainer } from './styles';
-import CategorySection from './components/CategorySection';
 
 const MINIMUM_DATE = moment(new Date(0));
 
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
-  const [numberOfTransactions, setNumberOfTransactions] = useState(0);
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -31,14 +30,7 @@ const Home: React.FC = () => {
   const isCurrentMonth = checkCurrentMonth(date);
 
   const animatedChangeDate = (value: Moment) => {
-    const isNextValueCurrentMonth = checkCurrentMonth(value);
-
-    if (isNextValueCurrentMonth) {
-      setNumberOfTransactions(0);
-    }
-
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
     setDate(value);
   };
 
@@ -89,7 +81,7 @@ const Home: React.FC = () => {
           <Divider />
           <CategorySection />
           <Divider />
-          <TransactionsSection numberOfTransactions={numberOfTransactions} />
+          <TransactionsSection />
         </ScreenContent>
       </ScrollView>
       <MonthYearPicker
