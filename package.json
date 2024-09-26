@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start",
     "dev": "APP_VARIANT=development expo start --dev-client",
+    "dev:prd": "DATA_SOURCE=production npm run dev",
     "start:wsl2": "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig.exe | grep -a 'Wi-Fi' -A 7 | cut -d\":\" -f 2 | tail -n1 | sed -e 's/\\s*//g') expo start",
     "prebuild": "expo prebuild",
     "build:development": "eas build --profile development",
