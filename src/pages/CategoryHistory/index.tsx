@@ -167,7 +167,7 @@ const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHis
 
   return (
     <ScreenContainer>
-      <ScreenHeader title="Histórico da categoria" actions={[HideValuesAction()]} />
+      <ScreenHeader title={`Histórico de "${category.name}"`} actions={[HideValuesAction()]} />
       <StyledFlatList
         refreshControl={
           <RefreshControl

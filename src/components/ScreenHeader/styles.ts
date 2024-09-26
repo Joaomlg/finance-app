@@ -8,6 +8,11 @@ export const Container = styled.View<{ canGoBack: boolean }>`
   padding-left: ${(props) => (props.canGoBack ? '16px' : '24px')};
 `;
 
+export const Content = styled.View`
+  flex: 1;
+  margin-right: 12px;
+`;
+
 export const TitleButton = styled.TouchableOpacity`
   flex-direction: row;
   align-items: flex-end;
@@ -16,6 +21,5 @@ export const TitleButton = styled.TouchableOpacity`
 export const Actions = styled.View`
   flex-direction: row;
   gap: 24px;
-  flex-grow: 1;
   justify-content: flex-end;
 `;
