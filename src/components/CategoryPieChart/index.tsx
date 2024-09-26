@@ -17,15 +17,17 @@ type Variant = 'inline' | 'complete';
 export interface CategoryPieChartProps {
   transactions: Transaction[];
   variant?: Variant;
+  onPress?: (categoryId: string) => void;
 }
 
 type Data = {
+  id: string;
   x: string;
   y: number;
   color: string;
 };
 
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, variant }) => {
+const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, variant, onPress }) => {
   const [selected, setSelected] = useState('');
 
   const theme = useTheme();
@@ -50,6 +52,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
 
       if (!res[category.id]) {
         res[category.id] = {
+          id: category.id,
           x: category.name,
           y: 0,
           color: category.color,
@@ -85,12 +88,17 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     setSelected('');
   };
 
+  const handleDataPressed = (data: Data) => {
+    setSelected((prev) => (prev === data.x ? '' : data.x));
+    if (onPress) onPress(data.id);
+  };
+
   const handleSlicePressed = () => {
     return [
       {
         target: 'data',
         mutation: ({ datum }: { datum: Data }) => {
-          setSelected((prev) => (prev === datum.x ? '' : datum.x));
+          handleDataPressed(datum);
         },
       },
     ];
@@ -140,7 +148,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
               style={{
                 opacity: item.x === selected || selected === '' ? 1 : 0.5,
               }}
-              onPress={() => setSelected((prev) => (prev === item.x ? '' : item.x))}
+              onPress={() => handleDataPressed(item)}
             >
               <Text ellipsize={true}>{item.x}</Text>
               <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />

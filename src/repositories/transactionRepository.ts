@@ -21,6 +21,7 @@ export type TransactionQueryOptions = {
   order?: Order;
   count?: number;
   walletId?: string;
+  categoryId?: string;
 };
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
@@ -40,6 +41,10 @@ const buildColletionQuery = (options?: TransactionQueryOptions) => {
 
   if (options?.walletId) {
     query = query.where('walletId', '==', options.walletId);
+  }
+
+  if (options?.categoryId) {
+    query = query.where('categoryId', '==', options.categoryId);
   }
 
   if (options?.order) {

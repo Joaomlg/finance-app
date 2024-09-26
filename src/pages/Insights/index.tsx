@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import CategoryPieChart from '../../components/CategoryPieChart';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
@@ -8,6 +8,7 @@ import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
 import { CategoryType, CategoryTypeList } from '../../models';
 import { transactionTypeText } from '../../utils/text';
+import { useNavigation } from '@react-navigation/native';
 
 const TABS = CategoryTypeList.map(
   (type) =>
@@ -18,7 +19,14 @@ const TABS = CategoryTypeList.map(
 );
 
 const Insights: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState('');
+
   const { expenseTransactions, incomeTransactions } = useContext(AppContext);
+  const navigation = useNavigation();
+
+  const handlePiePressed = (categoryId: string) => {
+    setSelectedCategory((prev) => (categoryId === prev ? '' : categoryId));
+  };
 
   const renderScene = (tabKey: string) => {
     const transactions =
@@ -26,14 +34,24 @@ const Insights: React.FC = () => {
 
     return (
       <ScreenContent>
-        <CategoryPieChart transactions={transactions} />
+        <CategoryPieChart transactions={transactions} onPress={handlePiePressed} />
       </ScreenContent>
     );
   };
 
   return (
     <ScreenContainer>
-      <ScreenHeader title="Insights" actions={[HideValuesAction()]} />
+      <ScreenHeader
+        title="Insights"
+        actions={[
+          {
+            icon: 'history',
+            hidden: selectedCategory === '',
+            onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
+          },
+          HideValuesAction(),
+        ]}
+      />
       <ScreenTabs tabs={TABS} renderScene={renderScene} />
     </ScreenContainer>
   );

@@ -6,7 +6,7 @@ import { Color } from '../../theme';
 import { Bar, BarContainer } from './styles';
 
 export interface HorizontalBarProps extends ViewProps {
-  color: Color;
+  color: Color | string;
   grow?: number;
   surplusGrow?: number;
 }
@@ -21,7 +21,7 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({
 
   const theme = useTheme();
 
-  const barColor = hideValues ? theme.colors.lightGray : theme.colors[color];
+  const barColor = hideValues ? theme.colors.lightGray : theme.colors[color as Color] || color;
 
   const containerGrow = hideValues ? 1 : grow || 1;
 
