@@ -39,7 +39,7 @@ const buildColletionQuery = (options?: TransactionQueryOptions) => {
   }
 
   if (options?.walletId) {
-    query.where('walletId', '==', options.walletId);
+    query = query.where('walletId', '==', options.walletId);
   }
 
   if (options?.order) {

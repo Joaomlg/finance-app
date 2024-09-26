@@ -151,9 +151,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     configureLoading && setLoading(true, 'Sincronizando conexão');
 
-    const lastTransaction = await transactionRepository.getLastWalletTransaction(wallet.id);
-
     try {
+      const lastTransaction = await transactionRepository.getLastWalletTransaction(wallet.id);
+
       await providerService.syncConnection(
         wallet.connection.id,
         lastTransaction?.date || wallet.connection.lastUpdatedAt,
