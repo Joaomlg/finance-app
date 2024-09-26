@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
@@ -7,7 +7,7 @@ import Provider from '../models/provider';
 import { transactionRepository, walletRepository } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
-import { NOW } from '../utils/date';
+import { NOW, CURRENT_MONTH } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
 
 export type MonthlyBalance = {
@@ -55,11 +55,8 @@ export type AppContextValue = {
 
 const AppContext = createContext({} as AppContextValue);
 
-const now = moment();
-const currentMonth = moment(now).startOf('month');
-
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [date, setDate] = useState(now);
+  const [date, setDate] = useState(NOW);
   const [hideValues, setHideValues] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -342,7 +339,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingMonthlyBalances(true);
 
     const dates = range(itemsPerPage).map((i) =>
-      currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'),
+      CURRENT_MONTH.clone().subtract(i + currentPage * itemsPerPage, 'months'),
     );
 
     const results = await Promise.all(

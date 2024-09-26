@@ -4,6 +4,8 @@ moment.locale('pt-BR');
 
 export const NOW = moment();
 
+export const CURRENT_MONTH = moment(NOW).startOf('month');
+
 export const getMonthStartDay = (date: Moment) => date.startOf('month');
 
 export const getMonthEndDay = (date: Moment) => date.endOf('month');
