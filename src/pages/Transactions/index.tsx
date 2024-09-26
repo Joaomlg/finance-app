@@ -56,6 +56,7 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
 
       if (categoryId) {
         data = data.filter((transaction) => transaction.categoryId === categoryId);
+        balance = data.reduce((total, item) => total + Math.abs(item.amount), 0);
       }
 
       return (
