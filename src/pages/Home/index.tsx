@@ -10,6 +10,7 @@ import ScreenContent from '../../components/ScreenContent';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import AppContext from '../../contexts/AppContext';
 import { NOW, checkCurrentMonth, formatMonthYearDate } from '../../utils/date';
+import { capitalize } from '../../utils/text';
 import BalanceSection from './components/BalanceSection';
 import CategorySection from './components/CategorySection';
 import SummarySection from './components/SummarySection/indes';
@@ -57,7 +58,7 @@ const Home: React.FC = () => {
       >
         <TopContainer>
           <StyledHeader
-            title={formatMonthYearDate(date)}
+            title={capitalize(formatMonthYearDate(date))}
             titleIcon="expand-more"
             onTitlePress={() => setMonthYearPickerOpened(true)}
             actions={[

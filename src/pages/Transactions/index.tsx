@@ -9,7 +9,7 @@ import AppContext from '../../contexts/AppContext';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatMonthYearDate } from '../../utils/date';
-import { transactionTypeText } from '../../utils/text';
+import { capitalize, transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
 
 const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transactions'>> = ({
@@ -86,7 +86,10 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
+        <ScreenHeader
+          title={capitalize(formatMonthYearDate(date))}
+          actions={[HideValuesAction()]}
+        />
         <ScreenTabs tabs={tabs} renderScene={renderScene} />
       </ScreenContainer>
       <ScreenFloatingButton
