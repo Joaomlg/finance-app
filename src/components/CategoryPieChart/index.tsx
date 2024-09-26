@@ -30,33 +30,33 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
 
   const theme = useTheme();
 
+  const filteredTransactions = transactions.filter((transaction) => !transaction.ignore);
+
   const totalValue = useMemo(
-    () => transactions.reduce((sum, item) => sum + Math.abs(item.amount), 0),
-    [transactions],
+    () => filteredTransactions.reduce((sum, item) => sum + Math.abs(item.amount), 0),
+    [filteredTransactions],
   );
 
   const data = useMemo(() => {
     const result = [] as Data[];
 
-    transactions
-      .filter((transaction) => !transaction.ignore)
-      .reduce((res, transaction) => {
-        const category =
-          getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
+    filteredTransactions.reduce((res, transaction) => {
+      const category =
+        getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
 
-        if (!res[category.id]) {
-          res[category.id] = {
-            x: category.name,
-            y: 0,
-            color: category.color,
-          };
-          result.push(res[category.id]);
-        }
+      if (!res[category.id]) {
+        res[category.id] = {
+          x: category.name,
+          y: 0,
+          color: category.color,
+        };
+        result.push(res[category.id]);
+      }
 
-        res[category.id].y += Math.abs(transaction.amount);
+      res[category.id].y += Math.abs(transaction.amount);
 
-        return res;
-      }, {} as Record<string, Data>);
+      return res;
+    }, {} as Record<string, Data>);
 
     const sortedResult = result.sort((a, b) => b.y - a.y);
 
@@ -75,7 +75,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     );
 
     return [...limitedData, otherData];
-  }, [transactions, variant, theme.colors.lightGray]);
+  }, [filteredTransactions, variant, theme.colors.lightGray]);
 
   const handleWhiteSpacePressed = () => {
     setSelected('');
