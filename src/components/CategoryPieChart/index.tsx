@@ -30,6 +30,10 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
 
   const theme = useTheme();
 
+  const pieSize = variant === 'inline' ? 120 : 300;
+  const piePadding = variant === 'inline' ? 0 : 50;
+  const pieRadius = 0.5 * pieSize - piePadding;
+
   const filteredTransactions = transactions.filter((transaction) => !transaction.ignore);
 
   const totalValue = useMemo(
@@ -97,9 +101,12 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
       <ChardContainer style={{ flexDirection: variant === 'inline' ? 'row' : 'column' }}>
         <VictoryPie
           data={data}
-          height={variant === 'inline' ? 120 : 300}
-          width={variant === 'inline' ? 120 : 300}
-          padding={variant === 'inline' ? 0 : undefined}
+          height={pieSize}
+          width={pieSize}
+          padding={piePadding}
+          radius={({ datum }) =>
+            (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius
+          }
           innerRadius={variant === 'inline' ? 25 : 50}
           cornerRadius={5}
           labels={({ datum }) => `${((datum.y * 100) / totalValue).toFixed(0)}%`}
