@@ -9,12 +9,12 @@ import { SectionContainer, SectionHeader, SeeMoreButton } from '../commonStyles'
 import { BalanceWithTrending, HorizontalBarContainer, SubSectionContainer } from './styles';
 
 const SummarySection: React.FC = () => {
-  const { hideValues, totalIncomes, totalExpenses } = useContext(AppContext);
+  const { totalIncomes, totalExpenses } = useContext(AppContext);
   const navigation = useNavigation();
 
   const balance = totalIncomes - totalExpenses;
 
-  const showTrendingIcon = !hideValues && balance !== 0;
+  const showTrendingIcon = balance !== 0;
 
   const incomesBarGrow = totalIncomes >= totalExpenses ? 1 : totalIncomes / totalExpenses;
   const expensesBarGrow = totalExpenses >= totalIncomes ? 1 : totalExpenses / totalIncomes;

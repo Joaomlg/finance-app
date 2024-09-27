@@ -28,7 +28,6 @@ const History: React.FC = () => {
   const [isLoadingMore, setLoadingMore] = useState(false);
 
   const {
-    hideValues,
     monthlyBalances,
     fetchMonthlyBalancesPage,
     fetchingMonthlyBalances,
@@ -83,7 +82,7 @@ const History: React.FC = () => {
 
       const balance = incomes - expenses;
 
-      const showTrendingIcon = !hideValues && balance !== 0;
+      const showTrendingIcon = balance !== 0;
 
       const incomesBarGrow = maxAmount === 0 ? 1 : Math.max(incomes / maxAmount, 0.005);
       const expensesBarGrow = maxAmount === 0 ? 1 : Math.max(expenses / maxAmount, 0.005);
@@ -113,11 +112,7 @@ const History: React.FC = () => {
           </Text>
           <HorizontalBarContainer>
             <StyledHorizontalBar color="income" grow={incomesBarGrow} />
-            <Money
-              value={incomes}
-              typography="defaultBold"
-              color={hideValues ? 'text' : 'income'}
-            />
+            <Money value={incomes} typography="defaultBold" color="income" />
           </HorizontalBarContainer>
           <HorizontalBarContainer>
             <StyledHorizontalBar
@@ -128,13 +123,13 @@ const History: React.FC = () => {
             <Money
               value={expenses}
               typography="defaultBold"
-              color={hideValues ? 'text' : balance < 0 ? 'error' : 'expense'}
+              color={balance < 0 ? 'error' : 'expense'}
             />
           </HorizontalBarContainer>
         </ItemContainer>
       );
     },
-    [hideValues, maxAmount, handleItemPress],
+    [maxAmount, handleItemPress],
   );
 
   const renderItemSeparator = useCallback(() => <StyledDivider />, []);
