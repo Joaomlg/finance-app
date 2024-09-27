@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
 import { useTheme } from 'styled-components';
 import { Data, VictoryPie } from 'victory-native';
 import { Transaction } from '../../models';
@@ -84,10 +83,6 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     return [...limitedData, otherData];
   }, [filteredTransactions, variant, theme.colors.lightGray]);
 
-  const handleWhiteSpacePressed = () => {
-    setSelected('');
-  };
-
   const handleDataPressed = (data: Data) => {
     setSelected((prev) => (prev === data.x ? '' : data.x));
     if (onPress) onPress(data.id);
@@ -105,58 +100,56 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleWhiteSpacePressed}>
-      <ChardContainer style={{ flexDirection: variant === 'inline' ? 'row' : 'column' }}>
-        <VictoryPie
-          data={data}
-          height={pieSize}
-          width={pieSize}
-          padding={piePadding}
-          radius={({ datum }) =>
-            (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius
-          }
-          innerRadius={variant === 'inline' ? 25 : 50}
-          cornerRadius={5}
-          labels={({ datum }) => `${((datum.y * 100) / totalValue).toFixed(0)}%`}
-          padAngle={2}
-          style={{
-            data: {
-              fill: ({ datum }) => datum.color,
-              fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
+    <ChardContainer
+      style={{ flexDirection: variant === 'inline' ? 'row' : 'column', minHeight: pieSize }}
+    >
+      <VictoryPie
+        data={data}
+        height={pieSize}
+        width={pieSize}
+        padding={piePadding}
+        radius={({ datum }) => (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius}
+        innerRadius={variant === 'inline' ? 25 : 50}
+        cornerRadius={5}
+        labels={({ datum }) => `${((datum.y * 100) / totalValue).toFixed(0)}%`}
+        padAngle={2}
+        style={{
+          data: {
+            fill: ({ datum }) => datum.color,
+            fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
+          },
+          labels: {
+            opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
+            fill: theme.colors.text,
+            fontSize: theme.text.default,
+            fontWeight: 'bold',
+          },
+        }}
+        events={[
+          {
+            target: 'data',
+            eventHandlers: {
+              onPressIn: handleSlicePressed,
             },
-            labels: {
-              opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
-              fill: theme.colors.text,
-              fontSize: theme.text.default,
-              fontWeight: 'bold',
-            },
-          }}
-          events={[
-            {
-              target: 'data',
-              eventHandlers: {
-                onPressIn: handleSlicePressed,
-              },
-            },
-          ]}
-        />
-        <LegendContainer>
-          {data.map((item, index) => (
-            <RowContent
-              key={index}
-              renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
-              style={{
-                opacity: item.x === selected || selected === '' ? 1 : 0.5,
-              }}
-              onPress={() => handleDataPressed(item)}
-            >
-              <Text ellipsize={true}>{item.x}</Text>
-              <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />
-            </RowContent>
-          ))}
-        </LegendContainer>
-      </ChardContainer>
-    </TouchableWithoutFeedback>
+          },
+        ]}
+      />
+      <LegendContainer>
+        {data.map((item, index) => (
+          <RowContent
+            key={index}
+            renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
+            style={{
+              opacity: item.x === selected || selected === '' ? 1 : 0.5,
+            }}
+            onPress={() => handleDataPressed(item)}
+          >
+            <Text ellipsize={true}>{item.x}</Text>
+            <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />
+          </RowContent>
+        ))}
+      </LegendContainer>
+    </ChardContainer>
   );
 };
 

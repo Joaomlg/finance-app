@@ -46,7 +46,7 @@ const Insights: React.FC = () => {
         actions={[
           {
             icon: 'history',
-            hidden: selectedCategory === '',
+            hidden: !selectedCategory || selectedCategory === '',
             onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
           },
           HideValuesAction(),
