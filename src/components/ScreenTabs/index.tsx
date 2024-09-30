@@ -37,6 +37,12 @@ const ScreenTabs: React.FC<ScreenTabsProps> = ({ tabs, renderScene }) => {
     <TabView
       navigationState={{ index, routes: tabs }}
       renderScene={({ route }) => renderScene(route.key)}
+      sceneContainerStyle={{
+        borderRightWidth: 0.2,
+        borderRightColor: theme.colors.primary,
+        borderLeftWidth: 0.2,
+        borderLeftColor: theme.colors.primary,
+      }}
       onIndexChange={setIndex}
       renderTabBar={renderTabBar}
       lazy={({ route }) => route.key !== 'default'}
