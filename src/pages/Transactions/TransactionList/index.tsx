@@ -2,7 +2,6 @@ import moment from 'moment';
 import React, { useCallback, useRef } from 'react';
 import { ListRenderItemInfo, RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import Divider from '../../../components/Divider';
 import Money from '../../../components/Money';
 import Text from '../../../components/Text';
 import { Transaction } from '../../../models';
@@ -11,6 +10,7 @@ import {
   ListHeaderContainer,
   ListSeparatorContainer,
   ListSeparatorDate,
+  ListSeparatorDivider,
   StyledFlatList,
   StyledTransactionListItem,
 } from './styles';
@@ -57,7 +57,10 @@ const TransactionList: React.FC<TransactionListProps> = ({
               {date.format('MMM')}
             </Text>
           </ListSeparatorDate>
-          <Divider />
+          <ListSeparatorDivider />
+          <Text typography="defaultBold" color="textLight">
+            {date.format('ddd')}
+          </Text>
         </ListSeparatorContainer>
       ) : (
         <></>

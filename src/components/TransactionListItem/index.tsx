@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { TouchableOpacityProps } from 'react-native';
 import { Category, Transaction } from '../../models';
 import Money from '../Money';
 import Text from '../Text';
@@ -9,7 +9,13 @@ import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import CategoryPicker from '../CategoryPicker';
-import { ListItem, ListItemAmount, ListItemContent, StyledCategoryIcon } from './styles';
+import {
+  CategoryIconContainer,
+  ListItem,
+  ListItemAmount,
+  ListItemContent,
+  StyledCategoryIcon,
+} from './styles';
 
 export interface TransactionListItemProps extends TouchableOpacityProps {
   item: Transaction;
@@ -47,9 +53,9 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
 
   return (
     <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
-      <TouchableOpacity onPress={handleCategoryAvatarPressed}>
+      <CategoryIconContainer onPress={handleCategoryAvatarPressed}>
         <StyledCategoryIcon category={category} ignored={item.ignore} />
-      </TouchableOpacity>
+      </CategoryIconContainer>
       <ListItemContent>
         {category.name && (
           <Text typography="extraLight" color="textLight">

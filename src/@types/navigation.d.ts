@@ -18,12 +18,14 @@ export declare global {
           }
         | undefined;
       manualConnect: undefined;
-      transactions: undefined;
+      transactions: { categoryId?: string } | undefined;
       transaction: { transactionId: string };
       setTransaction: { transactionType: string; transactionId?: string };
       history: undefined;
       settings: undefined;
       categories: undefined;
+      insights: undefined;
+      categoryHistory: { categoryId: string };
     }
   }
 }

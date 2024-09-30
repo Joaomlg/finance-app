@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { ViewProps } from 'react-native';
 import Icon, { IconName } from '../Icon';
 import Text from '../Text';
-import { Actions, Container, TitleButton } from './styles';
+import { Actions, Container, Content, TitleButton } from './styles';
 
 export type Action = {
   icon: IconName;
@@ -48,21 +48,22 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           onPress={() => navigation.goBack()}
         />
       )}
-      {onTitlePress ? (
-        <TitleButton onPress={onTitlePress}>
-          <>
-            <Text typography="heading" color="textWhite" transform="capitalize">
-              {title}
-            </Text>
-            {titleIcon && <Icon name={titleIcon} color="secondary" size={28} />}
-          </>
-        </TitleButton>
-      ) : (
-        <Text typography="heading" color="textWhite" transform="capitalize">
-          {title}
-        </Text>
-      )}
-
+      <Content>
+        {onTitlePress ? (
+          <TitleButton onPress={onTitlePress}>
+            <>
+              <Text typography="heading" color="textWhite" ellipsize={true}>
+                {title}
+              </Text>
+              {titleIcon && <Icon name={titleIcon} color="secondary" size={28} />}
+            </>
+          </TitleButton>
+        ) : (
+          <Text typography="heading" color="textWhite" ellipsize={true}>
+            {title}
+          </Text>
+        )}
+      </Content>
       {actions && (
         <Actions>
           {actions

@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useContext } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
@@ -7,12 +7,16 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
 import { Transaction, TransactionType } from '../../models';
+import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatMonthYearDate } from '../../utils/date';
-import { transactionTypeText } from '../../utils/text';
+import { capitalize, transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
 
-const Transactions: React.FC = () => {
-  const navigation = useNavigation();
+const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transactions'>> = ({
+  route,
+  navigation,
+}) => {
+  const categoryId = route.params?.categoryId;
 
   const {
     fetchingTransactions,
@@ -27,8 +31,8 @@ const Transactions: React.FC = () => {
 
   const tabs: TabProps[] = [
     { key: 'default', title: 'Tudo' },
-    { key: 'incomes', title: 'Entradas' },
-    { key: 'expenses', title: 'Saídas' },
+    { key: 'incomes', title: 'Receitas' },
+    { key: 'expenses', title: 'Despesas' },
   ];
 
   const renderScene = useCallback(
@@ -50,6 +54,11 @@ const Transactions: React.FC = () => {
           balance = totalIncomes - totalExpenses;
       }
 
+      if (categoryId) {
+        data = data.filter((transaction) => transaction.categoryId === categoryId);
+        balance = data.reduce((total, item) => total + Math.abs(item.amount), 0);
+      }
+
       return (
         <TransactionList
           isLoading={fetchingTransactions}
@@ -60,12 +69,13 @@ const Transactions: React.FC = () => {
       );
     },
     [
-      expenseTransactions,
+      categoryId,
+      fetchingTransactions,
       fetchTransactions,
       incomeTransactions,
-      fetchingTransactions,
-      totalExpenses,
       totalIncomes,
+      expenseTransactions,
+      totalExpenses,
       transactions,
     ],
   );
@@ -77,7 +87,10 @@ const Transactions: React.FC = () => {
   return (
     <>
       <ScreenContainer>
-        <ScreenHeader title={formatMonthYearDate(date)} actions={[HideValuesAction()]} />
+        <ScreenHeader
+          title={capitalize(formatMonthYearDate(date))}
+          actions={[HideValuesAction()]}
+        />
         <ScreenTabs tabs={tabs} renderScene={renderScene} />
       </ScreenContainer>
       <ScreenFloatingButton

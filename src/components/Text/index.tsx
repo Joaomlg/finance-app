@@ -8,9 +8,18 @@ export interface TextProps extends RNTextProps {
   color?: Color;
   transform?: TextStyle['textTransform'];
   strike?: boolean;
+  ellipsize?: boolean;
 }
 
-const Text: React.FC<TextProps> = ({ typography, color, style, transform, strike, ...rnProps }) => {
+const Text: React.FC<TextProps> = ({
+  typography,
+  color,
+  style,
+  transform,
+  strike,
+  ellipsize,
+  ...rnProps
+}) => {
   const theme = useTheme();
 
   return (
@@ -20,10 +29,13 @@ const Text: React.FC<TextProps> = ({ typography, color, style, transform, strike
           textTransform: transform || 'none',
           color: theme.colors[color || 'text'],
           textDecorationLine: strike ? 'line-through' : 'none',
+          flexShrink: ellipsize ? 1 : undefined,
           ...theme.typography[typography || 'default'],
         },
         style,
       ]}
+      numberOfLines={ellipsize ? 1 : undefined}
+      ellipsizeMode={ellipsize ? 'tail' : undefined}
       {...rnProps}
     />
   );

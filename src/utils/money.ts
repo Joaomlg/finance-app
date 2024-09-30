@@ -1,7 +1,7 @@
 import { Transaction } from '../models';
 
 export type FormatMoneyProps = {
-  value: number;
+  value?: number;
   absolute?: boolean;
   hidden?: boolean;
 };
@@ -11,7 +11,9 @@ export const formatMoney = ({ value, absolute, hidden }: FormatMoneyProps) => {
     return '••••••••';
   }
 
-  return (absolute ? Math.abs(value) : value)
+  const nonUndefinedValue = value || 0;
+
+  return (absolute ? Math.abs(nonUndefinedValue) : nonUndefinedValue)
     .toFixed(2)
     .replace('.', ',')
     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');

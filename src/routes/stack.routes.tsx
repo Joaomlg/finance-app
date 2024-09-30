@@ -6,6 +6,7 @@ import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
 import History from '../pages/History';
 import Home from '../pages/Home';
+import Insights from '../pages/Insights';
 import Login from '../pages/Login';
 import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
@@ -15,6 +16,7 @@ import TransactionDetail from '../pages/TransactionDetail';
 import Transactions from '../pages/Transactions';
 import WalletDetail from '../pages/WalletDetail';
 import Wallets from '../pages/Wallets';
+import CategoryHistory from '../pages/CategoryHistory';
 
 export type StackRouteParamList = {
   login: undefined;
@@ -26,12 +28,14 @@ export type StackRouteParamList = {
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };
   manualConnect: undefined;
-  transactions: undefined;
+  transactions: { categoryId?: string } | undefined;
   transaction: { transactionId: string };
   setTransaction: { transactionType: string; transactionId?: string };
   history: undefined;
   settings: undefined;
   categories: undefined;
+  insights: undefined;
+  categoryHistory: { categoryId: string };
 };
 
 const { Screen, Navigator, Group } = createNativeStackNavigator<StackRouteParamList>();
@@ -55,6 +59,8 @@ const StackRoutes: React.FC = () => {
         <Screen name="history" component={History} />
         <Screen name="settings" component={Settings} />
         <Screen name="categories" component={Categories} />
+        <Screen name="insights" component={Insights} />
+        <Screen name="categoryHistory" component={CategoryHistory} />
       </Group>
     </Navigator>
   );

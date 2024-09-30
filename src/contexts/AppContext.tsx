@@ -1,13 +1,14 @@
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
+import { transactionRepository, walletRepository } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
+import { NOW, CURRENT_MONTH } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
-import { transactionRepository, walletRepository } from '../repositories';
 
 export type MonthlyBalance = {
   date: Moment;
@@ -54,11 +55,8 @@ export type AppContextValue = {
 
 const AppContext = createContext({} as AppContextValue);
 
-const now = moment();
-const currentMonth = moment(now).startOf('month');
-
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [date, setDate] = useState(now);
+  const [date, setDate] = useState(NOW);
   const [hideValues, setHideValues] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -154,9 +152,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     configureLoading && setLoading(true, 'Sincronizando conexão');
 
     try {
+      const lastTransaction = await transactionRepository.getLastWalletTransaction(wallet.id);
+
       await providerService.syncConnection(
         wallet.connection.id,
-        wallet.connection.lastUpdatedAt,
+        lastTransaction?.date || wallet.connection.lastUpdatedAt,
         !wallet.connection.updateDisabled,
         walletRepository.updateWalletsBatch,
         transactionRepository.setTransactionsBatch,
@@ -339,7 +339,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingMonthlyBalances(true);
 
     const dates = range(itemsPerPage).map((i) =>
-      currentMonth.clone().subtract(i + currentPage * itemsPerPage, 'months'),
+      CURRENT_MONTH.clone().subtract(i + currentPage * itemsPerPage, 'months'),
     );
 
     const results = await Promise.all(
@@ -385,10 +385,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    const now = new Date();
-
     const walletsToSync = wallets.filter(
-      (wallet) => wallet.connection !== undefined && now > wallet.connection.lastUpdatedAt,
+      (wallet) =>
+        wallet.connection !== undefined && NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
     );
 
     if (!walletsToSync.length) {
