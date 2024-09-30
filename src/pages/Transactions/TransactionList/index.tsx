@@ -58,6 +58,9 @@ const TransactionList: React.FC<TransactionListProps> = ({
             </Text>
           </ListSeparatorDate>
           <ListSeparatorDivider />
+          <Text typography="defaultBold" color="textLight">
+            {date.format('ddd')}
+          </Text>
         </ListSeparatorContainer>
       ) : (
         <></>

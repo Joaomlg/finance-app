@@ -26,11 +26,11 @@ export const ListSeparatorContainer = styled.View`
   flex-direction: row;
   align-items: center;
   margin: 12px 0;
+  gap: 12px;
 `;
 
 export const ListSeparatorDate = styled.View`
   align-items: center;
-  margin-right: 12px;
 `;
 
 export const ListSeparatorDivider = styled(Divider)`
