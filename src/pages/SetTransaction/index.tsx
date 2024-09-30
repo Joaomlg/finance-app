@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import CategoryPicker from '../../components/CategoryPicker';
+import CurrencyInput from '../../components/CurrencyInput';
 import Divider from '../../components/Divider';
 import ListItemSelection, {
   SelectionItem,
@@ -47,8 +48,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
-  const handleTransactionBalanceChange = (value: string) => {
-    const amount = value === '' ? undefined : parseFloat(value.replace(',', '.'));
+  const handleTransactionBalanceChange = (amount: number) => {
     setTransactionValues((value) => ({ ...value, amount }));
   };
 
@@ -150,15 +150,12 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             <Text typography="light" color="textWhite">
               Valor da transação
             </Text>
-            <TextInput
-              textPrefix="R$ "
-              placeholder="0,00"
+            <CurrencyInput
               typography="heading"
               color="textWhite"
-              keyboardType="decimal-pad"
               iconRight={!isEditingAutomaticTransaction ? 'edit' : undefined}
-              defaultValue={transactionValues.amount?.toString()}
-              onChangeText={handleTransactionBalanceChange}
+              defaultNumberValue={transactionValues.amount}
+              onChangeValue={handleTransactionBalanceChange}
               readOnly={isEditingAutomaticTransaction}
             />
           </BalanceValueContainer>

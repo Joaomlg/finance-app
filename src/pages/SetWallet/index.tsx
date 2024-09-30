@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
+import CurrencyInput from '../../components/CurrencyInput';
 import Divider from '../../components/Divider';
 import ListItemSelection, {
   SelectionItem,
@@ -39,8 +40,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   const { wallets, createWallet, updateWallet } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
-  const handleWalletBalanceChange = (value: string) => {
-    const balance = parseFloat(value.replace(',', '.'));
+  const handleWalletBalanceChange = (balance: number) => {
     setWalletValues((value) => ({ ...value, balance }));
   };
 
@@ -140,15 +140,12 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             <Text typography="light" color="textWhite">
               Saldo atual
             </Text>
-            <TextInput
-              textPrefix="R$ "
-              placeholder="0,00"
+            <CurrencyInput
               typography="heading"
               color="textWhite"
-              keyboardType="decimal-pad"
               iconRight={!isEditing ? 'edit' : undefined}
-              defaultValue={walletValues.balance?.toString()}
-              onChangeText={handleWalletBalanceChange}
+              defaultNumberValue={walletValues.balance}
+              onChangeValue={handleWalletBalanceChange}
               readOnly={isEditing}
             />
           </BalanceValueContainer>
