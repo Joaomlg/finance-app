@@ -76,6 +76,12 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
     );
   };
 
+  const renderInstitutionAvatar = (institution: PresetInstitution, size?: number) => (
+    <Avatar color={institution.primaryColor} size={size}>
+      <Svg height="100%" width="100%" src={institution.imageUrl} />
+    </Avatar>
+  );
+
   const renderInstitutionSelector = () => {
     const handleItemPressed = (institution: PresetInstitution) => {
       setWalletValues((value) => ({
@@ -90,18 +96,12 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
       closeBottomSheet();
     };
 
-    const renderItemIcon = (institution: PresetInstitution) => (
-      <Avatar color={institution.primaryColor}>
-        <Svg height="100%" width="100%" src={institution.imageUrl} />
-      </Avatar>
-    );
-
     const items = presetInstituitions.map(
       (item) =>
         ({
           text: item.name,
           onPress: () => handleItemPressed(item),
-          renderIcon: () => renderItemIcon(item),
+          renderIcon: () => renderInstitutionAvatar(item),
         } as SelectionItem),
     );
 
@@ -171,6 +171,11 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
           <TextInput
             placeholder="Instituição"
             iconLeft="circle"
+            renderIconLeft={
+              selectedInstitution
+                ? () => renderInstitutionAvatar(selectedInstitution, 24)
+                : undefined
+            }
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderInstitutionSelector())}
             value={selectedInstitution?.name}

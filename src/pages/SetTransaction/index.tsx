@@ -4,6 +4,7 @@ import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
+import CategoryIcon from '../../components/CategoryIcon';
 import CategoryPicker from '../../components/CategoryPicker';
 import CurrencyInput from '../../components/CurrencyInput';
 import Divider from '../../components/Divider';
@@ -20,7 +21,7 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { Category, Transaction, TransactionType } from '../../models';
+import { Category, Transaction, TransactionType, Wallet } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById } from '../../utils/category';
 import { formatDate } from '../../utils/date';
@@ -56,6 +57,12 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     setTransactionValues((value) => ({ ...value, description: description.trim() }));
   };
 
+  const renderWalletInstitutionAvatar = (wallet: Wallet) => (
+    <Avatar color={wallet.styles.primaryColor} size={24}>
+      <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
+    </Avatar>
+  );
+
   const renderTransactionWalletSelector = () => {
     const handleItemPressed = (walletId: string) => {
       setTransactionValues((value) => ({
@@ -71,11 +78,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
         (wallet) =>
           ({
             text: wallet.name,
-            renderIcon: () => (
-              <Avatar color={wallet.styles.primaryColor} size={32}>
-                <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
-              </Avatar>
-            ),
+            renderIcon: () => renderWalletInstitutionAvatar(wallet),
             onPress: () => handleItemPressed(wallet.id),
           } as SelectionItem),
       );
@@ -181,6 +184,9 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           <TextInput
             placeholder="Carteira"
             iconLeft="account-balance-wallet"
+            renderIconLeft={
+              selectedWallet ? () => renderWalletInstitutionAvatar(selectedWallet) : undefined
+            }
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionWalletSelector())}
             value={selectedWallet?.name}
@@ -191,6 +197,11 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           <TextInput
             placeholder="Categoria"
             iconLeft="bookmark"
+            renderIconLeft={
+              selectedCategory
+                ? () => <CategoryIcon category={selectedCategory} size={24} />
+                : undefined
+            }
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionCategorySelector())}
             value={selectedCategory?.name}
