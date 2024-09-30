@@ -9,6 +9,7 @@ export const StyledFlatList = styled(
 ).attrs(() => ({
   contentContainerStyle: {
     padding: 24,
+    paddingBottom: 100,
   },
 }))`
   flex: 1;
