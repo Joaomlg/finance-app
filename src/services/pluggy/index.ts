@@ -137,7 +137,7 @@ export class PluggyService implements IProviderService {
       id: transaction.id,
       description: transaction.description,
       date: parseDate(transaction.date),
-      amount: transaction.amount,
+      amount: Math.abs(transaction.amount),
       type: transaction.type === 'CREDIT' ? 'INCOME' : 'EXPENSE',
       walletId: accountId,
     } as Transaction);

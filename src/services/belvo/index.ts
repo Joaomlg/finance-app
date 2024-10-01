@@ -189,7 +189,7 @@ export class BelvoService implements IProviderService {
       id: transaction.id,
       description: transaction.description,
       date: new Date(transaction.value_date),
-      amount: transaction.amount,
+      amount: Math.abs(transaction.amount),
       type: this.transactionTypeMap(transaction.type),
       walletId: transaction.account.id,
     } as Transaction);
