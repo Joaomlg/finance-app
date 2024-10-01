@@ -16,6 +16,8 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
 }) => {
   const [internalValue, setInternalValue] = useState(defaultNumberValue || 0);
 
+  const internalValueSign = internalValue < 0 ? -1 : 1;
+
   const keyPressed = (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
     event.preventDefault();
 
@@ -32,7 +34,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
     const intKey = parseInt(key);
 
     if (!isNaN(intKey)) {
-      newValue = newValue * 10 + intKey / 100;
+      newValue = newValue * 10 + (internalValueSign * intKey) / 100;
     }
 
     setInternalValue(newValue);
