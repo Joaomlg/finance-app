@@ -17,6 +17,7 @@ export type Action = {
   onPress?: () => void;
   onLongPress?: () => void;
   disabled?: boolean;
+  hidden?: boolean;
 };
 
 export interface ScreenFloatingButtonProps {
@@ -80,21 +81,23 @@ const ScreenFloatingButton: React.FC<ScreenFloatingButtonProps> = ({
         <OverlayContainer>
           {actions &&
             opened &&
-            actions.map((action, index) => (
-              <FloatingActionContainer
-                key={index}
-                onPress={() => !action.disabled && handleActionPress(action.onPress)}
-                onLongPress={() => !action.disabled && handleActionPress(action.onLongPress)}
-                disabled={action.disabled}
-              >
-                <FloatingActionText>
-                  <Text typography="defaultBold">{action.text}</Text>
-                </FloatingActionText>
-                <FLoatingActionButton>
-                  <Icon name={action.icon} size={24} color="text" />
-                </FLoatingActionButton>
-              </FloatingActionContainer>
-            ))}
+            actions
+              .filter((action) => !action.hidden)
+              .map((action, index) => (
+                <FloatingActionContainer
+                  key={index}
+                  onPress={() => !action.disabled && handleActionPress(action.onPress)}
+                  onLongPress={() => !action.disabled && handleActionPress(action.onLongPress)}
+                  disabled={action.disabled}
+                >
+                  <FloatingActionText>
+                    <Text typography="defaultBold">{action.text}</Text>
+                  </FloatingActionText>
+                  <FLoatingActionButton>
+                    <Icon name={action.icon} size={24} color="text" />
+                  </FLoatingActionButton>
+                </FloatingActionContainer>
+              ))}
           {renderFloatingButton()}
         </OverlayContainer>
       </TouchableWithoutFeedback>

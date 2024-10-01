@@ -59,11 +59,19 @@ const buildColletionQuery = (options?: TransactionQueryOptions) => {
 };
 
 const parseTransaction = (data: FirebaseFirestoreTypes.DocumentData) => {
-  const { date, ...values } = data;
-  return {
+  const { date, originalValues, ...values } = data;
+
+  const transaction = {
     ...values,
     date: date.toDate(),
   } as Transaction;
+
+  if (originalValues) {
+    const { date, ...values } = originalValues;
+    transaction.originalValues = { ...values, date: date?.toDate() };
+  }
+
+  return transaction;
 };
 
 export const getTransactionReference = (id: string) => {
@@ -123,6 +131,13 @@ export const setTransactionsBatch = async (transactions: Transaction[]) => {
 
 export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
   const data = flattenObject(values);
+
+  // undefined values mapped to firestore delete token
+  Object.keys(data).forEach((key) => {
+    if (data[key] === undefined) {
+      data[key] = firestore.FieldValue.delete();
+    }
+  });
 
   if (values.amount === undefined) {
     return await transactionsCollection.doc(id).update(data);

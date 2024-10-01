@@ -50,7 +50,23 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
   const handleTransactionBalanceChange = (amount: number) => {
-    setTransactionValues((value) => ({ ...value, amount }));
+    setTransactionValues((value) => {
+      const newValue = { ...value, amount };
+
+      if (isEditingAutomaticTransaction) {
+        newValue.changed = true;
+
+        if (!newValue.originalValues) {
+          newValue.originalValues = {};
+        }
+
+        if (newValue.originalValues.amount === undefined) {
+          newValue.originalValues.amount = value.amount;
+        }
+      }
+
+      return newValue;
+    });
   };
 
   const handleTransactionDescriptionChange = (description: string) => {
@@ -102,10 +118,23 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     const now = new Date();
 
     const handleDateSelected = (date: Date) => {
-      setTransactionValues((value) => ({
-        ...value,
-        date,
-      }));
+      setTransactionValues((value) => {
+        const newValue = { ...value, date };
+
+        if (isEditingAutomaticTransaction) {
+          newValue.changed = true;
+
+          if (!newValue.originalValues) {
+            newValue.originalValues = {};
+          }
+
+          if (newValue.originalValues.date === undefined) {
+            newValue.originalValues.date = value.date;
+          }
+        }
+
+        return newValue;
+      });
     };
 
     DateTimePickerAndroid.open({
@@ -156,10 +185,9 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             <CurrencyInput
               typography="heading"
               color="textWhite"
-              iconRight={!isEditingAutomaticTransaction ? 'edit' : undefined}
+              iconRight="edit"
               defaultNumberValue={transactionValues.amount}
               onChangeValue={handleTransactionBalanceChange}
-              readOnly={isEditingAutomaticTransaction}
             />
           </BalanceValueContainer>
         </HeaderExtensionContainer>
@@ -177,7 +205,6 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconRight="navigate-next"
             onPress={showTransactionDatePicker}
             value={transactionValues.date ? formatDate(moment(transactionValues.date)) : undefined}
-            disabled={isEditingAutomaticTransaction}
             readOnly
           />
           <Divider />

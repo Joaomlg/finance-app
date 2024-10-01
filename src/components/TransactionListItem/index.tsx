@@ -70,6 +70,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
         {wallet?.name && (
           <Text typography="extraLight" color="textLight">
             {wallet.name}
+            {item.changed ? '*' : ''}
           </Text>
         )}
         <Money typography="defaultBold" value={value} strike={item.ignore} />
