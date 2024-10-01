@@ -118,8 +118,10 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     const now = new Date();
 
     const handleDateSelected = (date: Date) => {
+      const dateWithoutTime = new Date(date.toDateString());
+
       setTransactionValues((value) => {
-        const newValue = { ...value, date };
+        const newValue = { ...value, date: dateWithoutTime };
 
         if (isEditingAutomaticTransaction) {
           newValue.changed = true;
