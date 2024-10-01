@@ -49,6 +49,11 @@ const Insights: React.FC = () => {
             hidden: !selectedCategory || selectedCategory === '',
             onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
           },
+          {
+            icon: 'receipt-long',
+            hidden: !selectedCategory || selectedCategory === '',
+            onPress: () => navigation.navigate('transactions', { categoryId: selectedCategory }),
+          },
           HideValuesAction(),
         ]}
       />
