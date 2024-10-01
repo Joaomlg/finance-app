@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native';
 import TextInput, { TextInputProps } from '../TextInput';
 import { formatMoney } from '../../utils/money';
@@ -14,7 +14,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
   onChangeValue,
   ...props
 }) => {
-  const [internalValue, setInternalalue] = useState(defaultNumberValue || 0);
+  const [internalValue, setInternalValue] = useState(defaultNumberValue || 0);
 
   const keyPressed = (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
     event.preventDefault();
@@ -35,10 +35,16 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
       newValue = newValue * 10 + intKey / 100;
     }
 
-    setInternalalue(newValue);
+    setInternalValue(newValue);
 
     if (onChangeValue) onChangeValue(newValue);
   };
+
+  useEffect(() => {
+    if (defaultNumberValue) {
+      setInternalValue(defaultNumberValue);
+    }
+  }, [defaultNumberValue]);
 
   return (
     <TextInput
