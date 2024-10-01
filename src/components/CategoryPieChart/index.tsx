@@ -99,6 +99,10 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     ];
   };
 
+  if (filteredTransactions.length === 0) {
+    return;
+  }
+
   return (
     <ChardContainer
       style={{ flexDirection: variant === 'inline' ? 'row' : 'column', minHeight: pieSize }}
