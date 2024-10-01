@@ -11,6 +11,12 @@ export const BottomHeaderContent = styled.View`
   flex: 1;
 `;
 
+export const ChipContainer = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+`;
+
 export const InformationGroup = styled.View`
   gap: 16px;
 `;

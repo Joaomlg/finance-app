@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext } from 'react';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 import CategoryIcon from '../../components/CategoryIcon';
 import Divider from '../../components/Divider';
 import Money from '../../components/Money';
@@ -18,13 +18,22 @@ import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { formatDateHourFull } from '../../utils/date';
 import { transactionTypeText } from '../../utils/text';
-import { BottomHeader, BottomHeaderContent, InformationGroup } from './styles';
+import { BottomHeader, BottomHeaderContent, ChipContainer, InformationGroup } from './styles';
+import Chip from '../../components/Chip';
+import { Transaction } from '../../models';
 
 const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'transaction'>> = ({
   route,
   navigation,
 }) => {
-  const { wallets, transactions, updateTransaction, deleteTransaction } = useContext(AppContext);
+  const {
+    wallets,
+    transactions,
+    fetchingTransactions,
+    fetchTransactions,
+    updateTransaction,
+    deleteTransaction,
+  } = useContext(AppContext);
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 
@@ -33,6 +42,8 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
   const category =
     getCategoryById(transaction.categoryId) || getDefaultCategoryByType(transaction.type);
+
+  const isAutomaticTransaction = wallet?.connection !== undefined;
 
   const toggleIgnore = async () => {
     await updateTransaction(transaction.id, {
@@ -45,6 +56,27 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
       transactionId: transaction.id,
       transactionType: transaction.type,
     });
+  };
+
+  const handleRestoreTransaction = () => {
+    Alert.alert(
+      'Restaurar transação?',
+      'Tem certeza que deseja restaurar os dados da transação?',
+      [
+        { text: 'Cancelar', onPress: () => {} },
+        {
+          text: 'Restaurar',
+          onPress: async () => {
+            await updateTransaction(transaction.id, {
+              changed: false,
+              ...transaction.originalValues,
+              originalValues: undefined,
+            } as Transaction);
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   const handleDeleteTransaction = async () => {
@@ -67,7 +99,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer refreshing={fetchingTransactions} onRefresh={fetchTransactions}>
         <ScreenHeader title="Detalhes" actions={[HideValuesAction()]} />
         <ScreenContent>
           <BottomHeader>
@@ -79,10 +111,26 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
               </Text>
             </BottomHeaderContent>
           </BottomHeader>
+          {isAutomaticTransaction && (
+            <ChipContainer>
+              <Chip text="Automático" color="primary" />
+              {transaction.changed && <Chip text="Alterado" color="lightGray" />}
+            </ChipContainer>
+          )}
           <InformationGroup>
-            <RowContent text="Criado em">
-              <Text typography="defaultBold">{formatDateHourFull(moment(transaction.date))}</Text>
-            </RowContent>
+            <View>
+              <RowContent text="Data">
+                <Text typography="defaultBold">{formatDateHourFull(moment(transaction.date))}</Text>
+              </RowContent>
+              {transaction.changed && transaction.originalValues?.date && (
+                <RowContent>
+                  <Text typography="extraLight">Data original</Text>
+                  <Text typography="extraLight">
+                    {formatDateHourFull(moment(transaction.originalValues.date))}
+                  </Text>
+                </RowContent>
+              )}
+            </View>
             <RowContent text="Conta">
               <Text typography="defaultBold">{wallet?.name}</Text>
             </RowContent>
@@ -95,14 +143,20 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            <RowContent text="Valor">
-              <Money
-                typography="defaultBold"
-                value={
-                  transaction.type === 'EXPENSE' ? -1 * transaction.amount : transaction.amount
-                }
-              />
-            </RowContent>
+            <View>
+              <RowContent text="Valor">
+                <Money typography="defaultBold" value={Math.abs(transaction.amount)} />
+              </RowContent>
+              {transaction.changed && transaction.originalValues?.amount && (
+                <RowContent>
+                  <Text typography="extraLight">Valor original</Text>
+                  <Money
+                    typography="extraLight"
+                    value={Math.abs(transaction.originalValues.amount)}
+                  />
+                </RowContent>
+              )}
+            </View>
           </InformationGroup>
           <Divider />
           <RowContent text="Ignorar transação">
@@ -113,7 +167,18 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
       <ScreenFloatingButton
         actions={[
           { text: 'Editar', icon: 'edit', onPress: handleEditTransaction },
-          { text: 'Remover', icon: 'delete', onPress: handleDeleteTransaction },
+          {
+            text: 'Restaurar',
+            icon: 'undo',
+            hidden: !transaction.changed,
+            onPress: handleRestoreTransaction,
+          },
+          {
+            text: 'Remover',
+            icon: 'delete',
+            hidden: isAutomaticTransaction,
+            onPress: handleDeleteTransaction,
+          },
         ]}
         icon="more-horiz"
       />

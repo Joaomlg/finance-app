@@ -29,12 +29,13 @@ const Insights: React.FC = () => {
   };
 
   const renderScene = (tabKey: string) => {
-    const transactions =
-      (tabKey as CategoryType) === 'EXPENSE' ? expenseTransactions : incomeTransactions;
+    const type = tabKey as CategoryType;
+
+    const transactions = type === 'EXPENSE' ? expenseTransactions : incomeTransactions;
 
     return (
       <ScreenContent>
-        <CategoryPieChart transactions={transactions} onPress={handlePiePressed} />
+        <CategoryPieChart transactions={transactions} type={type} onPress={handlePiePressed} />
       </ScreenContent>
     );
   };
@@ -48,6 +49,11 @@ const Insights: React.FC = () => {
             icon: 'history',
             hidden: !selectedCategory || selectedCategory === '',
             onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
+          },
+          {
+            icon: 'receipt-long',
+            hidden: !selectedCategory || selectedCategory === '',
+            onPress: () => navigation.navigate('transactions', { categoryId: selectedCategory }),
           },
           HideValuesAction(),
         ]}

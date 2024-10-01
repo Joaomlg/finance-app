@@ -2,6 +2,11 @@ export const TransactionTypeList = ['EXPENSE', 'INCOME'] as const;
 
 export type TransactionType = typeof TransactionTypeList[number];
 
+export type TransactionOriginalValues = {
+  date?: Date;
+  amount?: number;
+};
+
 export type Transaction = {
   id: string;
   type: TransactionType;
@@ -11,4 +16,6 @@ export type Transaction = {
   walletId: string;
   categoryId?: string;
   ignore?: boolean;
+  changed?: boolean;
+  originalValues?: TransactionOriginalValues;
 };
