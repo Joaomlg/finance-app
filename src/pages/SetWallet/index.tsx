@@ -27,6 +27,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   navigation,
 }) => {
   const [walletValues, setWalletValues] = useState({} as Wallet);
+  const [isLoading, setLoading] = useState(false);
 
   const walletId = route.params?.walletId;
   const isEditing = walletId !== undefined;
@@ -109,16 +110,22 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   };
 
   const handleSubmitWallet = async () => {
-    if (isEditing) {
-      await updateWallet(walletId, walletValues);
-    } else {
-      await createWallet({
-        ...walletValues,
-        id: uuid.v4().toString(),
-        createdAt: new Date(),
-        balance: walletValues.balance || 0,
-        initialBalance: walletValues.balance || 0,
-      });
+    setLoading(true);
+
+    try {
+      if (isEditing) {
+        await updateWallet(walletId, walletValues);
+      } else {
+        await createWallet({
+          ...walletValues,
+          id: uuid.v4().toString(),
+          createdAt: new Date(),
+          balance: walletValues.balance || 0,
+          initialBalance: walletValues.balance || 0,
+        });
+      }
+    } finally {
+      setLoading(false);
     }
 
     navigation.goBack();
@@ -184,7 +191,12 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
           <Divider />
         </ScreenContent>
       </ScreenContainer>
-      <ScreenFloatingButton icon="check" onPress={handleSubmitWallet} />
+      <ScreenFloatingButton
+        icon="check"
+        onPress={handleSubmitWallet}
+        loading={isLoading}
+        disabled={isLoading}
+      />
     </>
   );
 };

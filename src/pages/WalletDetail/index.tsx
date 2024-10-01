@@ -25,7 +25,8 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
   route,
   navigation,
 }) => {
-  const { wallets, updateWallet, deleteWallet } = useContext(AppContext);
+  const { wallets, fetchingWallets, fetchWallets, updateWallet, deleteWallet } =
+    useContext(AppContext);
 
   const wallet = wallets.find(({ id }) => id === route.params.walletId);
 
@@ -47,10 +48,6 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
   };
 
   const handleUpdateConnection = () => {
-    if (wallet.connection === undefined) {
-      return;
-    }
-
     const provider = wallet.connection?.provider.toLowerCase();
     const uri = `connect/${provider}`;
 
@@ -82,7 +79,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer refreshing={fetchingWallets} onRefresh={fetchWallets}>
         <ScreenHeader title="Detalhes da carteira" actions={[HideValuesAction()]} />
         <ScreenContent>
           {wallet.connection && hasError && (
@@ -148,6 +145,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
           {
             text: 'Atualizar',
             icon: 'sync',
+            hidden: wallet.connection === undefined,
             onPress: handleUpdateConnection,
           },
           { text: 'Editar', icon: 'edit', onPress: handleEditWallet },

@@ -1,8 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import moment, { Moment } from 'moment';
 import React, { useContext, useState } from 'react';
-import { LayoutAnimation, RefreshControl, ScrollView } from 'react-native';
-import { useTheme } from 'styled-components/native';
+import { LayoutAnimation } from 'react-native';
 import Divider from '../../components/Divider';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -22,7 +21,6 @@ const MINIMUM_DATE = moment(new Date(0));
 const Home: React.FC = () => {
   const [monthYearPickerOpened, setMonthYearPickerOpened] = useState(false);
 
-  const theme = useTheme();
   const navigation = useNavigation();
 
   const { fetchingWallets, fetchingTransactions, date, setDate, fetchWallets, fetchTransactions } =
@@ -45,16 +43,10 @@ const Home: React.FC = () => {
   };
 
   return (
-    <ScreenContainer>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={fetchingWallets || fetchingTransactions}
-            onRefresh={handleRefreshPage}
-            colors={[theme.colors.primary]}
-          />
-        }
-        contentContainerStyle={{ flexGrow: 1, overflow: 'hidden' }}
+    <>
+      <ScreenContainer
+        refreshing={fetchingWallets || fetchingTransactions}
+        onRefresh={handleRefreshPage}
       >
         <TopContainer>
           <StyledHeader
@@ -84,7 +76,7 @@ const Home: React.FC = () => {
           <Divider />
           <TransactionsSection />
         </ScreenContent>
-      </ScrollView>
+      </ScreenContainer>
       <MonthYearPicker
         isOpen={monthYearPickerOpened}
         selectedDate={date}
@@ -92,7 +84,7 @@ const Home: React.FC = () => {
         onChange={(value) => handleMonthYearPickerChange(value)}
         onClose={() => setMonthYearPickerOpened(false)}
       />
-    </ScreenContainer>
+    </>
   );
 };
 

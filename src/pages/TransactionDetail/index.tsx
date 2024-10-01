@@ -26,7 +26,14 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   route,
   navigation,
 }) => {
-  const { wallets, transactions, updateTransaction, deleteTransaction } = useContext(AppContext);
+  const {
+    wallets,
+    transactions,
+    fetchingTransactions,
+    fetchTransactions,
+    updateTransaction,
+    deleteTransaction,
+  } = useContext(AppContext);
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 
@@ -35,6 +42,8 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
   const category =
     getCategoryById(transaction.categoryId) || getDefaultCategoryByType(transaction.type);
+
+  const isAutomaticTransaction = wallet?.connection !== undefined;
 
   const toggleIgnore = async () => {
     await updateTransaction(transaction.id, {
@@ -90,7 +99,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer refreshing={fetchingTransactions} onRefresh={fetchTransactions}>
         <ScreenHeader title="Detalhes" actions={[HideValuesAction()]} />
         <ScreenContent>
           <BottomHeader>
@@ -102,7 +111,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
               </Text>
             </BottomHeaderContent>
           </BottomHeader>
-          {wallet?.connection && (
+          {isAutomaticTransaction && (
             <ChipContainer>
               <Chip text="Automático" color="primary" />
               {transaction.changed && <Chip text="Alterado" color="lightGray" />}
@@ -164,7 +173,12 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             hidden: !transaction.changed,
             onPress: handleRestoreTransaction,
           },
-          { text: 'Remover', icon: 'delete', onPress: handleDeleteTransaction },
+          {
+            text: 'Remover',
+            icon: 'delete',
+            hidden: isAutomaticTransaction,
+            onPress: handleDeleteTransaction,
+          },
         ]}
         icon="more-horiz"
       />

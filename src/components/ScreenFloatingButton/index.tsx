@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutAnimation, TouchableWithoutFeedback } from 'react-native';
+import { ActivityIndicator, LayoutAnimation, TouchableWithoutFeedback } from 'react-native';
 import Icon, { IconName } from '../Icon';
 import Text from '../Text';
 import {
@@ -10,6 +10,7 @@ import {
   FloatingButton,
   OverlayContainer,
 } from './styles';
+import { useTheme } from 'styled-components';
 
 export type Action = {
   text: string;
@@ -25,6 +26,8 @@ export interface ScreenFloatingButtonProps {
   closeIcon?: IconName;
   actions?: Action[];
   onPress?: () => void;
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 const DEFAULT_ICON: IconName = 'add';
@@ -37,8 +40,12 @@ const ScreenFloatingButton: React.FC<ScreenFloatingButtonProps> = ({
   closeIcon,
   actions,
   onPress,
+  loading,
+  disabled,
 }) => {
   const [opened, setOpened] = useState(false);
+
+  const theme = useTheme();
 
   const animatedToogle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -65,8 +72,10 @@ const ScreenFloatingButton: React.FC<ScreenFloatingButtonProps> = ({
 
   const renderFloatingButton = () => {
     return (
-      <FloatingButton onPress={handleButtonPress}>
-        {opened ? (
+      <FloatingButton onPress={handleButtonPress} disabled={disabled}>
+        {loading ? (
+          <ActivityIndicator size={24} color={theme.colors.textWhite} />
+        ) : opened ? (
           <Icon name={closeIcon || DEFAULT_CLOSE_ICON} size={24} color="textWhite" />
         ) : (
           <Icon name={icon || DEFAULT_ICON} size={24} color="textWhite" />

@@ -33,6 +33,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   navigation,
 }) => {
   const [transactionValues, setTransactionValues] = useState({} as Partial<Transaction>);
+  const [isLoading, setLoading] = useState(false);
 
   const transactionId = route.params.transactionId;
   const transactionType = route.params.transactionType as TransactionType;
@@ -73,8 +74,8 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     setTransactionValues((value) => ({ ...value, description: description.trim() }));
   };
 
-  const renderWalletInstitutionAvatar = (wallet: Wallet) => (
-    <Avatar color={wallet.styles.primaryColor} size={24}>
+  const renderWalletInstitutionAvatar = (wallet: Wallet, size?: number) => (
+    <Avatar color={wallet.styles.primaryColor} size={size}>
       <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
     </Avatar>
   );
@@ -155,14 +156,20 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   };
 
   const handleSubmitTransaction = async () => {
-    if (isEditing) {
-      await updateTransaction(transactionId, transactionValues);
-    } else {
-      await createTransaction({
-        ...(transactionValues as Transaction),
-        id: uuid.v4().toString(),
-        type: transactionType,
-      });
+    setLoading(true);
+
+    try {
+      if (isEditing) {
+        await updateTransaction(transactionId, transactionValues);
+      } else {
+        await createTransaction({
+          ...(transactionValues as Transaction),
+          id: uuid.v4().toString(),
+          type: transactionType,
+        });
+      }
+    } finally {
+      setLoading(false);
     }
 
     navigation.goBack();
@@ -214,7 +221,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Carteira"
             iconLeft="account-balance-wallet"
             renderIconLeft={
-              selectedWallet ? () => renderWalletInstitutionAvatar(selectedWallet) : undefined
+              selectedWallet ? () => renderWalletInstitutionAvatar(selectedWallet, 24) : undefined
             }
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionWalletSelector())}
@@ -252,7 +259,12 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           <Divider />
         </ScreenContent>
       </ScreenContainer>
-      <ScreenFloatingButton icon="check" onPress={handleSubmitTransaction} />
+      <ScreenFloatingButton
+        icon="check"
+        onPress={handleSubmitTransaction}
+        loading={isLoading}
+        disabled={isLoading}
+      />
     </>
   );
 };
