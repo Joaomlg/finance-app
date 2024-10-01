@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { Data, VictoryPie } from 'victory-native';
-import { Transaction } from '../../models';
+import { Transaction, TransactionType } from '../../models';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
 import Text from '../Text';
 import { ChardContainer, LegendContainer } from './styles';
+import { Color } from '../../theme';
+import { transactionTypeText } from '../../utils/text';
 
 const INLINE_NUMBER_OF_LINES = 3;
 
@@ -15,6 +17,7 @@ type Variant = 'inline' | 'complete';
 
 export interface CategoryPieChartProps {
   transactions: Transaction[];
+  type: TransactionType;
   variant?: Variant;
   onPress?: (categoryId: string) => void;
 }
@@ -26,7 +29,12 @@ type Data = {
   color: string;
 };
 
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, variant, onPress }) => {
+const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
+  transactions,
+  type,
+  variant,
+  onPress,
+}) => {
   const [selected, setSelected] = useState('');
 
   const theme = useTheme();
@@ -44,6 +52,16 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
 
   const data = useMemo(() => {
     const result = [] as Data[];
+
+    if (filteredTransactions.length === 0) {
+      return [
+        {
+          color: theme.colors[type.toLowerCase() as Color],
+          x: transactionTypeText[type],
+          y: 0.0001,
+        } as Data,
+      ];
+    }
 
     filteredTransactions.reduce((res, transaction) => {
       const category =
@@ -81,7 +99,17 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     );
 
     return [...limitedData, otherData];
-  }, [filteredTransactions, variant, theme.colors.lightGray]);
+  }, [filteredTransactions, variant, theme.colors, type]);
+
+  const renderSliceLabel = (data: Data) => {
+    if (totalValue === 0) {
+      return '100%';
+    }
+
+    const percentValue = (data.y * 100) / totalValue;
+
+    return percentValue > 1 ? `${percentValue.toFixed(0)}%` : '<1%';
+  };
 
   const handleDataPressed = (data: Data) => {
     setSelected((prev) => (prev === data.x ? '' : data.x));
@@ -99,10 +127,6 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
     ];
   };
 
-  if (filteredTransactions.length === 0) {
-    return;
-  }
-
   return (
     <ChardContainer
       style={{ flexDirection: variant === 'inline' ? 'row' : 'column', minHeight: pieSize }}
@@ -115,7 +139,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ transactions, varia
         radius={({ datum }) => (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius}
         innerRadius={variant === 'inline' ? 25 : 50}
         cornerRadius={5}
-        labels={({ datum }) => `${((datum.y * 100) / totalValue).toFixed(0)}%`}
+        labels={({ datum }) => renderSliceLabel(datum)}
         padAngle={2}
         style={{
           data: {

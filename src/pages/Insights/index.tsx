@@ -29,12 +29,13 @@ const Insights: React.FC = () => {
   };
 
   const renderScene = (tabKey: string) => {
-    const transactions =
-      (tabKey as CategoryType) === 'EXPENSE' ? expenseTransactions : incomeTransactions;
+    const type = tabKey as CategoryType;
+
+    const transactions = type === 'EXPENSE' ? expenseTransactions : incomeTransactions;
 
     return (
       <ScreenContent>
-        <CategoryPieChart transactions={transactions} onPress={handlePiePressed} />
+        <CategoryPieChart transactions={transactions} type={type} onPress={handlePiePressed} />
       </ScreenContent>
     );
   };
