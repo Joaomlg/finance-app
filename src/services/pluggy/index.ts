@@ -8,8 +8,6 @@ export * from './types';
 
 const DEFAULT_PAGE_SIZE = 100;
 
-const parseDate = (dateStr: string) => new Date(dateStr.replace('Z', '-03:00'));
-
 export class PluggyService implements IProviderService {
   constructor(private client: PluggyClient) {}
 
@@ -108,7 +106,7 @@ export class PluggyService implements IProviderService {
       type: account.subtype,
       balance: account.balance,
       initialBalance: account.balance,
-      createdAt: parseDate(item.createdAt),
+      createdAt: new Date(item.createdAt),
       styles: {
         imageUrl: item.connector.imageUrl,
         primaryColor: '#' + item.connector.primaryColor,
@@ -117,7 +115,7 @@ export class PluggyService implements IProviderService {
         id: item.id,
         status: item.status,
         provider: 'PLUGGY',
-        lastUpdatedAt: item.lastUpdatedAt ? parseDate(item.lastUpdatedAt) : new Date(),
+        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
       },
     } as Wallet);
 
@@ -128,7 +126,7 @@ export class PluggyService implements IProviderService {
       connection: {
         id: item.id,
         status: item.status,
-        lastUpdatedAt: item.lastUpdatedAt ? parseDate(item.lastUpdatedAt) : new Date(),
+        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
       },
     } as Wallet);
 
@@ -136,7 +134,7 @@ export class PluggyService implements IProviderService {
     ({
       id: transaction.id,
       description: transaction.description,
-      date: parseDate(transaction.date),
+      date: new Date(transaction.date),
       amount: Math.abs(transaction.amount),
       type: transaction.type === 'CREDIT' ? 'INCOME' : 'EXPENSE',
       walletId: accountId,
