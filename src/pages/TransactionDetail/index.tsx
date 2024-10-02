@@ -37,7 +37,12 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 
-  if (!transaction) return;
+  if (!transaction) {
+    setTimeout(() => {
+      navigation.goBack();
+    }, 100);
+    return;
+  }
 
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
   const category =
