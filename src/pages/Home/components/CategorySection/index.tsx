@@ -8,13 +8,13 @@ import { SectionContainer, SectionHeader, SeeMoreButton } from '../commonStyles'
 const CategorySection: React.FC = () => {
   const { expenseTransactions } = useContext(AppContext);
 
-  const nevigation = useNavigation();
+  const navigation = useNavigation();
 
   return (
     <SectionContainer>
       <SectionHeader>
         <Text typography="title">Despesas por categoria</Text>
-        <SeeMoreButton text="Ver mais" onPress={() => nevigation.navigate('insights')} />
+        <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('insights')} />
       </SectionHeader>
       <CategoryPieChart transactions={expenseTransactions} type="EXPENSE" variant="inline" />
     </SectionContainer>
