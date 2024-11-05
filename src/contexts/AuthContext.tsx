@@ -11,6 +11,7 @@ type User = {
 
 export type AuthContextValue = {
   user: User | undefined;
+  authenticated: boolean;
   signInWithGoogle: (token: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -57,7 +58,9 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   if (initializing) return null;
 
   return (
-    <AuthContext.Provider value={{ user, signInWithGoogle, signOut }}>
+    <AuthContext.Provider
+      value={{ user, authenticated: user !== undefined, signInWithGoogle, signOut }}
+    >
       <>{children}</>
     </AuthContext.Provider>
   );
