@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect } from 'react';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
 import AuthContext from '../../contexts/AuthContext';
@@ -15,7 +15,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      navigation.navigate('home');
+      navigation.dispatch(StackActions.replace('home'));
     }
   }, [navigation, user]);
 
