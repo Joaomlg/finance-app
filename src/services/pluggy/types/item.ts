@@ -63,11 +63,11 @@ export type Item = {
   /** Current execution status of item. */
   executionStatus: ExecutionStatus;
   /** Date of the first connection */
-  createdAt: Date;
+  createdAt: string;
   /** Date of last item related data update */
-  updatedAt: Date;
+  updatedAt: string;
   /** Last connection sync date with the institution. */
-  lastUpdatedAt: Date | null;
+  lastUpdatedAt: string | null;
   /** In case of MFA connections, extra parameter will be available. */
   parameter: ConnectorCredential | null;
   /** Url where notifications will be sent at any item's event */

@@ -3,10 +3,13 @@ import { Wallet } from '../models';
 import { flattenObject } from '../utils/object';
 import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
+import { baseCollectionRef } from './common';
 
 const WALLETS_FIREBASE_COLLECTION = 'wallets';
 
-const walletsCollection = firestore().collection(getRepositoryName(WALLETS_FIREBASE_COLLECTION));
+const walletsCollection = baseCollectionRef.collection(
+  getRepositoryName(WALLETS_FIREBASE_COLLECTION),
+);
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
   const { createdAt, ...values } = data;

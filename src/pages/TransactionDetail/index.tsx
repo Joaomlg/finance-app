@@ -3,6 +3,7 @@ import moment from 'moment';
 import React, { useContext } from 'react';
 import { Alert, View } from 'react-native';
 import CategoryIcon from '../../components/CategoryIcon';
+import Chip from '../../components/Chip';
 import Divider from '../../components/Divider';
 import Money from '../../components/Money';
 import RowContent from '../../components/RowContent';
@@ -14,13 +15,12 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import Switch from '../../components/Switch';
 import Text from '../../components/Text';
 import AppContext from '../../contexts/AppContext';
+import { Transaction } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
-import { formatDateHourFull } from '../../utils/date';
+import { formatDate } from '../../utils/date';
 import { transactionTypeText } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, ChipContainer, InformationGroup } from './styles';
-import Chip from '../../components/Chip';
-import { Transaction } from '../../models';
 
 const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'transaction'>> = ({
   route,
@@ -37,7 +37,12 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
 
   const transaction = transactions.find(({ id }) => id === route.params.transactionId);
 
-  if (!transaction) return;
+  if (!transaction) {
+    setTimeout(() => {
+      navigation.goBack();
+    }, 100);
+    return;
+  }
 
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
   const category =
@@ -120,13 +125,13 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
           <InformationGroup>
             <View>
               <RowContent text="Data">
-                <Text typography="defaultBold">{formatDateHourFull(moment(transaction.date))}</Text>
+                <Text typography="defaultBold">{formatDate(moment(transaction.date))}</Text>
               </RowContent>
               {transaction.changed && transaction.originalValues?.date && (
                 <RowContent>
                   <Text typography="extraLight">Data original</Text>
                   <Text typography="extraLight">
-                    {formatDateHourFull(moment(transaction.originalValues.date))}
+                    {formatDate(moment(transaction.originalValues.date))}
                   </Text>
                 </RowContent>
               )}

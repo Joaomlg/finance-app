@@ -4,6 +4,7 @@ import { getTransactionSignedAmount } from '../utils/money';
 import { flattenObject } from '../utils/object';
 import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
+import { baseCollectionRef } from './common';
 import { getWalletReference } from './walletRepository';
 
 type DateInterval = {
@@ -26,7 +27,7 @@ export type TransactionQueryOptions = {
 
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
-const transactionsCollection = firestore().collection(
+const transactionsCollection = baseCollectionRef.collection(
   getRepositoryName(TRANSACTIONS_FIREBASE_COLLECTION),
 );
 

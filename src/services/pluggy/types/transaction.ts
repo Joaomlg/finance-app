@@ -74,7 +74,7 @@ export type Transaction = {
   /** Primary identifier of the Account */
   accountId: string;
   /** Date of the transaction that was made. */
-  date: Date;
+  date: string;
   /** Transaction original description */
   description: string;
   /** Transation type of movement */
