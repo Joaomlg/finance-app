@@ -15,7 +15,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint --ext .tsx --ext .ts ./src/",
-    "format": "prettier --check ./src"
+    "format": "prettier --check ./src",
+    "eas-build-pre-install": "cp $DEV_GOOGLE_SERVICES_JSON $EAS_BUILD_WORKINGDIR/android/app/src/development/google-services.json && cp $GOOGLE_SERVICES_JSON $EAS_BUILD_WORKINGDIR/android/app/google-services.json"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.2",

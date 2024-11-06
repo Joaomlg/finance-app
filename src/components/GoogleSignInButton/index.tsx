@@ -1,9 +1,10 @@
 import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import React, { useCallback, useContext, useState } from 'react';
+import { GOOGLE_SERVICE_CLIENT_ID } from 'react-native-dotenv';
 import AuthContext from '../../contexts/AuthContext';
 
 GoogleSignin.configure({
-  webClientId: '953691595970-jgj8r4rf4fe09h0ajfah7ieebr38bbrf.apps.googleusercontent.com',
+  webClientId: GOOGLE_SERVICE_CLIENT_ID,
 });
 
 const GoogleSignInButton: React.FC<{ onPress?: () => void; onError?: () => void }> = ({

@@ -19,12 +19,12 @@ export default {
     },
     assetBundlePatterns: ['**/*'],
     ios: {
-      googleServicesFile: './GoogleService-Info.plist',
+      googleServicesFile: process.env.GOOGLE_SERVICES_PLIST,
       supportsTablet: true,
       bundleIdentifier: IS_DEV ? 'com.joaomlg.financeapp.dev' : 'com.joaomlg.financeapp',
     },
     android: {
-      googleServicesFile: './google-services.json',
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON,
       adaptiveIcon: {
         foregroundImage: IS_DEV
           ? './src/assets/dev-adaptive-icon.png'
