@@ -53,17 +53,17 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <SecurityGuard>
-          <AppContextProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <BottomSheetContextProvider>
-                <SafeAreaView style={{ flex: 1 }}>
-                  <StatusBar style="light" backgroundColor={theme.colors.primary} />
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetContextProvider>
+              <SafeAreaView style={{ flex: 1 }}>
+                <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                <AppContextProvider>
                   <Routes />
-                  <Toast />
-                </SafeAreaView>
-              </BottomSheetContextProvider>
-            </GestureHandlerRootView>
-          </AppContextProvider>
+                </AppContextProvider>
+                <Toast />
+              </SafeAreaView>
+            </BottomSheetContextProvider>
+          </GestureHandlerRootView>
         </SecurityGuard>
       </AuthContextProvider>
     </ThemeProvider>

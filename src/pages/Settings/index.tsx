@@ -17,7 +17,6 @@ const Settings: React.FC = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigation.navigate('login');
   };
 
   return (
