@@ -1,5 +1,5 @@
 import { Moment } from 'moment';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
@@ -7,9 +7,8 @@ import Provider from '../models/provider';
 import { transactionRepository, walletRepository } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
-import { NOW, CURRENT_MONTH } from '../utils/date';
+import { CURRENT_MONTH, NOW } from '../utils/date';
 import { RecursivePartial } from '../utils/type';
-import AuthContext from './AuthContext';
 
 export type MonthlyBalance = {
   date: Moment;
@@ -57,8 +56,6 @@ export type AppContextValue = {
 const AppContext = createContext({} as AppContextValue);
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { authenticated } = useContext(AuthContext);
-
   const [date, setDate] = useState(NOW);
   const [hideValues, setHideValues] = useState(false);
 
@@ -380,12 +377,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   useEffect(() => {
-    if (!authenticated) return;
     return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
-  }, [authenticated]);
+  }, []);
 
   useEffect(() => {
-    if (!authenticated || !wallets || wallets.length === 0) {
+    if (!wallets || wallets.length === 0) {
       return;
     }
 
@@ -405,16 +401,14 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
 
     syncAllConnections();
-  }, [authenticated, syncWalletConnection, wallets]);
+  }, [syncWalletConnection, wallets]);
 
   useEffect(() => {
-    if (!authenticated) return;
-
     return transactionRepository.onTransactionsChange(
       (transactions) => setTransactions(transactions),
       transactionQueryOptions,
     );
-  }, [authenticated, transactionQueryOptions]);
+  }, [transactionQueryOptions]);
 
   useEffect(() => {
     setMonthlyBalances([]);
