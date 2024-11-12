@@ -54,7 +54,6 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const selectedDate = watch('date') ? formatDate(moment(watch('date'))) : undefined;
   const selectedWallet = wallets.find(({ id }) => id === watch('walletId'));
   const selectedCategory = getCategoryById(watch('categoryId'));
-  console.log('selecteddate', selectedDate);
 
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
