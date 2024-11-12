@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import CurrencyInput from '../../components/CurrencyInput';
@@ -18,43 +19,35 @@ import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { Wallet, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
+import { onSubmitError, useYupValidationResolver } from '../../utils/forms';
 import { walletTypeText } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
+import walletSchema from './walletSchema';
 
 const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet'>> = ({
   route,
   navigation,
 }) => {
-  const [walletValues, setWalletValues] = useState({} as Wallet);
   const [isLoading, setLoading] = useState(false);
 
-  const walletId = route.params?.walletId;
-  const isEditing = walletId !== undefined;
-
-  const isEditingAutomaticWallet = walletValues.connection !== undefined;
-
-  const selectedInstitution = presetInstituitions.find(
-    ({ id }) => id === walletValues.institutionId,
-  );
+  const { reset, setValue, watch, handleSubmit } = useForm<Wallet>({
+    resolver: useYupValidationResolver(walletSchema),
+  });
 
   const { wallets, createWallet, updateWallet } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
-  const handleWalletBalanceChange = (balance: number) => {
-    setWalletValues((value) => ({ ...value, balance }));
-  };
+  const walletId = route.params?.walletId;
+  const isEditing = walletId !== undefined;
 
-  const handleWalletNameChange = (name: string) => {
-    setWalletValues((value) => ({ ...value, name: name.trim() }));
-  };
+  const isEditingAutomaticWallet = watch('connection') !== undefined;
+
+  const selectedInstitution = presetInstituitions.find(({ id }) => id == watch('institutionId'));
 
   const renderWalletTypeSelector = () => {
     const handleItemPressed = (type: WalletType) => {
-      setWalletValues((value) => ({
-        ...value,
-        type,
-      }));
+      setValue('type', type);
       closeBottomSheet();
     };
 
@@ -85,15 +78,11 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
 
   const renderInstitutionSelector = () => {
     const handleItemPressed = (institution: PresetInstitution) => {
-      setWalletValues((value) => ({
-        ...value,
-        institutionId: institution.id,
-        styles: {
-          imageUrl: institution.imageUrl,
-          primaryColor: institution.primaryColor,
-        },
-      }));
-
+      setValue('institutionId', institution.id);
+      setValue('styles', {
+        imageUrl: institution.imageUrl,
+        primaryColor: institution.primaryColor,
+      });
       closeBottomSheet();
     };
 
@@ -109,19 +98,19 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
     return <ListItemSelection title="Instituição" items={items} />;
   };
 
-  const handleSubmitWallet = async () => {
+  const onSubmitWallet = async (data: Wallet) => {
     setLoading(true);
 
     try {
       if (isEditing) {
-        await updateWallet(walletId, walletValues);
+        await updateWallet(walletId, data);
       } else {
         await createWallet({
-          ...walletValues,
+          ...data,
           id: uuid.v4().toString(),
           createdAt: new Date(),
-          balance: walletValues.balance || 0,
-          initialBalance: walletValues.balance || 0,
+          balance: data.balance || 0,
+          initialBalance: data.balance || 0,
         });
       }
     } finally {
@@ -134,9 +123,9 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   useEffect(() => {
     const initialValue = wallets.find(({ id }) => id === walletId);
     if (initialValue) {
-      setWalletValues(initialValue);
+      reset(initialValue);
     }
-  }, [walletId, wallets]);
+  }, [reset, walletId, wallets]);
 
   return (
     <>
@@ -151,8 +140,8 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
               typography="heading"
               color="textWhite"
               iconRight={!isEditing ? 'edit' : undefined}
-              defaultNumberValue={walletValues.balance}
-              onChangeValue={handleWalletBalanceChange}
+              defaultNumberValue={watch('balance')}
+              onChangeValue={(value) => setValue('balance', value)}
               readOnly={isEditing}
             />
           </BalanceValueContainer>
@@ -161,8 +150,8 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
           <TextInput
             placeholder="Nome"
             iconLeft="font-download"
-            defaultValue={walletValues.name}
-            onChangeText={handleWalletNameChange}
+            defaultValue={watch('name')}
+            onChangeText={(value) => setValue('name', value)}
           />
           <Divider />
           <TextInput
@@ -170,7 +159,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             iconLeft="account-balance-wallet"
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderWalletTypeSelector())}
-            value={walletTypeText[walletValues.type]}
+            value={walletTypeText[watch('type')]}
             disabled={isEditingAutomaticWallet}
             readOnly
           />
@@ -193,7 +182,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
       </ScreenContainer>
       <ScreenFloatingButton
         icon="check"
-        onPress={handleSubmitWallet}
+        onPress={handleSubmit(onSubmitWallet, onSubmitError)}
         loading={isLoading}
         disabled={isLoading}
       />
