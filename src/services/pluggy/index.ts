@@ -8,6 +8,8 @@ export * from './types';
 
 const DEFAULT_PAGE_SIZE = 100;
 
+const CONNECTORS_WITHOUT_UPDATE = ['MeuPluggy'];
+
 export class PluggyService implements IProviderService {
   constructor(private client: PluggyClient) {}
 
@@ -119,6 +121,7 @@ export class PluggyService implements IProviderService {
         status: item.status,
         provider: 'PLUGGY',
         lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+        updateDisabled: CONNECTORS_WITHOUT_UPDATE.includes(item.connector.name),
       },
     } as Wallet);
 
