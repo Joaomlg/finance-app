@@ -57,7 +57,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, ...viewProps }) => {
             </Avatar>
             <CardHeaderContent>
               <CardHeaderContentName>
-                <Text>{wallet.name}</Text>
+                <Text ellipsize={true}>{wallet.name}</Text>
                 <Icon name={wallet.connection ? 'link' : 'link-off'} size={18} />
               </CardHeaderContentName>
               {wallet.connection && (

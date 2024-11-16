@@ -12,7 +12,7 @@ export const CardHeader = styled.View`
 `;
 
 export const CardHeaderContent = styled.View`
-  flex-grow: 1;
+  flex: 1;
 `;
 
 export const CardHeaderContentName = styled.View`
