@@ -105,7 +105,7 @@ export class PluggyService implements IProviderService {
   private buildNewWallet = (item: Item, account: Account) =>
     ({
       id: account.id,
-      name: item.connector.name,
+      name: `${item.connector.name} - ${account.name}`,
       type: account.subtype,
       balance: account.balance,
       initialBalance: account.balance,

@@ -248,7 +248,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       await deleteWalletConnectionIfNecessary(wallet);
     } catch (error) {
       Toast.show({
-        type: 'warn',
+        type: 'info',
         text1: 'Não foi possível apagar a conexão com o provedor!',
       });
       hasError = true;
