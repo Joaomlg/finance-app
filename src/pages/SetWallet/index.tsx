@@ -65,6 +65,11 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             icon: 'savings',
             onPress: () => handleItemPressed('SAVINGS_ACCOUNT'),
           },
+          {
+            text: 'Cartão de crédito',
+            icon: 'credit-card',
+            onPress: () => handleItemPressed('CREDIT_CARD'),
+          },
         ]}
       />
     );
