@@ -26,9 +26,11 @@ export class PluggyService implements IProviderService {
     await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
-      accounts.map(({ id: accountId }) =>
-        this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
-      ),
+      accounts
+        .filter(({ type }) => type != 'CREDIT')
+        .map(({ id: accountId }) =>
+          this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
+        ),
     );
   };
 
@@ -48,9 +50,11 @@ export class PluggyService implements IProviderService {
     await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
 
     await Promise.all(
-      accounts.map(({ id: accountId }) =>
-        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
-      ),
+      accounts
+        .filter(({ type }) => type != 'CREDIT')
+        .map(({ id: accountId }) =>
+          this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
+        ),
     );
   };
 
@@ -65,7 +69,6 @@ export class PluggyService implements IProviderService {
     ]);
 
     const filteredAccounts = accounts.results.filter((account) =>
-      //@ts-expect-error WalletTypeList is a string list
       WalletTypeList.includes(account.subtype),
     );
 
