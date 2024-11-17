@@ -16,6 +16,7 @@ import {
   ListItemContent,
   StyledCategoryIcon,
 } from './styles';
+import { ellipsize } from '../../utils/text';
 
 export interface TransactionListItemProps extends TouchableOpacityProps {
   item: Transaction;
@@ -69,7 +70,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
       <ListItemAmount>
         {wallet?.name && (
           <Text typography="extraLight" color="textLight">
-            {wallet.name}
+            {ellipsize(wallet.name, 10)}
             {item.changed ? '*' : ''}
           </Text>
         )}
