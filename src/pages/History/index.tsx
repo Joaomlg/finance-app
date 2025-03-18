@@ -62,7 +62,7 @@ const History: React.FC = () => {
 
   const handleItemPress = useCallback(
     (item: MonthlyBalance) => {
-      navigation.navigate('transactions');
+      navigation.navigate('home');
       setDate(item.date);
     },
     [navigation, setDate],
