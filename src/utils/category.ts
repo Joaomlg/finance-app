@@ -162,6 +162,20 @@ export const expensePresetCategories: Category[] = [
     color: '#ff7f0e',
     type: 'EXPENSE',
   },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-20',
+    name: 'Investimento',
+    icon: 'trending-up',
+    color: '#7f7f7f',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-21',
+    name: 'Imposto',
+    icon: 'request-quote',
+    color: '#8c564b',
+    type: 'EXPENSE',
+  },
 ];
 
 export const incomePresetCategories: Category[] = [
