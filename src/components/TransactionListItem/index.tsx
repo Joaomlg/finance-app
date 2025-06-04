@@ -41,6 +41,13 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
     });
   };
 
+  const handleItemLongPressed = () => {
+    navigation.navigate('setTransaction', {
+      transactionId: item.id,
+      transactionType: item.type,
+    });
+  };
+
   const handleCategoryAvatarPressed = () => {
     openBottomSheet(renderTransactionCategorySelector());
   };
@@ -55,7 +62,12 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
   };
 
   return (
-    <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
+    <ListItem
+      onPress={handleItemPressed}
+      onLongPress={handleItemLongPressed}
+      ignored={item.ignore}
+      {...props}
+    >
       <CategoryIconContainer onPress={handleCategoryAvatarPressed}>
         <StyledCategoryIcon category={category} ignored={item.ignore} />
       </CategoryIconContainer>
