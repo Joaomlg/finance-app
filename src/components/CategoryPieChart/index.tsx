@@ -10,6 +10,7 @@ import Text from '../Text';
 import { ChardContainer, LegendContainer } from './styles';
 import { Color } from '../../theme';
 import { transactionTypeText } from '../../utils/text';
+import { View } from 'react-native';
 
 const INLINE_NUMBER_OF_LINES = 3;
 
@@ -128,56 +129,58 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
   };
 
   return (
-    <ChardContainer
-      style={{ flexDirection: variant === 'inline' ? 'row' : 'column', minHeight: pieSize }}
-    >
-      <VictoryPie
-        data={data}
-        height={pieSize}
-        width={pieSize}
-        padding={piePadding}
-        radius={({ datum }) => (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius}
-        innerRadius={variant === 'inline' ? 25 : 50}
-        cornerRadius={5}
-        labels={({ datum }) => renderSliceLabel(datum)}
-        padAngle={2}
-        style={{
-          data: {
-            fill: ({ datum }) => datum.color,
-            fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
-          },
-          labels: {
-            opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
-            fill: theme.colors.text,
-            fontSize: theme.text.default,
-            fontWeight: 'bold',
-          },
-        }}
-        events={[
-          {
-            target: 'data',
-            eventHandlers: {
-              onPressIn: handleSlicePressed,
+    <View style={{ minHeight: pieSize, height: variant === 'inline' ? 'auto' : '100%' }}>
+      <ChardContainer style={{ flexDirection: variant === 'inline' ? 'row' : 'column' }}>
+        <VictoryPie
+          data={data}
+          height={pieSize}
+          width={pieSize}
+          padding={piePadding}
+          radius={({ datum }) =>
+            (datum.x === selected && variant !== 'inline' ? 1.1 : 1) * pieRadius
+          }
+          innerRadius={variant === 'inline' ? 25 : 50}
+          cornerRadius={5}
+          labels={({ datum }) => renderSliceLabel(datum)}
+          padAngle={2}
+          style={{
+            data: {
+              fill: ({ datum }) => datum.color,
+              fillOpacity: ({ datum }) => (datum.x === selected || selected === '' ? 1 : 0.5),
             },
-          },
-        ]}
-      />
-      <LegendContainer>
-        {data.map((item, index) => (
-          <RowContent
-            key={index}
-            renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
-            style={{
-              opacity: item.x === selected || selected === '' ? 1 : 0.5,
-            }}
-            onPress={() => handleDataPressed(item)}
-          >
-            <Text ellipsize={true}>{item.x}</Text>
-            <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />
-          </RowContent>
-        ))}
-      </LegendContainer>
-    </ChardContainer>
+            labels: {
+              opacity: ({ datum }) => (datum.x === selected ? 1 : 0),
+              fill: theme.colors.text,
+              fontSize: theme.text.default,
+              fontWeight: 'bold',
+            },
+          }}
+          events={[
+            {
+              target: 'data',
+              eventHandlers: {
+                onPressIn: handleSlicePressed,
+              },
+            },
+          ]}
+        />
+        <LegendContainer>
+          {data.map((item, index) => (
+            <RowContent
+              key={index}
+              renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
+              style={{
+                opacity: item.x === selected || selected === '' ? 1 : 0.5,
+              }}
+              onPress={() => handleDataPressed(item)}
+            >
+              <Text ellipsize={true}>{item.x}</Text>
+              <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />
+            </RowContent>
+          ))}
+        </LegendContainer>
+      </ChardContainer>
+    </View>
   );
 };
 
