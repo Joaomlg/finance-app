@@ -20,3 +20,7 @@ export const ChipContainer = styled.View`
 export const InformationGroup = styled.View`
   gap: 16px;
 `;
+
+export const AnnotationContainer = styled.View`
+  gap: 12px;
+`;

@@ -186,6 +186,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconLeft="description"
             defaultValue={watch('description')}
             onChangeText={(value) => setValue('description', value.trim())}
+            disabled={isEditing}
           />
           <Divider />
           <TextInput
@@ -222,6 +223,13 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             onPress={() => openBottomSheet(renderTransactionCategorySelector())}
             value={selectedCategory?.name}
             readOnly
+          />
+          <Divider />
+          <TextInput
+            placeholder="Anotação"
+            iconLeft="edit"
+            defaultValue={watch('annotation')}
+            onChangeText={(value) => setValue('annotation', value.trim())}
           />
           <Divider />
           <TextInput

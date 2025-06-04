@@ -18,4 +18,5 @@ export type Transaction = {
   ignore?: boolean;
   changed?: boolean;
   originalValues?: TransactionOriginalValues;
+  annotation?: string;
 };
