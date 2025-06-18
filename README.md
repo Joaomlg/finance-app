@@ -11,7 +11,7 @@
 
 ## 🎨 Design
 
-You can see the layout of this project in [Figma](https://www.figma.com/file/OMrKC7nSHrZgWkkyxPCTud/finance-app).
+You can see the layout of this project in [Figma](https://www.figma.com/file/OMrKC7nSHrZgWkkyxPCTud/finance-app), and try out the [screen prototype](https://www.figma.com/proto/OMrKC7nSHrZgWkkyxPCTud/finance-app?node-id=1325-27&p=f&t=I3pLQ99FTIoRbpOF-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1325%3A27).
 
 <h4 align="center">
   <img src=".github/assets/design.png" width="600px"></img>
