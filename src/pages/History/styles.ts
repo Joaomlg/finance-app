@@ -13,6 +13,7 @@ export const StyledSectionList = styled(
 ).attrs({
   contentContainerStyle: {
     padding: 24,
+    paddingTop: 12,
   },
 })`
   flex: 1;

@@ -11,6 +11,7 @@ import AnnualBalanceItem from './AnnualBalanceItem';
 import MonthlyBalanceItem from './MonthlyBalanceItem';
 import { StyledButton, StyledDivider, StyledSectionList } from './styles';
 import { AnnualBalance } from './types';
+import { View } from 'react-native';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -47,7 +48,12 @@ const History: React.FC = () => {
           incomes: 0,
           expenses: 0,
           data: [],
+          complete: false,
         });
+
+        if (dataIndex > 0) {
+          summary[dataIndex - 1].complete = true;
+        }
       }
 
       summary[dataIndex].incomes += item.incomes;
@@ -80,6 +86,13 @@ const History: React.FC = () => {
     setLoadingMore(false);
   }, [currentMonthlyBalancesPage, fetchPage]);
 
+  const renderSectionFooter = useCallback(
+    (section: AnnualBalance) => {
+      return section.complete ? renderItemSeparator() : null;
+    },
+    [renderItemSeparator],
+  );
+
   const renderFooter = useCallback(
     () =>
       monthlyBalances.length > 0 ? (
@@ -110,8 +123,10 @@ const History: React.FC = () => {
         sections={annualBalances}
         keyExtractor={(item) => item.date.toISOString()}
         renderItem={({ item }) => <MonthlyBalanceItem data={item} maxAmount={maxAmount} />}
-        renderSectionHeader={({ section }) => <AnnualBalanceItem data={section} />}
         ItemSeparatorComponent={renderItemSeparator}
+        renderSectionHeader={({ section }) => <AnnualBalanceItem data={section} />}
+        SectionSeparatorComponent={() => <View style={{ paddingBottom: 12 }} />}
+        renderSectionFooter={({ section }) => renderSectionFooter(section)}
         ListFooterComponent={renderFooter}
         stickySectionHeadersEnabled={true}
       />

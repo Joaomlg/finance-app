@@ -5,4 +5,5 @@ export type AnnualBalance = {
   incomes: number;
   expenses: number;
   data: MonthlyBalance[];
+  complete: boolean;
 };
