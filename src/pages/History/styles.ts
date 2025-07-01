@@ -22,10 +22,14 @@ export const StyledSectionList = styled(
   border-top-right-radius: 24px;
 `;
 
+export const SectionDivider = styled.View`
+  padding-bottom: 12px;
+`;
+
 export const StyledDivider = styled(Divider)`
   margin: 24px 0;
 `;
 
 export const StyledButton = styled(Button)`
-  margin-top: 48px;
+  margin-top: 36px;
 `;

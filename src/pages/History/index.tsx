@@ -9,9 +9,8 @@ import AppContext from '../../contexts/AppContext';
 import { getCurrentYear } from '../../utils/date';
 import AnnualBalanceItem from './AnnualBalanceItem';
 import MonthlyBalanceItem from './MonthlyBalanceItem';
-import { StyledButton, StyledDivider, StyledSectionList } from './styles';
+import { SectionDivider, StyledButton, StyledDivider, StyledSectionList } from './styles';
 import { AnnualBalance } from './types';
-import { View } from 'react-native';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -125,7 +124,7 @@ const History: React.FC = () => {
         renderItem={({ item }) => <MonthlyBalanceItem data={item} maxAmount={maxAmount} />}
         ItemSeparatorComponent={renderItemSeparator}
         renderSectionHeader={({ section }) => <AnnualBalanceItem data={section} />}
-        SectionSeparatorComponent={() => <View style={{ paddingBottom: 12 }} />}
+        SectionSeparatorComponent={() => <SectionDivider />}
         renderSectionFooter={({ section }) => renderSectionFooter(section)}
         ListFooterComponent={renderFooter}
         stickySectionHeadersEnabled={true}
