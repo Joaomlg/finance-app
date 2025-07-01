@@ -20,11 +20,21 @@ const AnnualBalanceItem: React.FC<AnnualBalanceItemProps> = ({ data }) => {
       <AnnualBalanceContent>
         <AnnualBalanceValueContainer>
           <Icon name="arrow-downward" color="income" size={16} />
-          <Money typography="defaultBold" color="income" value={data.incomes || 0} />
+          <Money
+            typography="defaultBold"
+            color="income"
+            value={data.incomes || 0}
+            marked={!data.complete}
+          />
         </AnnualBalanceValueContainer>
         <AnnualBalanceValueContainer>
           <Icon name="arrow-upward" color="expense" size={16} />
-          <Money typography="defaultBold" color="expense" value={data.expenses || 0} />
+          <Money
+            typography="defaultBold"
+            color="expense"
+            value={data.expenses || 0}
+            marked={!data.complete}
+          />
         </AnnualBalanceValueContainer>
       </AnnualBalanceContent>
     </AnnualBalanceContainer>
