@@ -53,7 +53,7 @@ export const expensePresetCategories: Category[] = [
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-3',
     name: 'Compras',
-    icon: 'shopping-cart',
+    icon: 'shopping-bag',
     color: '#ffbb78',
     type: 'EXPENSE',
   },
@@ -174,6 +174,13 @@ export const expensePresetCategories: Category[] = [
     name: 'Imposto',
     icon: 'request-quote',
     color: '#8c564b',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-22',
+    name: 'Trabalho',
+    icon: 'business-center',
+    color: '#17becf',
     type: 'EXPENSE',
   },
 ];
