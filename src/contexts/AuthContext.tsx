@@ -33,6 +33,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const signOut = async () => {
     await Promise.all([auth().signOut(), GoogleSignin.signOut()]);
+    setUser(undefined);
   };
 
   useEffect(() => {

@@ -6,9 +6,10 @@ export type Signal = '+' | '-';
 
 export interface MoneyProps extends TextProps {
   value: number;
+  marked?: boolean;
 }
 
-const Money: React.FC<MoneyProps> = ({ value, ...textProps }) => {
+const Money: React.FC<MoneyProps> = ({ value, marked, ...textProps }) => {
   const { hideValues } = useContext(AppContext);
 
   const formatedValue = Math.abs(value)
@@ -20,7 +21,9 @@ const Money: React.FC<MoneyProps> = ({ value, ...textProps }) => {
 
   const prefix = value < 0 ? '- ' : '';
 
-  const finalText = `${prefix}${currency} ${formatedValue}`;
+  const suffix = marked ? '*' : '';
+
+  const finalText = `${prefix}${currency} ${formatedValue}${suffix}`;
 
   return <Text {...textProps}>{hideValues ? '$$$$' : finalText}</Text>;
 };

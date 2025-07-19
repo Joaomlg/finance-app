@@ -1,6 +1,6 @@
 import { Connection } from './connection';
 
-export const WalletTypeList = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT'] as const; // CREDIT_CARD
+export const WalletTypeList = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'CREDIT_CARD'] as const;
 
 export type WalletType = typeof WalletTypeList[number];
 

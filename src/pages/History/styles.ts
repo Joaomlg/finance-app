@@ -1,15 +1,19 @@
-import { FlatList, FlatListProps } from 'react-native';
+import { SectionList, SectionListProps } from 'react-native';
 import styled from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
-import HorizontalBar from '../../components/HorizontalBar';
 import { MonthlyBalance } from '../../contexts/AppContext';
+import { AnnualBalance } from './types';
 
-export const StyledFlatList = styled(
-  FlatList as new (props: FlatListProps<MonthlyBalance>) => FlatList<MonthlyBalance>,
+export const StyledSectionList = styled(
+  SectionList as new (props: SectionListProps<MonthlyBalance, AnnualBalance>) => SectionList<
+    MonthlyBalance,
+    AnnualBalance
+  >,
 ).attrs({
   contentContainerStyle: {
     padding: 24,
+    paddingTop: 12,
   },
 })`
   flex: 1;
@@ -18,31 +22,8 @@ export const StyledFlatList = styled(
   border-top-right-radius: 24px;
 `;
 
-export const ItemContainer = styled.View`
-  gap: 12px;
-`;
-
-export const ItemHeader = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-export const MonthTrendContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-`;
-
-export const TouchableIconContainer = styled.TouchableOpacity``;
-
-export const HorizontalBarContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const StyledHorizontalBar = styled(HorizontalBar)`
-  margin-right: 12px;
+export const SectionDivider = styled.View`
+  padding-bottom: 12px;
 `;
 
 export const StyledDivider = styled(Divider)`
@@ -50,5 +31,5 @@ export const StyledDivider = styled(Divider)`
 `;
 
 export const StyledButton = styled(Button)`
-  margin-top: 48px;
+  margin-top: 36px;
 `;

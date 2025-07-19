@@ -8,11 +8,14 @@ import { useNavigation } from '@react-navigation/native';
 import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
+import { ellipsize } from '../../utils/text';
 import CategoryPicker from '../CategoryPicker';
+import Icon from '../Icon';
 import {
   CategoryIconContainer,
   ListItem,
   ListItemAmount,
+  ListItemAnnotation,
   ListItemContent,
   StyledCategoryIcon,
 } from './styles';
@@ -38,6 +41,13 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
     });
   };
 
+  const handleItemLongPressed = () => {
+    navigation.navigate('setTransaction', {
+      transactionId: item.id,
+      transactionType: item.type,
+    });
+  };
+
   const handleCategoryAvatarPressed = () => {
     openBottomSheet(renderTransactionCategorySelector());
   };
@@ -52,7 +62,12 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
   };
 
   return (
-    <ListItem onPress={handleItemPressed} ignored={item.ignore} {...props}>
+    <ListItem
+      onPress={handleItemPressed}
+      onLongPress={handleItemLongPressed}
+      ignored={item.ignore}
+      {...props}
+    >
       <CategoryIconContainer onPress={handleCategoryAvatarPressed}>
         <StyledCategoryIcon category={category} ignored={item.ignore} />
       </CategoryIconContainer>
@@ -65,11 +80,19 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
         <Text numberOfLines={2} ellipsizeMode="tail">
           {item.description}
         </Text>
+        {item.annotation && (
+          <ListItemAnnotation>
+            <Icon name="edit" size={10} color="textLight"></Icon>
+            <Text typography="extraLight" color="textLight" numberOfLines={1} ellipsizeMode="tail">
+              {item.annotation}
+            </Text>
+          </ListItemAnnotation>
+        )}
       </ListItemContent>
       <ListItemAmount>
         {wallet?.name && (
           <Text typography="extraLight" color="textLight">
-            {wallet.name}
+            {ellipsize(wallet.name, 10)}
             {item.changed ? '*' : ''}
           </Text>
         )}

@@ -10,6 +10,8 @@ export const getMonthStartDay = (date: Moment) => date.startOf('month');
 
 export const getMonthEndDay = (date: Moment) => date.endOf('month');
 
+export const getCurrentYear = () => NOW.year();
+
 export const checkCurrentMonth = (date: Moment) => date.isSame(NOW, 'month');
 
 export const checkCurrentYear = (date: Moment) => date.isSame(NOW, 'year');

@@ -53,8 +53,8 @@ export const expensePresetCategories: Category[] = [
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-3',
     name: 'Compras',
-    icon: 'shopping-cart',
-    color: '#ff7f0e',
+    icon: 'shopping-bag',
+    color: '#ffbb78',
     type: 'EXPENSE',
   },
   {
@@ -153,6 +153,34 @@ export const expensePresetCategories: Category[] = [
     name: 'Pagamentos',
     icon: 'payments',
     color: '#bcbd22',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-19',
+    name: 'Manutenção',
+    icon: 'construction',
+    color: '#ff7f0e',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-20',
+    name: 'Investimento',
+    icon: 'trending-up',
+    color: '#7f7f7f',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-21',
+    name: 'Imposto',
+    icon: 'request-quote',
+    color: '#8c564b',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-22',
+    name: 'Trabalho',
+    icon: 'business-center',
+    color: '#17becf',
     type: 'EXPENSE',
   },
 ];

@@ -8,6 +8,14 @@ export const textCompare = (text1: string, text2: string) => {
   return text1.localeCompare(text2);
 };
 
+export const ellipsize = (text: string, maxSize: number) => {
+  if (text.length <= maxSize) {
+    return text;
+  }
+
+  return text.substring(0, maxSize - 1) + '…';
+};
+
 export const walletTypeText: Record<WalletType, string> = {
   CHECKING_ACCOUNT: 'Conta corrente',
   SAVINGS_ACCOUNT: 'Conta poupança',

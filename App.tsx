@@ -16,7 +16,6 @@ import SecurityGuard from './src/components/SecurityGuard';
 import { AppContextProvider } from './src/contexts/AppContext';
 import { AuthContextProvider } from './src/contexts/AuthContext';
 import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
-import HooksProvider from './src/hooks';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
 import light from './src/theme/light';
@@ -54,19 +53,17 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <SecurityGuard>
-          <AppContextProvider>
-            <HooksProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <BottomSheetContextProvider>
-                  <SafeAreaView style={{ flex: 1 }}>
-                    <StatusBar style="light" backgroundColor={theme.colors.primary} />
-                    <Routes />
-                    <Toast />
-                  </SafeAreaView>
-                </BottomSheetContextProvider>
-              </GestureHandlerRootView>
-            </HooksProvider>
-          </AppContextProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetContextProvider>
+              <SafeAreaView style={{ flex: 1 }}>
+                <StatusBar style="light" backgroundColor={theme.colors.primary} />
+                <AppContextProvider>
+                  <Routes />
+                </AppContextProvider>
+                <Toast />
+              </SafeAreaView>
+            </BottomSheetContextProvider>
+          </GestureHandlerRootView>
         </SecurityGuard>
       </AuthContextProvider>
     </ThemeProvider>

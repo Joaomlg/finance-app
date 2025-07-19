@@ -8,6 +8,8 @@ export * from './types';
 
 const DEFAULT_PAGE_SIZE = 100;
 
+const CONNECTORS_WITHOUT_UPDATE = ['MeuPluggy'];
+
 export class PluggyService implements IProviderService {
   constructor(private client: PluggyClient) {}
 
@@ -26,9 +28,11 @@ export class PluggyService implements IProviderService {
     await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
-      accounts.map(({ id: accountId }) =>
-        this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
-      ),
+      accounts
+        .filter(({ type }) => type != 'CREDIT')
+        .map(({ id: accountId }) =>
+          this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
+        ),
     );
   };
 
@@ -48,9 +52,11 @@ export class PluggyService implements IProviderService {
     await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
 
     await Promise.all(
-      accounts.map(({ id: accountId }) =>
-        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
-      ),
+      accounts
+        .filter(({ type }) => type != 'CREDIT')
+        .map(({ id: accountId }) =>
+          this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
+        ),
     );
   };
 
@@ -65,7 +71,6 @@ export class PluggyService implements IProviderService {
     ]);
 
     const filteredAccounts = accounts.results.filter((account) =>
-      //@ts-expect-error WalletTypeList is a string list
       WalletTypeList.includes(account.subtype),
     );
 
@@ -102,7 +107,7 @@ export class PluggyService implements IProviderService {
   private buildNewWallet = (item: Item, account: Account) =>
     ({
       id: account.id,
-      name: item.connector.name,
+      name: `${item.connector.name} - ${account.name}`,
       type: account.subtype,
       balance: account.balance,
       initialBalance: account.balance,
@@ -116,6 +121,7 @@ export class PluggyService implements IProviderService {
         status: item.status,
         provider: 'PLUGGY',
         lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+        updateDisabled: CONNECTORS_WITHOUT_UPDATE.includes(item.connector.name),
       },
     } as Wallet);
 

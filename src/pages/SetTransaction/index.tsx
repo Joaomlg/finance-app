@@ -2,6 +2,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import uuid from 'react-native-uuid';
 import Avatar from '../../components/Avatar';
 import CategoryIcon from '../../components/CategoryIcon';
@@ -25,15 +26,23 @@ import { Category, Transaction, TransactionType, Wallet } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById } from '../../utils/category';
 import { formatDate } from '../../utils/date';
+import { onSubmitError, useYupValidationResolver } from '../../utils/forms';
 import { transactionTypeText } from '../../utils/text';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
+import transactionSchema from './transactionSchema';
 
 const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setTransaction'>> = ({
   route,
   navigation,
 }) => {
-  const [transactionValues, setTransactionValues] = useState({} as Partial<Transaction>);
   const [isLoading, setLoading] = useState(false);
+
+  const { reset, setValue, watch, handleSubmit } = useForm<Transaction>({
+    resolver: useYupValidationResolver(transactionSchema),
+  });
+
+  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext);
+  const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const transactionId = route.params.transactionId;
   const transactionType = route.params.transactionType as TransactionType;
@@ -42,36 +51,26 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const screenTitle = (isEditing ? 'Editar ' : 'Nova ') + transactionTypeText[transactionType];
 
-  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext);
-  const { openBottomSheet, closeBottomSheet } = useBottomSheet();
-
-  const selectedWallet = wallets.find(({ id }) => id === transactionValues.walletId);
-  const selectedCategory = getCategoryById(transactionValues.categoryId);
+  const selectedDate = watch('date') ? formatDate(moment(watch('date'))) : undefined;
+  const selectedWallet = wallets.find(({ id }) => id === watch('walletId'));
+  const selectedCategory = getCategoryById(watch('categoryId'));
 
   const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
 
   const handleTransactionBalanceChange = (amount: number) => {
-    setTransactionValues((value) => {
-      const newValue = { ...value, amount };
+    if (isEditingAutomaticTransaction) {
+      setValue('changed', true);
 
-      if (isEditingAutomaticTransaction) {
-        newValue.changed = true;
+      const originalValues = watch('originalValues') || {};
 
-        if (!newValue.originalValues) {
-          newValue.originalValues = {};
-        }
-
-        if (newValue.originalValues.amount === undefined) {
-          newValue.originalValues.amount = value.amount;
-        }
+      if (originalValues.amount === undefined) {
+        originalValues.amount = watch('amount');
       }
 
-      return newValue;
-    });
-  };
+      setValue('originalValues', originalValues);
+    }
 
-  const handleTransactionDescriptionChange = (description: string) => {
-    setTransactionValues((value) => ({ ...value, description: description.trim() }));
+    setValue('amount', amount);
   };
 
   const renderWalletInstitutionAvatar = (wallet: Wallet, size?: number) => (
@@ -82,10 +81,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const renderTransactionWalletSelector = () => {
     const handleItemPressed = (walletId: string) => {
-      setTransactionValues((value) => ({
-        ...value,
-        walletId,
-      }));
+      setValue('walletId', walletId);
       closeBottomSheet();
     };
 
@@ -105,10 +101,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const renderTransactionCategorySelector = () => {
     const handleItemPressed = ({ id }: Category) => {
-      setTransactionValues((value) => ({
-        ...value,
-        categoryId: id,
-      }));
+      setValue('categoryId', id);
       closeBottomSheet();
     };
 
@@ -121,49 +114,36 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     const handleDateSelected = (date: Date) => {
       const dateWithoutTime = new Date(date.toDateString());
 
-      setTransactionValues((value) => {
-        const newValue = { ...value, date: dateWithoutTime };
+      if (isEditingAutomaticTransaction) {
+        setValue('changed', true);
 
-        if (isEditingAutomaticTransaction) {
-          newValue.changed = true;
+        const originalValues = watch('originalValues') || {};
 
-          if (!newValue.originalValues) {
-            newValue.originalValues = {};
-          }
-
-          if (newValue.originalValues.date === undefined) {
-            newValue.originalValues.date = value.date;
-          }
+        if (originalValues.date === undefined) {
+          originalValues.date = watch('date');
         }
+      }
 
-        return newValue;
-      });
+      setValue('date', dateWithoutTime);
     };
 
     DateTimePickerAndroid.open({
-      value: transactionValues.date || now,
+      value: watch('date') || now,
       onChange: (_, date) => date && handleDateSelected(date),
       mode: 'date',
       maximumDate: now,
     });
   };
 
-  const handleTransactionIgnoreToggle = () => {
-    setTransactionValues(({ ignore, ...values }) => ({
-      ...values,
-      ignore: !ignore,
-    }));
-  };
-
-  const handleSubmitTransaction = async () => {
+  const onSubmitTransaction = async (transaction: Transaction) => {
     setLoading(true);
 
     try {
       if (isEditing) {
-        await updateTransaction(transactionId, transactionValues);
+        await updateTransaction(transactionId, transaction);
       } else {
         await createTransaction({
-          ...(transactionValues as Transaction),
+          ...transaction,
           id: uuid.v4().toString(),
           type: transactionType,
         });
@@ -178,9 +158,9 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   useEffect(() => {
     const initialValue = transactions.find(({ id }) => id === transactionId);
     if (initialValue) {
-      setTransactionValues(initialValue);
+      reset(initialValue);
     }
-  }, [transactionId, transactions]);
+  }, [reset, transactionId, transactions]);
 
   return (
     <>
@@ -195,7 +175,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
               typography="heading"
               color="textWhite"
               iconRight="edit"
-              defaultNumberValue={transactionValues.amount}
+              defaultNumberValue={watch('amount')}
               onChangeValue={handleTransactionBalanceChange}
             />
           </BalanceValueContainer>
@@ -204,8 +184,9 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           <TextInput
             placeholder="Descrição"
             iconLeft="description"
-            defaultValue={transactionValues.description}
-            onChangeText={handleTransactionDescriptionChange}
+            defaultValue={watch('description')}
+            onChangeText={(value) => setValue('description', value.trim())}
+            disabled={isEditing}
           />
           <Divider />
           <TextInput
@@ -213,7 +194,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconLeft="calendar-month"
             iconRight="navigate-next"
             onPress={showTransactionDatePicker}
-            value={transactionValues.date ? formatDate(moment(transactionValues.date)) : undefined}
+            value={selectedDate}
             readOnly
           />
           <Divider />
@@ -245,12 +226,19 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
           />
           <Divider />
           <TextInput
+            placeholder="Anotação"
+            iconLeft="edit"
+            defaultValue={watch('annotation')}
+            onChangeText={(value) => setValue('annotation', value.trim())}
+          />
+          <Divider />
+          <TextInput
             placeholder="Ignorar transação"
             iconLeft="do-not-disturb-on"
             renderIconRight={() => (
               <Switch
-                value={transactionValues.ignore}
-                onValueChange={handleTransactionIgnoreToggle}
+                value={watch('ignore')}
+                onValueChange={(value) => setValue('ignore', value)}
               />
             )}
             onPress={showTransactionDatePicker}
@@ -261,7 +249,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
       </ScreenContainer>
       <ScreenFloatingButton
         icon="check"
-        onPress={handleSubmitTransaction}
+        onPress={handleSubmit(onSubmitTransaction, onSubmitError)}
         loading={isLoading}
         disabled={isLoading}
       />

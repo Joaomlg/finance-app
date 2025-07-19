@@ -145,6 +145,11 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             <RowContent text="Categoria">
               <Text typography="defaultBold">{category.name}</Text>
             </RowContent>
+            {transaction.annotation && (
+              <RowContent text="Anotação">
+                <Text typography="defaultBold">{transaction.annotation}</Text>
+              </RowContent>
+            )}
           </InformationGroup>
           <Divider />
           <InformationGroup>

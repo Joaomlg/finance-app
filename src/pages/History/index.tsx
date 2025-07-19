@@ -1,28 +1,20 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ListRenderItemInfo, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { useTheme } from 'styled-components/native';
-import Icon from '../../components/Icon';
-import Money from '../../components/Money';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import Text from '../../components/Text';
-import AppContext, { MonthlyBalance } from '../../contexts/AppContext';
-import { checkCurrentYear } from '../../utils/date';
-import {
-  HorizontalBarContainer,
-  ItemContainer,
-  ItemHeader,
-  MonthTrendContainer,
-  StyledButton,
-  StyledDivider,
-  StyledFlatList,
-  StyledHorizontalBar,
-  TouchableIconContainer,
-} from './styles';
+import AppContext from '../../contexts/AppContext';
+import { getCurrentYear } from '../../utils/date';
+import AnnualBalanceItem from './AnnualBalanceItem';
+import MonthlyBalanceItem from './MonthlyBalanceItem';
+import { SectionDivider, StyledButton, StyledDivider, StyledSectionList } from './styles';
+import { AnnualBalance } from './types';
 
 const ITEMS_PER_PAGE = 4;
+
+const CURRENT_YEAR = getCurrentYear();
 
 const History: React.FC = () => {
   const [isLoadingMore, setLoadingMore] = useState(false);
@@ -33,17 +25,42 @@ const History: React.FC = () => {
     fetchingMonthlyBalances,
     currentMonthlyBalancesPage,
     setCurrentMonthlyBalancesPage,
-    setDate,
   } = useContext(AppContext);
 
   const theme = useTheme();
-  const navigation = useNavigation();
 
   const maxAmount = useMemo(() => {
     return monthlyBalances.reduce(
       (currentMax, item) => Math.max(currentMax, item.incomes, item.expenses),
       0,
     );
+  }, [monthlyBalances]);
+
+  const annualBalances = useMemo(() => {
+    return monthlyBalances.reduce((summary, item) => {
+      const year = item.date.year();
+      const dataIndex = CURRENT_YEAR - year;
+
+      if (summary.length <= dataIndex) {
+        summary.push({
+          year,
+          incomes: 0,
+          expenses: 0,
+          data: [],
+          complete: false,
+        });
+
+        if (dataIndex > 0) {
+          summary[dataIndex - 1].complete = true;
+        }
+      }
+
+      summary[dataIndex].incomes += item.incomes;
+      summary[dataIndex].expenses += item.expenses;
+      summary[dataIndex].data.push(item);
+
+      return summary;
+    }, [] as AnnualBalance[]);
   }, [monthlyBalances]);
 
   const fetchPage = useCallback(
@@ -60,13 +77,7 @@ const History: React.FC = () => {
     }
   }, [currentMonthlyBalancesPage, fetchPage]);
 
-  const handleItemPress = useCallback(
-    (item: MonthlyBalance) => {
-      navigation.navigate('transactions');
-      setDate(item.date);
-    },
-    [navigation, setDate],
-  );
+  const renderItemSeparator = useCallback(() => <StyledDivider />, []);
 
   const handleLoadMore = useCallback(async () => {
     setLoadingMore(true);
@@ -74,65 +85,12 @@ const History: React.FC = () => {
     setLoadingMore(false);
   }, [currentMonthlyBalancesPage, fetchPage]);
 
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<MonthlyBalance>) => {
-      const { date, incomes, expenses } = item;
-
-      const dateText = checkCurrentYear(date) ? date.format('MMMM') : date.format('MMMM YYYY');
-
-      const balance = incomes - expenses;
-
-      const showTrendingIcon = balance !== 0;
-
-      const incomesBarGrow = maxAmount === 0 ? 1 : Math.max(incomes / maxAmount, 0.005);
-      const expensesBarGrow = maxAmount === 0 ? 1 : Math.max(expenses / maxAmount, 0.005);
-
-      const expensesSurplusBarGrow = balance < 0 ? (expenses - incomes) / expenses : 0;
-
-      return (
-        <ItemContainer>
-          <ItemHeader>
-            <MonthTrendContainer>
-              <Text typography="headingRegular" transform="capitalize">
-                {dateText}
-              </Text>
-              {showTrendingIcon &&
-                (balance > 0 ? (
-                  <Icon name="trending-up" color="income" size={24} />
-                ) : (
-                  <Icon name="trending-down" color="error" size={24} />
-                ))}
-            </MonthTrendContainer>
-            <TouchableIconContainer onPress={() => handleItemPress(item)}>
-              <Icon name="navigate-next" size={28} />
-            </TouchableIconContainer>
-          </ItemHeader>
-          <Text>
-            Saldo: <Money value={balance} typography="defaultBold" />
-          </Text>
-          <HorizontalBarContainer>
-            <StyledHorizontalBar color="income" grow={incomesBarGrow} />
-            <Money value={incomes} typography="defaultBold" color="income" />
-          </HorizontalBarContainer>
-          <HorizontalBarContainer>
-            <StyledHorizontalBar
-              color="expense"
-              grow={expensesBarGrow}
-              surplusGrow={expensesSurplusBarGrow}
-            />
-            <Money
-              value={expenses}
-              typography="defaultBold"
-              color={balance < 0 ? 'error' : 'expense'}
-            />
-          </HorizontalBarContainer>
-        </ItemContainer>
-      );
+  const renderSectionFooter = useCallback(
+    (section: AnnualBalance) => {
+      return section.complete ? renderItemSeparator() : null;
     },
-    [maxAmount, handleItemPress],
+    [renderItemSeparator],
   );
-
-  const renderItemSeparator = useCallback(() => <StyledDivider />, []);
 
   const renderFooter = useCallback(
     () =>
@@ -152,8 +110,8 @@ const History: React.FC = () => {
 
   return (
     <ScreenContainer>
-      <ScreenHeader title="Histórico mensal" actions={[HideValuesAction()]} />
-      <StyledFlatList
+      <ScreenHeader title="Histórico" actions={[HideValuesAction()]} />
+      <StyledSectionList
         refreshControl={
           <RefreshControl
             refreshing={fetchingMonthlyBalances && !isLoadingMore}
@@ -161,10 +119,15 @@ const History: React.FC = () => {
             colors={[theme.colors.primary]}
           />
         }
-        data={monthlyBalances}
-        renderItem={renderItem}
+        sections={annualBalances}
+        keyExtractor={(item) => item.date.toISOString()}
+        renderItem={({ item }) => <MonthlyBalanceItem data={item} maxAmount={maxAmount} />}
         ItemSeparatorComponent={renderItemSeparator}
+        renderSectionHeader={({ section }) => <AnnualBalanceItem data={section} />}
+        SectionSeparatorComponent={() => <SectionDivider />}
+        renderSectionFooter={({ section }) => renderSectionFooter(section)}
         ListFooterComponent={renderFooter}
+        stickySectionHeadersEnabled={true}
       />
     </ScreenContainer>
   );

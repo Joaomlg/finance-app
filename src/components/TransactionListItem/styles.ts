@@ -22,6 +22,12 @@ export const ListItemContent = styled.View`
   margin-right: 16px;
 `;
 
+export const ListItemAnnotation = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+`;
+
 export const ListItemAmount = styled.View`
   flex-grow: 1;
   align-items: flex-end;
