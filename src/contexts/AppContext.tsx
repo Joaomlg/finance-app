@@ -169,7 +169,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         lastTransaction?.date || wallet.connection.lastUpdatedAt,
         !wallet.connection.updateDisabled,
         walletRepository.updateWalletsBatch,
-        transactionRepository.setTransactionsBatch,
+        transactionRepository.securelySetTransactionsBatch,
       );
     } catch (error) {
       Toast.show({

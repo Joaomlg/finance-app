@@ -25,6 +25,10 @@ export type TransactionQueryOptions = {
   categoryId?: string;
 };
 
+export type SetTransactionOptions = {
+  merge: boolean;
+};
+
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
 const getTransactionsCollectionReference = () =>
@@ -119,12 +123,18 @@ export const setTransaction = async (transaction: Transaction) => {
   });
 };
 
-export const setTransactionsBatch = async (transactions: Transaction[]) => {
+export const securelySetTransactionsBatch = async (transactions: Transaction[]) =>
+  setTransactionsBatch(transactions, { merge: true });
+
+export const setTransactionsBatch = async (
+  transactions: Transaction[],
+  options = {} as SetTransactionOptions,
+) => {
   const batch = firestore().batch();
 
   transactions.forEach((transaction) => {
     const transactionReference = getTransactionReference(transaction.id);
-    batch.set(transactionReference, transaction);
+    batch.set(transactionReference, transaction, options);
   });
 
   return batch.commit();
