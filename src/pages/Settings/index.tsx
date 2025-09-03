@@ -25,7 +25,7 @@ const Settings: React.FC = () => {
   const handleExport = async () => {
     Alert.alert(
       'Exportar transações?',
-      'Deseja exportar todas as transações para um arquivo .csv?',
+      'Deseja exportar todas as transações para um arquivo .json?',
       [
         { text: 'Cancelar', onPress: () => {} },
         {
