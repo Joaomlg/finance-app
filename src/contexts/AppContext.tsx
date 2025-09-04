@@ -60,7 +60,7 @@ export type AppContextValue = {
 const AppContext = createContext({} as AppContextValue);
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [date, setDate] = useState(NOW);
+  const [date, setDate] = useState(NOW.clone());
   const [hideValues, setHideValues] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
