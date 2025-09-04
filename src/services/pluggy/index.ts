@@ -28,11 +28,9 @@ export class PluggyService implements IProviderService {
     await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
-      accounts
-        .filter(({ type }) => type != 'CREDIT')
-        .map(({ id: accountId }) =>
-          this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
-        ),
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
+      ),
     );
   };
 
@@ -52,11 +50,9 @@ export class PluggyService implements IProviderService {
     await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
 
     await Promise.all(
-      accounts
-        .filter(({ type }) => type != 'CREDIT')
-        .map(({ id: accountId }) =>
-          this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
-        ),
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
+      ),
     );
   };
 
