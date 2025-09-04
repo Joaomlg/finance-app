@@ -51,9 +51,13 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   const isAutomaticTransaction = wallet?.connection !== undefined;
 
   const toggleIgnore = async () => {
-    await updateTransaction(transaction.id, {
-      ignore: !transaction.ignore,
-    });
+    await updateTransaction(
+      transaction.id,
+      {
+        ignore: !transaction.ignore,
+      },
+      false,
+    );
   };
 
   const handleEditTransaction = () => {
@@ -72,11 +76,15 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
         {
           text: 'Restaurar',
           onPress: async () => {
-            await updateTransaction(transaction.id, {
-              changed: false,
-              ...transaction.originalValues,
-              originalValues: undefined,
-            } as Transaction);
+            await updateTransaction(
+              transaction.id,
+              {
+                changed: false,
+                ...transaction.originalValues,
+                originalValues: undefined,
+              } as Transaction,
+              false,
+            );
           },
         },
       ],

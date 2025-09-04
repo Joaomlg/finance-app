@@ -39,7 +39,11 @@ export type AppContextValue = {
   fetchTransactions: () => Promise<void>;
   fetchingTransactions: boolean;
   createTransaction: (transaction: Transaction) => Promise<void>;
-  updateTransaction: (id: string, values: RecursivePartial<Transaction>) => Promise<void>;
+  updateTransaction: (
+    id: string,
+    values: RecursivePartial<Transaction>,
+    updateWalletBalance: boolean,
+  ) => Promise<void>;
   deleteTransaction: (transaction: Transaction) => Promise<void>;
   incomeTransactions: Transaction[];
   totalIncomes: number;
@@ -309,11 +313,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingTransactions(false);
   };
 
-  const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+  const updateTransaction = async (
+    id: string,
+    values: RecursivePartial<Transaction>,
+    updateWalletBalance: boolean,
+  ) => {
     setFetchingTransactions(true);
 
     try {
-      await transactionRepository.updateTransaction(id, values);
+      await transactionRepository.updateTransaction(id, values, updateWalletBalance);
       Toast.show({ type: 'success', text1: 'Transação alterada com sucesso!' });
     } catch (error) {
       Toast.show({

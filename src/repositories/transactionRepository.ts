@@ -140,7 +140,11 @@ export const setTransactionsBatch = async (
   return batch.commit();
 };
 
-export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+export const updateTransaction = async (
+  id: string,
+  values: RecursivePartial<Transaction>,
+  updateWalletBalance: boolean,
+) => {
   const data = flattenObject(values);
 
   // undefined values mapped to firestore delete token
@@ -150,7 +154,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
     }
   });
 
-  if (values.amount === undefined) {
+  if (!updateWalletBalance || values.amount === undefined) {
     const collection = getTransactionsCollectionReference();
     return await collection.doc(id).update(data);
   }

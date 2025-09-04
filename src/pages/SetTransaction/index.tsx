@@ -140,7 +140,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
     try {
       if (isEditing) {
-        await updateTransaction(transactionId, transaction);
+        await updateTransaction(transactionId, transaction, !isEditingAutomaticTransaction);
       } else {
         await createTransaction({
           ...transaction,
