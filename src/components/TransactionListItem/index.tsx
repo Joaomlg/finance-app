@@ -54,7 +54,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
 
   const renderTransactionCategorySelector = () => {
     const handleItemPressed = async ({ id }: Category) => {
-      await updateTransaction(item.id, { categoryId: id });
+      await updateTransaction(item.id, { categoryId: id }, false);
       closeBottomSheet();
     };
 

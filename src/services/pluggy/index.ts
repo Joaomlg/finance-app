@@ -140,5 +140,6 @@ export class PluggyService implements IProviderService {
       amount: Math.abs(transaction.amount),
       type: transaction.type === 'CREDIT' ? 'INCOME' : 'EXPENSE',
       walletId: accountId,
+      updateWalletBalance: false,
     } as Transaction);
 }

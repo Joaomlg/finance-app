@@ -123,7 +123,13 @@ export const setTransaction = async (transaction: Transaction) => {
       throw 'Transaction already exist!';
     }
 
-    t.set(transactionReference, transaction).update(walletReference, {
+    t.set(transactionReference, transaction);
+
+    if (!transaction.updateWalletBalance) {
+      return;
+    }
+
+    t.update(walletReference, {
       balance: firestore.FieldValue.increment(getTransactionSignedAmount(transaction)),
     });
   });
@@ -205,6 +211,10 @@ export const deleteTransaction = async (transaction: Transaction) => {
     }
 
     t.delete(transactionReference);
+
+    if (!transaction.updateWalletBalance) {
+      return;
+    }
 
     if (walletSnapshot.exists) {
       t.update(walletReference, {
