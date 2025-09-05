@@ -8,6 +8,10 @@ export const ChardContainer = styled.View`
   gap: 20px;
 `;
 
+export const LegendScrollContainer = styled.ScrollView`
+  width: 100%;
+`;
+
 export const LegendContainer = styled.View`
   flex: 1;
   gap: 8px;
