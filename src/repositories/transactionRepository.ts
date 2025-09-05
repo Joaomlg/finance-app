@@ -72,7 +72,13 @@ const parseTransaction = (data: FirebaseFirestoreTypes.DocumentData) => {
 
   if (originalValues) {
     const { date, ...values } = originalValues;
-    transaction.originalValues = { ...values, date: date?.toDate() };
+
+    transaction.originalValues = { ...values };
+
+    if (date) {
+      // @ts-expect-error originalValues is defined
+      transaction.originalValues.date = date.toDate();
+    }
   }
 
   return transaction;
