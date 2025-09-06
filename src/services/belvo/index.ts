@@ -192,6 +192,7 @@ export class BelvoService implements IProviderService {
       amount: Math.abs(transaction.amount),
       type: this.transactionTypeMap(transaction.type),
       walletId: transaction.account.id,
+      updateWalletBalance: false,
     } as Transaction);
 
   private transactionTypeMap: (type: TransactionType) => CommonTransactionType = (

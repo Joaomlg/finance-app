@@ -55,7 +55,8 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   const selectedWallet = wallets.find(({ id }) => id === watch('walletId'));
   const selectedCategory = getCategoryById(watch('categoryId'));
 
-  const isEditingAutomaticTransaction = isEditing && selectedWallet?.connection !== undefined;
+  const isAutomaticTransaction = selectedWallet?.connection !== undefined;
+  const isEditingAutomaticTransaction = isEditing && isAutomaticTransaction;
 
   const handleTransactionBalanceChange = (amount: number) => {
     if (isEditingAutomaticTransaction) {
@@ -140,7 +141,11 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
     try {
       if (isEditing) {
-        await updateTransaction(transactionId, transaction);
+        await updateTransaction(
+          transactionId,
+          transaction,
+          transaction.updateWalletBalance || false,
+        );
       } else {
         await createTransaction({
           ...transaction,
@@ -156,15 +161,21 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
   };
 
   useEffect(() => {
-    const initialValue = transactions.find(({ id }) => id === transactionId);
-    if (initialValue) {
-      reset(initialValue);
+    const transaction = transactions.find(({ id }) => id === transactionId);
+
+    if (isEditing && transaction) {
+      reset(transaction);
     }
-  }, [reset, transactionId, transactions]);
+
+    if (!isEditing) {
+      const initialData = { updateWalletBalance: true } as Transaction;
+      reset(initialData);
+    }
+  }, [isEditing, reset, transactionId, transactions]);
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer variant="scrollable">
         <ScreenHeader title={screenTitle} />
         <HeaderExtensionContainer>
           <BalanceValueContainer>
@@ -185,8 +196,8 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Descrição"
             iconLeft="description"
             defaultValue={watch('description')}
-            onChangeText={(value) => setValue('description', value.trim())}
-            disabled={isEditing}
+            onChangeText={(value) => setValue('description', value)}
+            disabled={isEditingAutomaticTransaction}
           />
           <Divider />
           <TextInput
@@ -229,7 +240,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Anotação"
             iconLeft="edit"
             defaultValue={watch('annotation')}
-            onChangeText={(value) => setValue('annotation', value.trim())}
+            onChangeText={(value) => setValue('annotation', value)}
           />
           <Divider />
           <TextInput
@@ -241,10 +252,27 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
                 onValueChange={(value) => setValue('ignore', value)}
               />
             )}
-            onPress={showTransactionDatePicker}
             readOnly
           />
           <Divider />
+          {!isAutomaticTransaction && (
+            <>
+              <TextInput
+                placeholder="Atualizar carteira"
+                iconLeft="currency-exchange"
+                renderIconRight={() => (
+                  <Switch
+                    value={watch('updateWalletBalance')}
+                    onValueChange={(value) => setValue('updateWalletBalance', value)}
+                    disabled={isEditing}
+                  />
+                )}
+                readOnly
+                disabled={isEditing}
+              />
+              <Divider />
+            </>
+          )}
         </ScreenContent>
       </ScreenContainer>
       <ScreenFloatingButton

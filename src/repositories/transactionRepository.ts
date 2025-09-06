@@ -25,6 +25,10 @@ export type TransactionQueryOptions = {
   categoryId?: string;
 };
 
+export type SetTransactionOptions = {
+  merge: boolean;
+};
+
 const TRANSACTIONS_FIREBASE_COLLECTION = 'transactions';
 
 const getTransactionsCollectionReference = () =>
@@ -68,7 +72,13 @@ const parseTransaction = (data: FirebaseFirestoreTypes.DocumentData) => {
 
   if (originalValues) {
     const { date, ...values } = originalValues;
-    transaction.originalValues = { ...values, date: date?.toDate() };
+
+    transaction.originalValues = { ...values };
+
+    if (date) {
+      // @ts-expect-error originalValues is defined
+      transaction.originalValues.date = date.toDate();
+    }
   }
 
   return transaction;
@@ -113,24 +123,40 @@ export const setTransaction = async (transaction: Transaction) => {
       throw 'Transaction already exist!';
     }
 
-    t.set(transactionReference, transaction).update(walletReference, {
+    t.set(transactionReference, transaction);
+
+    if (!transaction.updateWalletBalance) {
+      return;
+    }
+
+    t.update(walletReference, {
       balance: firestore.FieldValue.increment(getTransactionSignedAmount(transaction)),
     });
   });
 };
 
-export const setTransactionsBatch = async (transactions: Transaction[]) => {
+export const securelySetTransactionsBatch = async (transactions: Transaction[]) =>
+  setTransactionsBatch(transactions, { merge: true });
+
+export const setTransactionsBatch = async (
+  transactions: Transaction[],
+  options = {} as SetTransactionOptions,
+) => {
   const batch = firestore().batch();
 
   transactions.forEach((transaction) => {
     const transactionReference = getTransactionReference(transaction.id);
-    batch.set(transactionReference, transaction);
+    batch.set(transactionReference, transaction, options);
   });
 
   return batch.commit();
 };
 
-export const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+export const updateTransaction = async (
+  id: string,
+  values: RecursivePartial<Transaction>,
+  updateWalletBalance: boolean,
+) => {
   const data = flattenObject(values);
 
   // undefined values mapped to firestore delete token
@@ -140,7 +166,7 @@ export const updateTransaction = async (id: string, values: RecursivePartial<Tra
     }
   });
 
-  if (values.amount === undefined) {
+  if (!updateWalletBalance || values.amount === undefined) {
     const collection = getTransactionsCollectionReference();
     return await collection.doc(id).update(data);
   }
@@ -185,6 +211,10 @@ export const deleteTransaction = async (transaction: Transaction) => {
     }
 
     t.delete(transactionReference);
+
+    if (!transaction.updateWalletBalance) {
+      return;
+    }
 
     if (walletSnapshot.exists) {
       t.update(walletReference, {

@@ -19,4 +19,5 @@ export type Transaction = {
   changed?: boolean;
   originalValues?: TransactionOriginalValues;
   annotation?: string;
+  updateWalletBalance?: boolean;
 };

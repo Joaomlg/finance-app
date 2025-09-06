@@ -1,5 +1,7 @@
-import { Moment } from 'moment';
+import * as FileSystem from 'expo-file-system';
+import moment, { Moment } from 'moment';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
@@ -37,7 +39,11 @@ export type AppContextValue = {
   fetchTransactions: () => Promise<void>;
   fetchingTransactions: boolean;
   createTransaction: (transaction: Transaction) => Promise<void>;
-  updateTransaction: (id: string, values: RecursivePartial<Transaction>) => Promise<void>;
+  updateTransaction: (
+    id: string,
+    values: RecursivePartial<Transaction>,
+    updateWalletBalance: boolean,
+  ) => Promise<void>;
   deleteTransaction: (transaction: Transaction) => Promise<void>;
   incomeTransactions: Transaction[];
   totalIncomes: number;
@@ -51,12 +57,14 @@ export type AppContextValue = {
   fetchingMonthlyBalances: boolean;
   currentMonthlyBalancesPage: number;
   setCurrentMonthlyBalancesPage: (value: number) => void;
+
+  exportTransactions: () => Promise<void>;
 };
 
 const AppContext = createContext({} as AppContextValue);
 
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [date, setDate] = useState(NOW);
+  const [date, setDate] = useState(NOW.clone());
   const [hideValues, setHideValues] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -165,7 +173,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         lastTransaction?.date || wallet.connection.lastUpdatedAt,
         !wallet.connection.updateDisabled,
         walletRepository.updateWalletsBatch,
-        transactionRepository.setTransactionsBatch,
+        transactionRepository.securelySetTransactionsBatch,
       );
     } catch (error) {
       Toast.show({
@@ -305,11 +313,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingTransactions(false);
   };
 
-  const updateTransaction = async (id: string, values: RecursivePartial<Transaction>) => {
+  const updateTransaction = async (
+    id: string,
+    values: RecursivePartial<Transaction>,
+    updateWalletBalance: boolean,
+  ) => {
     setFetchingTransactions(true);
 
     try {
-      await transactionRepository.updateTransaction(id, values);
+      await transactionRepository.updateTransaction(id, values, updateWalletBalance);
       Toast.show({ type: 'success', text1: 'Transação alterada com sucesso!' });
     } catch (error) {
       Toast.show({
@@ -380,6 +392,54 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
 
     setFetchingMonthlyBalances(false);
+  };
+
+  const exportTransactions = async () => {
+    setLoading(true, 'Exportando transações');
+
+    try {
+      let directory = FileSystem.documentDirectory;
+
+      if (!directory) {
+        setLoading(false);
+        return;
+      }
+
+      if (Platform.OS === 'android') {
+        const permissions =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+        if (!permissions.granted) {
+          throw 'Permission denied!';
+        }
+
+        directory = permissions.directoryUri;
+      }
+
+      const filename = `transactions_${moment().toISOString()}.json`;
+
+      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        directory,
+        filename,
+        'application/json',
+      );
+
+      const allTransactions = await transactionRepository.getTransactions();
+      const content = JSON.stringify(allTransactions);
+
+      await FileSystem.writeAsStringAsync(fileUri, content, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      Toast.show({ type: 'success', text1: 'Transações exportadas com sucesso!' });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível exportar as transações.',
+      });
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -453,6 +513,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         fetchingMonthlyBalances,
         currentMonthlyBalancesPage,
         setCurrentMonthlyBalancesPage,
+        exportTransactions,
       }}
     >
       {children}

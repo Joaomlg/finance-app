@@ -63,7 +63,8 @@
     "react-native-webview": "13.8.6",
     "styled-components": "^5.3.6",
     "victory-native": "^37.0.3-next.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-file-system": "~17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

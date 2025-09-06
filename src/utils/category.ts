@@ -183,6 +183,13 @@ export const expensePresetCategories: Category[] = [
     color: '#17becf',
     type: 'EXPENSE',
   },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-23',
+    name: 'Assinaturas',
+    icon: 'subscriptions',
+    color: '#1f77b4',
+    type: 'EXPENSE',
+  },
 ];
 
 export const incomePresetCategories: Category[] = [

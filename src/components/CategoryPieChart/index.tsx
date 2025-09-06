@@ -7,7 +7,7 @@ import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
 import Text from '../Text';
-import { ChardContainer, LegendContainer } from './styles';
+import { ChardContainer, LegendContainer, LegendScrollContainer } from './styles';
 import { Color } from '../../theme';
 import { transactionTypeText } from '../../utils/text';
 import { View } from 'react-native';
@@ -164,21 +164,26 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
             },
           ]}
         />
-        <LegendContainer>
-          {data.map((item, index) => (
-            <RowContent
-              key={index}
-              renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
-              style={{
-                opacity: item.x === selected || selected === '' ? 1 : 0.5,
-              }}
-              onPress={() => handleDataPressed(item)}
-            >
-              <Text ellipsize={true}>{item.x}</Text>
-              <Money value={item.y} typography={variant !== 'inline' ? 'defaultBold' : 'default'} />
-            </RowContent>
-          ))}
-        </LegendContainer>
+        <LegendScrollContainer>
+          <LegendContainer>
+            {data.map((item, index) => (
+              <RowContent
+                key={index}
+                renderLeftIcon={() => <Avatar color={item.color} fill={item.color} size={12} />}
+                style={{
+                  opacity: item.x === selected || selected === '' ? 1 : 0.5,
+                }}
+                onPress={() => handleDataPressed(item)}
+              >
+                <Text ellipsize={true}>{item.x}</Text>
+                <Money
+                  value={item.y}
+                  typography={variant !== 'inline' ? 'defaultBold' : 'default'}
+                />
+              </RowContent>
+            ))}
+          </LegendContainer>
+        </LegendScrollContainer>
       </ChardContainer>
     </View>
   );

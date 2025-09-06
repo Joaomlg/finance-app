@@ -28,11 +28,9 @@ export class PluggyService implements IProviderService {
     await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
-      accounts
-        .filter(({ type }) => type != 'CREDIT')
-        .map(({ id: accountId }) =>
-          this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
-        ),
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback),
+      ),
     );
   };
 
@@ -52,11 +50,9 @@ export class PluggyService implements IProviderService {
     await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
 
     await Promise.all(
-      accounts
-        .filter(({ type }) => type != 'CREDIT')
-        .map(({ id: accountId }) =>
-          this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
-        ),
+      accounts.map(({ id: accountId }) =>
+        this.fetchAndCreateTransactions(accountId, createTransactionsCallback, lastUpdateDate),
+      ),
     );
   };
 
@@ -104,13 +100,17 @@ export class PluggyService implements IProviderService {
     } while (transactions.results.length !== 0);
   };
 
+  private computeAccountBalance = (account: Account) => {
+    return account.balance + (account.bankData?.automaticallyInvestedBalance || 0);
+  };
+
   private buildNewWallet = (item: Item, account: Account) =>
     ({
       id: account.id,
       name: `${item.connector.name} - ${account.name}`,
       type: account.subtype,
-      balance: account.balance,
-      initialBalance: account.balance,
+      balance: this.computeAccountBalance(account),
+      initialBalance: this.computeAccountBalance(account),
       createdAt: new Date(item.createdAt),
       styles: {
         imageUrl: item.connector.imageUrl,
@@ -128,7 +128,7 @@ export class PluggyService implements IProviderService {
   private buildUpdateWallet = (item: Item, account: Account) =>
     ({
       id: account.id,
-      balance: account.balance,
+      balance: this.computeAccountBalance(account),
       connection: {
         id: item.id,
         status: item.status,
@@ -144,5 +144,6 @@ export class PluggyService implements IProviderService {
       amount: Math.abs(transaction.amount),
       type: transaction.type === 'CREDIT' ? 'INCOME' : 'EXPENSE',
       walletId: accountId,
+      updateWalletBalance: false,
     } as Transaction);
 }
