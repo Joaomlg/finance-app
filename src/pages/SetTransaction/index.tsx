@@ -197,7 +197,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             iconLeft="description"
             defaultValue={watch('description')}
             onChangeText={(value) => setValue('description', value.trim())}
-            disabled={isEditing}
+            disabled={isEditingAutomaticTransaction}
           />
           <Divider />
           <TextInput
