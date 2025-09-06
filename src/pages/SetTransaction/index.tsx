@@ -196,7 +196,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Descrição"
             iconLeft="description"
             defaultValue={watch('description')}
-            onChangeText={(value) => setValue('description', value.trim())}
+            onChangeText={(value) => setValue('description', value)}
             disabled={isEditingAutomaticTransaction}
           />
           <Divider />
@@ -240,7 +240,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             placeholder="Anotação"
             iconLeft="edit"
             defaultValue={watch('annotation')}
-            onChangeText={(value) => setValue('annotation', value.trim())}
+            onChangeText={(value) => setValue('annotation', value)}
           />
           <Divider />
           <TextInput
