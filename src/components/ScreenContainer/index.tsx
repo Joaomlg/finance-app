@@ -5,6 +5,7 @@ import { useTheme } from 'styled-components';
 import { Container } from './styles';
 
 export interface ScreenContainerProps extends SafeAreaProviderProps {
+  variant?: 'default' | 'scrollable';
   refreshing?: boolean;
   onRefresh?: () => void;
   stickHeader?: boolean;
@@ -12,6 +13,7 @@ export interface ScreenContainerProps extends SafeAreaProviderProps {
 
 const ScreenContainer: React.FC<ScreenContainerProps> = ({
   children,
+  variant,
   refreshing,
   onRefresh,
   stickHeader,
@@ -19,19 +21,22 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
 }) => {
   const theme = useTheme();
 
-  if (refreshing !== undefined) {
+  const refreshControl =
+    refreshing !== undefined || onRefresh !== undefined ? (
+      <RefreshControl
+        refreshing={refreshing || false}
+        onRefresh={onRefresh}
+        colors={[theme.colors.primary]}
+      />
+    ) : undefined;
+
+  if (variant === 'scrollable' || refreshControl) {
     return (
       <Container {...props}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           stickyHeaderIndices={stickHeader ? [0] : undefined}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[theme.colors.primary]}
-            />
-          }
+          refreshControl={refreshControl}
         >
           {children}
         </ScrollView>

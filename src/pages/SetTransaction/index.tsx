@@ -175,7 +175,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer variant="scrollable">
         <ScreenHeader title={screenTitle} />
         <HeaderExtensionContainer>
           <BalanceValueContainer>

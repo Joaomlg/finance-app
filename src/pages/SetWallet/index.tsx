@@ -134,7 +134,7 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
 
   return (
     <>
-      <ScreenContainer>
+      <ScreenContainer variant="scrollable">
         <ScreenHeader title={isEditing ? 'Editar carteira' : 'Nova carteira'} />
         <HeaderExtensionContainer>
           <BalanceValueContainer>
