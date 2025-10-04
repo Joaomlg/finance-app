@@ -66,6 +66,8 @@ export type TransactionFilters = PageFilters & {
   to?: string;
   /** Filter greater than date. Format can be ISO Date, or 'YYYY-MM-dd' string. */
   from?: string;
+  /** Filter greater than createdAt. Format (yyyy-mm-ddThh:mm:ss.000Z) */
+  createdAtFrom?: string;
 };
 
 export type Transaction = {

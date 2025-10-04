@@ -85,7 +85,7 @@ export class PluggyService implements IProviderService {
       transactions = await this.client.fetchTransactions(accountId, {
         pageSize: DEFAULT_PAGE_SIZE,
         page,
-        from: startDate?.toISOString(),
+        createdAtFrom: startDate?.toISOString(),
       });
 
       await createTransactionsCallback(
