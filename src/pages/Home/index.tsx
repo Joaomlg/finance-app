@@ -1,7 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import moment, { Moment } from 'moment';
-import React, { useContext, useState } from 'react';
-import { LayoutAnimation } from 'react-native';
+import React, { useCallback, useContext, useState } from 'react';
+import { BackHandler, LayoutAnimation } from 'react-native';
 import Divider from '../../components/Divider';
 import MonthYearPicker from '../../components/MonthYearPicker';
 import ScreenContainer from '../../components/ScreenContainer';
@@ -28,10 +28,15 @@ const Home: React.FC = () => {
 
   const isCurrentMonth = checkCurrentMonth(date);
 
-  const animatedChangeDate = (value: Moment) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setDate(value);
-  };
+  const animatedChangeDate = useCallback(
+    (value: Moment) => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setDate(value);
+    },
+    [setDate],
+  );
+
+  const setCurrentMonth = useCallback(() => animatedChangeDate(NOW), [animatedChangeDate]);
 
   const handleMonthYearPickerChange = (value: Moment) => {
     animatedChangeDate(value);
@@ -41,6 +46,21 @@ const Home: React.FC = () => {
   const handleRefreshPage = async () => {
     await Promise.all([fetchWallets(), fetchTransactions()]);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (!isCurrentMonth) {
+          setCurrentMonth();
+          return true;
+        }
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [isCurrentMonth, setCurrentMonth]),
+  );
 
   return (
     <>
@@ -56,7 +76,7 @@ const Home: React.FC = () => {
             actions={[
               {
                 icon: 'undo',
-                onPress: () => animatedChangeDate(NOW),
+                onPress: setCurrentMonth,
                 hidden: isCurrentMonth,
               },
               HideValuesAction(),
