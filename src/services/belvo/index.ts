@@ -1,9 +1,10 @@
 import moment from 'moment';
 import {
+  BankAccount,
   TransactionType as CommonTransactionType,
   ConnectionStatus,
   Transaction,
-  Wallet,
+  TransactionalAccount,
   WalletTypeList,
 } from '../../models';
 import { IProviderService } from '../providerService.interface';
@@ -34,15 +35,23 @@ export class BelvoService implements IProviderService {
 
   fetchConnection = async (
     connectionId: string,
-    createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createBankAccountCallback: (account: BankAccount) => Promise<void>,
+    createTransactionalAccountsCallback: (accounts: TransactionalAccount[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
-    const wallets = await this.fetchWallets(connectionId, this.buildNewWallet);
+    const [link, institution, accounts] = await this.fetchConnectionData(connectionId);
 
-    await createWalletsCallback(wallets);
+    await createBankAccountCallback(this.buildNewBankAccount(link, institution));
+
+    await createTransactionalAccountsCallback(
+      accounts
+        //@ts-expect-error WalletTypeList is a string list
+        .filter(({ category }) => WalletTypeList.includes(category))
+        .map(this.buildNewTransactionalAccount),
+    );
 
     await Promise.all(
-      wallets.map(({ id }) =>
+      accounts.map(({ id }) =>
         this.fetchAndCreateTransactions(connectionId, id, createTransactionsCallback),
       ),
     );
@@ -52,19 +61,27 @@ export class BelvoService implements IProviderService {
     connectionId: string,
     lastUpdateDate: Date,
     shouldUpdate: boolean,
-    updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    updateBankAccountCallback: (bankAccount: BankAccount) => Promise<void>,
+    updateTransactionalAccountsCallback: (accounts: TransactionalAccount[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
     if (shouldUpdate) {
       await this.updateAccountAndTransactions(connectionId, lastUpdateDate);
     }
 
-    const wallets = await this.fetchWallets(connectionId, this.buildUpdateWallet);
+    const [link, , accounts] = await this.fetchConnectionData(connectionId);
 
-    await updateWalletsCallback(wallets);
+    await updateBankAccountCallback(this.buildUpdateBankAccount(link));
+
+    await updateTransactionalAccountsCallback(
+      accounts
+        //@ts-expect-error WalletTypeList is a string list
+        .filter(({ category }) => WalletTypeList.includes(category))
+        .map(this.buildUpdateTransactionalAccount),
+    );
 
     await Promise.all(
-      wallets.map(({ id }) =>
+      accounts.map(({ id }) =>
         this.fetchAndCreateTransactions(
           connectionId,
           id,
@@ -79,10 +96,7 @@ export class BelvoService implements IProviderService {
     await this.client.links.delete(connectionId);
   };
 
-  private fetchWallets = async (
-    connectionId: string,
-    walletFactory: (link: Link, institution: Institution, account: Account) => Wallet,
-  ) => {
+  private fetchConnectionData = async (connectionId: string) => {
     const link = await this.client.links.detail(connectionId);
 
     const institution = (
@@ -99,10 +113,7 @@ export class BelvoService implements IProviderService {
       },
     });
 
-    //@ts-expect-error WalletTypeList is a string list
-    const filteredAccounts = accounts.filter(({ category }) => WalletTypeList.includes(category));
-
-    return filteredAccounts.map((account) => walletFactory(link, institution, account));
+    return [link, institution, accounts] as [Link, Institution, Account[]];
   };
 
   private fetchAndCreateTransactions = async (
@@ -135,16 +146,13 @@ export class BelvoService implements IProviderService {
       );
 
       page++;
-    } while (transactions.length === DEFAULT_PAGE_SIZE);
+    } while (transactions.length !== 0);
   };
 
-  private buildNewWallet = (link: Link, institution: Institution, account: Account) =>
+  private buildNewBankAccount = (link: Link, institution: Institution) =>
     ({
-      id: account.id,
+      id: link.id,
       name: institution.display_name || link.institution,
-      type: account.category,
-      balance: account.balance.available,
-      initialBalance: account.balance.available,
       createdAt: new Date(link.created_at),
       styles: {
         imageUrl: institution.icon_logo,
@@ -156,18 +164,33 @@ export class BelvoService implements IProviderService {
         provider: 'BELVO',
         lastUpdatedAt: new Date(link.last_accessed_at),
       },
-    } as Wallet);
+    } as BankAccount);
 
-  private buildUpdateWallet = (link: Link, institution: Institution, account: Account) =>
+  private buildNewTransactionalAccount = (account: Account) =>
     ({
       id: account.id,
+      type: 'TRANSACTIONAL_ACCOUNT',
+      subtype: account.category,
       balance: account.balance.available,
+      initialBalance: account.balance.available,
+      bankAccountId: account.link,
+    } as TransactionalAccount);
+
+  private buildUpdateBankAccount = (link: Link) =>
+    ({
+      id: link.id,
       connection: {
         id: link.id,
         status: this.linkStatusToConnectionStatus(link.status),
         lastUpdatedAt: new Date(link.last_accessed_at),
       },
-    } as Wallet);
+    } as BankAccount);
+
+  private buildUpdateTransactionalAccount = (account: Account) =>
+    ({
+      id: account.id,
+      balance: account.balance.available,
+    } as TransactionalAccount);
 
   private linkStatusToConnectionStatus: (status: LinkStatus) => ConnectionStatus = (
     status: LinkStatus,

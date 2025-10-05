@@ -1,13 +1,14 @@
-import { Transaction, Wallet } from '../models';
+import { BankAccount, Transaction, TransactionalAccount } from '../models';
 
 export interface IProviderService {
   /** Create an access token to provider */
   createAccessToken: (connectionId?: string) => Promise<string>;
 
-  /** Fetch new connection wallets and transactions */
+  /** Fetch new connection accounts and transactions */
   fetchConnection: (
     connectionId: string,
-    createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    createBankAccountCallback: (account: BankAccount) => Promise<void>,
+    createTransactionalAccountsCallback: (accounts: TransactionalAccount[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => Promise<void>;
 
@@ -16,7 +17,8 @@ export interface IProviderService {
     connectionId: string,
     lastUpdateDate: Date,
     shouldUpdate: boolean,
-    updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
+    updateBankAccountsCallback: (account: BankAccount) => Promise<void>,
+    updateTransactionalAccountsCallback: (accounts: TransactionalAccount[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => Promise<void>;
 

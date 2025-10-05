@@ -50,7 +50,10 @@ export const setBankAccount = async (account: BankAccount) => {
   await collection.doc(account.id).set(account);
 };
 
-export const updateBankAccount = async (id: string, values: RecursivePartial<BankAccount>) => {
+export const updateBankAccount = async (
+  account: RecursivePartial<BankAccount> & { id: string },
+) => {
+  const { id, ...values } = account;
   const collection = getBankAccountsCollectionReference();
   const data = flattenObject(values);
   await collection.doc(id).update(data);

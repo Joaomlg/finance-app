@@ -6,7 +6,12 @@ import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
 import { Transaction, Wallet } from '../models';
 import Provider from '../models/provider';
-import { transactionRepository, walletRepository } from '../repositories';
+import {
+  bankAccountRepository,
+  transactionalAccountRepository,
+  transactionRepository,
+  walletRepository,
+} from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
 import { CURRENT_MONTH, NOW } from '../utils/date';
@@ -149,7 +154,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     await providerService.fetchConnection(
       connectionId,
-      walletRepository.setWalletsBatch,
+      bankAccountRepository.setBankAccount,
+      transactionalAccountRepository.setTransactionalAccountsBatch,
       transactionRepository.setTransactionsBatch,
     );
 
@@ -172,7 +178,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         wallet.connection.id,
         lastTransaction?.date || wallet.connection.lastUpdatedAt,
         !wallet.connection.updateDisabled,
-        walletRepository.updateWalletsBatch,
+        bankAccountRepository.updateBankAccount,
+        transactionalAccountRepository.updateTransactionalAccountsBatch,
         transactionRepository.securelySetTransactionsBatch,
       );
     } catch (error) {
