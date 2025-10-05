@@ -12,4 +12,5 @@ export type TransactionalAccount = {
   subtype: TransactionalAccountSubtype;
   balance: number;
   initialBalance: number;
+  bankAccountId: string;
 };
