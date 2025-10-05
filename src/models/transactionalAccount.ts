@@ -11,5 +11,5 @@ export type TransactionalAccount = {
   type: 'TRANSACTIONAL_ACCOUNT';
   subtype: TransactionalAccountSubtype;
   balance: number;
-  initialbalance: number;
+  initialBalance: number;
 };
