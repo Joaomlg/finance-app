@@ -1,7 +1,17 @@
-import Provider from './provider';
+export type PositionType = 'FIXED_INCOME';
 
-export type Investment = {
+export type TaxType = 'CDI';
+
+export type FixedIncomePosition = {
   id: string;
-  balance: number;
-  provider: Provider;
+  name: string;
+  type: PositionType;
+  investedAmount: number;
+  quantity: number;
+  marketValue: number;
+  taxRate: number;
+  taxType: TaxType;
+  date: Date;
+  dueDate: Date;
+  accountId: string;
 };
