@@ -97,7 +97,7 @@ export class PluggyService implements IProviderService {
       );
 
       page++;
-    } while (transactions.results.length !== 0);
+    } while (transactions.results.length === DEFAULT_PAGE_SIZE);
   };
 
   private computeAccountBalance = (account: Account) => {

@@ -135,7 +135,7 @@ export class BelvoService implements IProviderService {
       );
 
       page++;
-    } while (transactions.length !== 0);
+    } while (transactions.length === DEFAULT_PAGE_SIZE);
   };
 
   private buildNewWallet = (link: Link, institution: Institution, account: Account) =>
