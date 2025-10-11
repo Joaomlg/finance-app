@@ -4,13 +4,12 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
-import { Transaction, Wallet } from '../models';
+import { BankAccount, Transaction, TransactionalAccount } from '../models';
 import Provider from '../models/provider';
 import {
   bankAccountRepository,
   transactionalAccountRepository,
   transactionRepository,
-  walletRepository,
 } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
@@ -30,14 +29,23 @@ export type AppContextValue = {
   setHideValues: (value: boolean) => void;
 
   setupConnection: (connectionId: string, provider: Provider) => Promise<void>;
-  syncWalletConnection: (wallet: Wallet) => Promise<void>;
+  syncBankAccountConnection: (bankAccount: BankAccount) => Promise<void>;
 
-  wallets: Wallet[];
-  fetchWallets: () => Promise<void>;
-  fetchingWallets: boolean;
-  createWallet: (wallet: Wallet) => Promise<void>;
-  updateWallet: (id: string, values: RecursivePartial<Wallet>) => Promise<void>;
-  deleteWallet: (wallet: Wallet) => Promise<void>;
+  bankAccounts: BankAccount[];
+  fetchBankAccounts: () => Promise<void>;
+  fetchingBankAccounts: boolean;
+  createBankAccount: (bankAccount: BankAccount) => Promise<void>;
+  updateBankAccount: (values: RecursivePartial<BankAccount> & { id: string }) => Promise<void>;
+  deleteBankAccount: (bankAccount: BankAccount) => Promise<void>;
+
+  transactionalAccounts: TransactionalAccount[];
+  fetchTransactionalAccounts: () => Promise<void>;
+  fetchingTransactionalAccounts: boolean;
+  createTransactionalAccount: (transactionalAccount: TransactionalAccount) => Promise<void>;
+  updateTransactionalAccount: (
+    id: string,
+    values: RecursivePartial<TransactionalAccount>,
+  ) => Promise<void>;
   totalBalance: number;
 
   transactions: Transaction[];
@@ -47,7 +55,7 @@ export type AppContextValue = {
   updateTransaction: (
     id: string,
     values: RecursivePartial<Transaction>,
-    updateWalletBalance: boolean,
+    updateTransactionalAccountBalance: boolean,
   ) => Promise<void>;
   deleteTransaction: (transaction: Transaction) => Promise<void>;
   incomeTransactions: Transaction[];
@@ -75,8 +83,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>();
 
-  const [wallets, setWallets] = useState([] as Wallet[]);
-  const [fetchingWallets, setFetchingWallets] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState([] as BankAccount[]);
+  const [fetchingBankAccounts, setFetchingBankAccounts] = useState(false);
+
+  const [transactionalAccounts, setTransactionalAccounts] = useState([] as TransactionalAccount[]);
+  const [fetchingTransactionalAccounts, setFetchingTransactionalAccounts] = useState(false);
 
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
@@ -102,10 +113,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const totalBalance = useMemo(
     () =>
-      wallets
-        .filter(({ type }) => type === 'CHECKING_ACCOUNT' || type === 'SAVINGS_ACCOUNT')
+      transactionalAccounts
+        .filter(({ subtype }) => subtype === 'CHECKING_ACCOUNT' || subtype === 'SAVINGS_ACCOUNT')
         .reduce((total, { balance }) => total + balance, 0),
-    [wallets],
+    [transactionalAccounts],
   );
 
   const incomeTransactions = useMemo(
@@ -136,10 +147,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const totalInvoice = useMemo(
     () =>
-      wallets
-        .filter(({ type }) => type === 'CREDIT_CARD')
+      transactionalAccounts
+        .filter(({ subtype }) => subtype === 'CREDIT_CARD')
         .reduce((total, { balance }) => total + balance, 0),
-    [wallets],
+    [transactionalAccounts],
   );
 
   const setLoading = (status: boolean, message?: string) => {
@@ -162,105 +173,136 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setLoading(false);
   };
 
-  const syncWalletConnection = useCallback(async (wallet: Wallet, configureLoading = true) => {
-    if (wallet.connection === undefined) {
+  const syncBankAccountConnection = useCallback(
+    async (bankAccount: BankAccount, configureLoading = true) => {
+      if (bankAccount.connection === undefined) {
+        return;
+      }
+
+      const providerService = getProviderService(bankAccount.connection.provider);
+
+      configureLoading && setLoading(true, 'Sincronizando conexão');
+
+      try {
+        const lastTransaction = await transactionRepository.getLastTransactionalAccountTransaction(
+          bankAccount.id,
+        );
+
+        await providerService.syncConnection(
+          bankAccount.connection.id,
+          lastTransaction?.date || bankAccount.connection.lastUpdatedAt,
+          !bankAccount.connection.updateDisabled,
+          bankAccountRepository.updateBankAccount,
+          transactionalAccountRepository.updateTransactionalAccountsBatch,
+          transactionRepository.securelySetTransactionsBatch,
+        );
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: `Erro ao sincronizar conexão "${bankAccount.name}"!`,
+        });
+      }
+
+      configureLoading && setLoading(false);
+    },
+    [],
+  );
+
+  const fetchBankAccounts = async () => {
+    setFetchingBankAccounts(true);
+
+    try {
+      const bankAccounts = await bankAccountRepository.getBankAccounts();
+      setBankAccounts(bankAccounts);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível obter informações das contas bancárias!',
+      });
+    }
+
+    setFetchingBankAccounts(false);
+  };
+
+  const createBankAccount = async (bankAccount: BankAccount) => {
+    setFetchingBankAccounts(true);
+
+    try {
+      await bankAccountRepository.setBankAccount(bankAccount);
+      Toast.show({ type: 'success', text1: 'Conta bancária criada com sucesso!' });
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a conta bancária!' });
+    }
+
+    setFetchingBankAccounts(false);
+  };
+
+  const updateBankAccount = async (values: RecursivePartial<BankAccount> & { id: string }) => {
+    setFetchingBankAccounts(true);
+
+    try {
+      await bankAccountRepository.updateBankAccount(values);
+      Toast.show({ type: 'success', text1: 'Conta bancária atualizada com sucesso!' });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da conta bancária!',
+      });
+    }
+
+    setFetchingBankAccounts(false);
+  };
+
+  const deleteBankAccount = async (bankAccount: BankAccount) => {
+    setFetchingBankAccounts(true);
+
+    let hasError = false;
+
+    // TODO: refactor to use a single transaction
+    const relatedTransactionalAccounts = transactionalAccounts.filter(
+      (account) => account.bankAccountId === bankAccount.id,
+    );
+
+    try {
+      await bankAccountRepository.deleteBankAccount(bankAccount);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível apagar a conta bancária!',
+      });
       return;
     }
 
-    const providerService = getProviderService(wallet.connection.provider);
-
-    configureLoading && setLoading(true, 'Sincronizando conexão');
-
     try {
-      const lastTransaction = await transactionRepository.getLastWalletTransaction(wallet.id);
-
-      await providerService.syncConnection(
-        wallet.connection.id,
-        lastTransaction?.date || wallet.connection.lastUpdatedAt,
-        !wallet.connection.updateDisabled,
-        bankAccountRepository.updateBankAccount,
-        transactionalAccountRepository.updateTransactionalAccountsBatch,
-        transactionRepository.securelySetTransactionsBatch,
+      await Promise.all(
+        relatedTransactionalAccounts.map((transactionalAccount) =>
+          transactionalAccountRepository.deleteTransactionalAccount(transactionalAccount),
+        ),
       );
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: `Erro ao sincronizar conexão "${wallet.name}"!`,
-      });
-    }
-
-    configureLoading && setLoading(false);
-  }, []);
-
-  const fetchWallets = async () => {
-    setFetchingWallets(true);
-
-    try {
-      const wallets = await walletRepository.getWallets();
-      setWallets(wallets);
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
-    }
-
-    setFetchingWallets(false);
-  };
-
-  const createWallet = async (wallet: Wallet) => {
-    setFetchingWallets(true);
-
-    try {
-      await walletRepository.setWallet(wallet);
-      Toast.show({ type: 'success', text1: 'Carteira criada com sucesso!' });
-    } catch (error) {
-      Toast.show({ type: 'error', text1: 'Não foi possível criar a carteira!' });
-    }
-
-    setFetchingWallets(false);
-  };
-
-  const updateWallet = async (id: string, values: RecursivePartial<Wallet>) => {
-    setFetchingWallets(true);
-
-    try {
-      await walletRepository.updateWallet(id, values);
-      Toast.show({ type: 'success', text1: 'Carteira atualizada com sucesso!' });
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Não foi possível atualizar as informações da carteira!',
-      });
-    }
-
-    setFetchingWallets(false);
-  };
-
-  const deleteWallet = async (wallet: Wallet) => {
-    setFetchingWallets(true);
-
-    let hasError = false;
-
-    try {
-      await walletRepository.deleteWallet(wallet);
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Não foi possível apagar a carteira!',
-      });
-      return;
-    }
-
-    try {
-      await transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Não foi possível apagar as transações da carteira!',
+        text1: 'Não foi possível apagar uma conta associada!',
       });
       hasError = true;
     }
 
     try {
-      await deleteWalletConnectionIfNecessary(wallet);
+      await Promise.all(
+        relatedTransactionalAccounts.map((account) =>
+          transactionRepository.deleteAllTransactionsByAccountId(account.id),
+        ),
+      );
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível apagar as transações da conta!',
+      });
+      hasError = true;
+    }
+
+    try {
+      await deleteBankAccountConnectionIfNecessary(bankAccount);
     } catch (error) {
       Toast.show({
         type: 'info',
@@ -270,28 +312,65 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     if (!hasError) {
-      Toast.show({ type: 'success', text1: 'Carteira removida com sucesso!' });
+      Toast.show({ type: 'success', text1: 'Conta removida com sucesso!' });
     }
 
-    setFetchingWallets(false);
+    setFetchingBankAccounts(false);
   };
 
-  const deleteWalletConnectionIfNecessary = async (wallet: Wallet) => {
-    if (!wallet.connection) {
+  const deleteBankAccountConnectionIfNecessary = async (bankAccount: BankAccount) => {
+    if (!bankAccount.connection) {
       return;
     }
 
-    const hasOtherWalletWithSameConnection = wallets.find(
-      (item) => item.connection?.id === wallet.connection?.id && item.id !== wallet.id,
-    );
+    const providerService = getProviderService(bankAccount.connection.provider);
 
-    if (hasOtherWalletWithSameConnection) {
-      return;
+    await providerService.deleteConnection(bankAccount.connection.id);
+  };
+
+  const fetchTransactionalAccounts = async () => {
+    setFetchingTransactionalAccounts(true);
+
+    try {
+      const transactionalAccounts = await transactionalAccountRepository.getTransactionalAccounts();
+      setTransactionalAccounts(transactionalAccounts);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das contas!' });
     }
 
-    const providerService = getProviderService(wallet.connection.provider);
+    setFetchingTransactionalAccounts(false);
+  };
 
-    await providerService.deleteConnection(wallet.connection.id);
+  const createTransactionalAccount = async (transactionalAccount: TransactionalAccount) => {
+    setFetchingTransactionalAccounts(true);
+
+    try {
+      await transactionalAccountRepository.setTransactionalAccount(transactionalAccount);
+      Toast.show({ type: 'success', text1: 'Conta criada com sucesso!' });
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível criar a conta!' });
+    }
+
+    setFetchingTransactionalAccounts(false);
+  };
+
+  const updateTransactionalAccount = async (
+    id: string,
+    values: RecursivePartial<TransactionalAccount>,
+  ) => {
+    setFetchingTransactionalAccounts(true);
+
+    try {
+      await transactionalAccountRepository.updateTransactionalAccount(id, values);
+      Toast.show({ type: 'success', text1: 'Conta atualizada com sucesso!' });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da conta!',
+      });
+    }
+
+    setFetchingTransactionalAccounts(false);
   };
 
   const fetchTransactions = async () => {
@@ -323,12 +402,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const updateTransaction = async (
     id: string,
     values: RecursivePartial<Transaction>,
-    updateWalletBalance: boolean,
+    updateTransactionalAccountBalance: boolean,
   ) => {
     setFetchingTransactions(true);
 
     try {
-      await transactionRepository.updateTransaction(id, values, updateWalletBalance);
+      await transactionRepository.updateTransaction(id, values, updateTransactionalAccountBalance);
       Toast.show({ type: 'success', text1: 'Transação alterada com sucesso!' });
     } catch (error) {
       Toast.show({
@@ -357,7 +436,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const fetchMonthlyBalancesPage = async (itemsPerPage: number, currentPage: number) => {
-    if (wallets.length === 0) {
+    if (transactionalAccounts.length === 0) {
       return;
     }
 
@@ -450,31 +529,43 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   useEffect(() => {
-    return walletRepository.onWalletsChange((wallets) => setWallets(wallets));
+    return bankAccountRepository.onBankAccountsChange((bankAccounts) =>
+      setBankAccounts(bankAccounts),
+    );
   }, []);
 
   useEffect(() => {
-    if (!wallets || wallets.length === 0) {
+    return transactionalAccountRepository.onTransactionalAccountsChange((transactionalAccounts) =>
+      setTransactionalAccounts(transactionalAccounts),
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!bankAccounts || bankAccounts.length === 0) {
       return;
     }
 
-    const walletsToSync = wallets.filter(
-      (wallet) =>
-        wallet.connection !== undefined && NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
+    const bankAccountsToSync = bankAccounts.filter(
+      (account) =>
+        account.connection !== undefined && NOW.isAfter(account.connection.lastUpdatedAt, 'day'),
     );
 
-    if (!walletsToSync.length) {
+    if (!bankAccountsToSync.length) {
       return;
     }
 
     const syncAllConnections = async () => {
       setLoading(true, 'Sincronizando conexões');
-      await Promise.all(walletsToSync.map((wallet) => syncWalletConnection(wallet, false)));
+      await Promise.all(
+        bankAccountsToSync.map((transactionalAccount) =>
+          syncBankAccountConnection(transactionalAccount, false),
+        ),
+      );
       setLoading(false);
     };
 
     syncAllConnections();
-  }, [syncWalletConnection, wallets]);
+  }, [bankAccounts, syncBankAccountConnection]);
 
   useEffect(() => {
     return transactionRepository.onTransactionsChange(
@@ -496,13 +587,18 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         hideValues,
         setHideValues,
         setupConnection,
-        syncWalletConnection,
-        wallets,
-        fetchWallets,
-        fetchingWallets,
-        createWallet,
-        updateWallet,
-        deleteWallet,
+        syncBankAccountConnection,
+        bankAccounts,
+        fetchBankAccounts,
+        fetchingBankAccounts,
+        createBankAccount,
+        updateBankAccount,
+        deleteBankAccount,
+        transactionalAccounts,
+        fetchTransactionalAccounts,
+        fetchingTransactionalAccounts,
+        createTransactionalAccount,
+        updateTransactionalAccount,
         totalBalance,
         transactions,
         fetchTransactions,
