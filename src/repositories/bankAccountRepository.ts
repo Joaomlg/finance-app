@@ -1,6 +1,5 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { BankAccount } from '../models';
-import { Account } from '../services/pluggy';
 import { flattenObject } from '../utils/object';
 import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
@@ -59,7 +58,7 @@ export const updateBankAccount = async (
   await collection.doc(id).update(data);
 };
 
-export const deleteBankAccount = async (account: Account) => {
+export const deleteBankAccount = async (account: BankAccount) => {
   const collection = getBankAccountsCollectionReference();
   await collection.doc(account.id).delete();
 };
