@@ -5,7 +5,7 @@ import { flattenObject } from '../utils/object';
 import { getRepositoryName } from '../utils/repository';
 import { RecursivePartial } from '../utils/type';
 import { getBaseCollectionRef } from './common';
-import { getWalletReference } from './walletRepository';
+import { getTransactionalAccountReference } from './transactionalAccountRepository';
 
 type DateInterval = {
   startDate: Date;
@@ -21,7 +21,7 @@ export type TransactionQueryOptions = {
   interval?: DateInterval;
   order?: Order;
   count?: number;
-  walletId?: string;
+  accountId?: string;
   categoryId?: string;
 };
 
@@ -43,8 +43,8 @@ const buildColletionQuery = (options?: TransactionQueryOptions) => {
       .where('date', '<=', options.interval.endDate);
   }
 
-  if (options?.walletId) {
-    query = query.where('walletId', '==', options.walletId);
+  if (options?.accountId) {
+    query = query.where('accountId', '==', options.accountId);
   }
 
   if (options?.categoryId) {
@@ -107,14 +107,14 @@ export const onTransactionsChange = (
 };
 
 export const setTransaction = async (transaction: Transaction) => {
-  const walletReference = getWalletReference(transaction.walletId);
+  const transactionalAccountReference = getTransactionalAccountReference(transaction.accountId);
   const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
-    const walletSnapshot = await t.get(walletReference);
+    const transactionalAccountSnapshot = await t.get(transactionalAccountReference);
 
-    if (!walletSnapshot.exists) {
-      throw 'Wallet does not exist!';
+    if (!transactionalAccountSnapshot.exists) {
+      throw 'TransactionalAccount does not exist!';
     }
 
     const transactionSnapshot = await t.get(transactionReference);
@@ -125,11 +125,11 @@ export const setTransaction = async (transaction: Transaction) => {
 
     t.set(transactionReference, transaction);
 
-    if (!transaction.updateWalletBalance) {
+    if (!transaction.updateAccountBalance) {
       return;
     }
 
-    t.update(walletReference, {
+    t.update(transactionalAccountReference, {
       balance: firestore.FieldValue.increment(getTransactionSignedAmount(transaction)),
     });
   });
@@ -155,7 +155,7 @@ export const setTransactionsBatch = async (
 export const updateTransaction = async (
   id: string,
   values: RecursivePartial<Transaction>,
-  updateWalletBalance: boolean,
+  updateAccountBalance: boolean,
 ) => {
   const data = flattenObject(values);
 
@@ -166,7 +166,7 @@ export const updateTransaction = async (
     }
   });
 
-  if (!updateWalletBalance || values.amount === undefined) {
+  if (!updateAccountBalance || values.amount === undefined) {
     const collection = getTransactionsCollectionReference();
     return await collection.doc(id).update(data);
   }
@@ -181,14 +181,16 @@ export const updateTransaction = async (
       throw 'Transaction does not exist!';
     }
 
-    const walletReference = getWalletReference(transactionSnapshot.data()?.walletId);
-    const walletSnapshot = await t.get(walletReference);
+    const transactionalAccountReference = getTransactionalAccountReference(
+      transactionSnapshot.data()?.accountId,
+    );
+    const transactionalAccountSnapshot = await t.get(transactionalAccountReference);
 
-    if (!walletSnapshot.exists) {
-      throw 'Wallet does not exist!';
+    if (!transactionalAccountSnapshot.exists) {
+      throw 'TransactionalAccount does not exist!';
     }
 
-    t.update(transactionReference, data).update(walletReference, {
+    t.update(transactionReference, data).update(transactionalAccountReference, {
       balance: firestore.FieldValue.increment(
         // @ts-expect-error transaction and transactionSnapshot has amount
         getTransactionSignedAmount(values) - getTransactionSignedAmount(transactionSnapshot.data()),
@@ -198,11 +200,11 @@ export const updateTransaction = async (
 };
 
 export const deleteTransaction = async (transaction: Transaction) => {
-  const walletReference = getWalletReference(transaction.walletId);
+  const transactionalAccountReference = getTransactionalAccountReference(transaction.accountId);
   const transactionReference = getTransactionReference(transaction.id);
 
   await firestore().runTransaction(async (t) => {
-    const walletSnapshot = await t.get(walletReference);
+    const transactionalAccountSnapshot = await t.get(transactionalAccountReference);
 
     const transactionSnapshot = await t.get(transactionReference);
 
@@ -212,21 +214,21 @@ export const deleteTransaction = async (transaction: Transaction) => {
 
     t.delete(transactionReference);
 
-    if (!transaction.updateWalletBalance) {
+    if (!transaction.updateAccountBalance) {
       return;
     }
 
-    if (walletSnapshot.exists) {
-      t.update(walletReference, {
+    if (transactionalAccountSnapshot.exists) {
+      t.update(transactionalAccountReference, {
         balance: firestore.FieldValue.increment(-1 * getTransactionSignedAmount(transaction)),
       });
     }
   });
 };
 
-export const deleteAllTransactionsByWalletId = async (walletId: string) => {
+export const deleteAllTransactionsByAccountId = async (accountId: string) => {
   const collection = getTransactionsCollectionReference();
-  const transactionsQuerySnapshot = await collection.where('walletId', '==', walletId).get();
+  const transactionsQuerySnapshot = await collection.where('accountId', '==', accountId).get();
 
   const batch = firestore().batch();
 
@@ -237,9 +239,9 @@ export const deleteAllTransactionsByWalletId = async (walletId: string) => {
   return batch.commit();
 };
 
-export const getLastWalletTransaction = async (walletId: string) => {
+export const getLastTransactionalAccountTransaction = async (accountId: string) => {
   const result = await getTransactions({
-    walletId,
+    accountId,
     order: {
       by: 'date',
       direction: 'desc',

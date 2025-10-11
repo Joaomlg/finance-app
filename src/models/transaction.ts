@@ -13,11 +13,11 @@ export type Transaction = {
   description: string;
   amount: number;
   date: Date;
-  walletId: string;
+  accountId: string;
   categoryId?: string;
   ignore?: boolean;
   changed?: boolean;
   originalValues?: TransactionOriginalValues;
   annotation?: string;
-  updateWalletBalance?: boolean;
+  updateAccountBalance?: boolean;
 };
