@@ -51,6 +51,7 @@ export type AppContextValue = {
   totalExpenses: number;
 
   totalInvoice: number;
+  totalInvestment: number;
 
   monthlyBalances: MonthlyBalance[];
   fetchMonthlyBalancesPage: (itemsPerPage: number, currentPage: number) => Promise<void>;
@@ -136,6 +137,18 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         .reduce((total, { balance }) => total + balance, 0),
     [wallets],
   );
+
+  const totalInvestment = useMemo(() => {
+    const seenIds = new Set<string>();
+    return wallets.reduce((total, wallet) => {
+      const connection = wallet.connection;
+      if (connection && !seenIds.has(connection.id)) {
+        seenIds.add(connection.id);
+        return total + (connection.temporaryData?.investmentAmount || 0);
+      }
+      return total;
+    }, 0);
+  }, [wallets]);
 
   const setLoading = (status: boolean, message?: string) => {
     setIsLoading(status);
@@ -508,6 +521,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         totalIncomes,
         totalExpenses,
         totalInvoice,
+        totalInvestment,
         monthlyBalances,
         fetchMonthlyBalancesPage,
         fetchingMonthlyBalances,
