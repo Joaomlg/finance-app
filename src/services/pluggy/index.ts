@@ -115,17 +115,13 @@ export class PluggyService implements IProviderService {
     } while (transactions.results.length !== 0);
   };
 
-  private computeAccountBalance = (account: Account) => {
-    return account.balance + (account.bankData?.automaticallyInvestedBalance || 0);
-  };
-
   private buildNewWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
     ({
       id: account.id,
       name: `${item.connector.name} - ${account.name}`,
       type: account.subtype,
-      balance: this.computeAccountBalance(account),
-      initialBalance: this.computeAccountBalance(account),
+      balance: account.balance,
+      initialBalance: account.balance,
       createdAt: new Date(item.createdAt),
       styles: {
         imageUrl: item.connector.imageUrl,
@@ -146,7 +142,7 @@ export class PluggyService implements IProviderService {
   private buildUpdateWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
     ({
       id: account.id,
-      balance: this.computeAccountBalance(account),
+      balance: account.balance,
       connection: {
         id: item.id,
         status: item.status,
