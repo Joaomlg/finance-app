@@ -13,10 +13,10 @@ import { UNCATEGORIZED_CATEGORY_ID } from '../../utils/category';
 
 const TABS = CategoryTypeList.map(
   (type) =>
-  ({
-    key: type,
-    title: transactionTypeText[type],
-  } as TabProps),
+    ({
+      key: type,
+      title: transactionTypeText[type],
+    } as TabProps),
 );
 
 const Insights: React.FC = () => {
@@ -48,7 +48,10 @@ const Insights: React.FC = () => {
         actions={[
           {
             icon: 'history',
-            hidden: !selectedCategory || selectedCategory === '' || selectedCategory === UNCATEGORIZED_CATEGORY_ID,
+            hidden:
+              !selectedCategory ||
+              selectedCategory === '' ||
+              selectedCategory === UNCATEGORIZED_CATEGORY_ID,
             onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
           },
           {
