@@ -105,9 +105,6 @@ export class PluggyService implements IProviderService {
 
       await createTransactionsCallback(
         transactions.results
-          .filter(
-            (transaction) => startDate === undefined || new Date(transaction.date) > startDate,
-          )
           .map((transaction) => this.buildTransaction(transaction, accountId)),
       );
 
