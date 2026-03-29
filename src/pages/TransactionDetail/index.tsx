@@ -18,7 +18,7 @@ import AppContext from '../../contexts/AppContext';
 import { Transaction } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
-import { formatDate } from '../../utils/date';
+import { formatDate, formatHour } from '../../utils/date';
 import { transactionTypeText } from '../../utils/text';
 import { BottomHeader, BottomHeaderContent, ChipContainer, InformationGroup } from './styles';
 
@@ -144,6 +144,9 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
                 </RowContent>
               )}
             </View>
+            <RowContent text="Horário">
+              <Text typography="defaultBold">{formatHour(moment(transaction.date))}</Text>
+            </RowContent>
             <RowContent text="Conta">
               <Text typography="defaultBold">{wallet?.name}</Text>
             </RowContent>
