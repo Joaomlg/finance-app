@@ -104,7 +104,8 @@ export class PluggyService implements IProviderService {
       });
 
       await createTransactionsCallback(
-        transactions.results.map((transaction) => this.buildTransaction(transaction, accountId)),
+        transactions.results
+          .map((transaction) => this.buildTransaction(transaction, accountId)),
       );
 
       page++;
