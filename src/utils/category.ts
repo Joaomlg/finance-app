@@ -2,7 +2,6 @@ import { Category, CategoryType } from '../models';
 import light from '../theme/light';
 
 const PRESET_CATEGORY_ID_PREFIX = 'finance-app-category-';
-export const UNCATEGORIZED_CATEGORY_ID = '__uncategorized__';
 
 export const getCategoryById = (id?: string) => {
   if (!id || !id.startsWith(PRESET_CATEGORY_ID_PREFIX)) {
@@ -20,7 +19,6 @@ export const getCategoryById = (id?: string) => {
 
 export const getDefaultCategoryByType = (type: CategoryType) => {
   return {
-    id: UNCATEGORIZED_CATEGORY_ID,
     name: 'Sem categoria',
     icon: type === 'EXPENSE' ? 'shopping-cart' : 'attach-money',
     color: type === 'EXPENSE' ? light.colors.expense : light.colors.income,
