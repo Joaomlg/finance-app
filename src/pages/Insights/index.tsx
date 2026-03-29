@@ -9,13 +9,14 @@ import AppContext from '../../contexts/AppContext';
 import { CategoryType, CategoryTypeList } from '../../models';
 import { transactionTypeText } from '../../utils/text';
 import { useNavigation } from '@react-navigation/native';
+import { UNCATEGORIZED_CATEGORY_ID } from '../../utils/category';
 
 const TABS = CategoryTypeList.map(
   (type) =>
-    ({
-      key: type,
-      title: transactionTypeText[type],
-    } as TabProps),
+  ({
+    key: type,
+    title: transactionTypeText[type],
+  } as TabProps),
 );
 
 const Insights: React.FC = () => {
@@ -47,7 +48,7 @@ const Insights: React.FC = () => {
         actions={[
           {
             icon: 'history',
-            hidden: !selectedCategory || selectedCategory === '',
+            hidden: !selectedCategory || selectedCategory === '' || selectedCategory === UNCATEGORIZED_CATEGORY_ID,
             onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
           },
           {

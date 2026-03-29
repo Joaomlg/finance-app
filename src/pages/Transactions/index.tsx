@@ -8,6 +8,7 @@ import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
 import { Transaction, TransactionType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
+import { UNCATEGORIZED_CATEGORY_ID } from '../../utils/category';
 import { formatMonthYearDate } from '../../utils/date';
 import { capitalize, transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
@@ -55,7 +56,11 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
       }
 
       if (categoryId) {
-        data = data.filter((transaction) => transaction.categoryId === categoryId);
+        data = data.filter((transaction) =>
+          categoryId === UNCATEGORIZED_CATEGORY_ID
+            ? !transaction.categoryId
+            : transaction.categoryId === categoryId,
+        );
         balance = data.reduce((total, item) => total + Math.abs(item.amount), 0);
       }
 

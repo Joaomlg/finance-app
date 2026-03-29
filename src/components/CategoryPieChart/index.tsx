@@ -65,8 +65,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
     }
 
     filteredTransactions.reduce((res, transaction) => {
-      const category =
-        getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
+      const category = getCategoryById(transaction.categoryId) || getDefaultCategoryByType(type);
 
       if (!res[category.id]) {
         res[category.id] = {
