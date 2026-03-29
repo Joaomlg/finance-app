@@ -126,8 +126,7 @@ export class BelvoService implements IProviderService {
       });
 
       await createTransactionsCallback(
-        transactions
-          .map((transaction) => this.buildTransaction(transaction)),
+        transactions.map((transaction) => this.buildTransaction(transaction)),
       );
 
       page++;
