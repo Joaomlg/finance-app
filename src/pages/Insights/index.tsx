@@ -1,14 +1,15 @@
-import React, { useContext, useState } from 'react';
-import CategoryPieChart from '../../components/CategoryPieChart';
+import React, { useCallback, useContext, useState } from 'react';
+import TransactionPieChart from '../../components/TransactionPieChart';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
-import { CategoryType, CategoryTypeList } from '../../models';
+import { CategoryType, CategoryTypeList, Transaction } from '../../models';
 import { transactionTypeText } from '../../utils/text';
 import { useNavigation } from '@react-navigation/native';
+import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 
 const TABS = CategoryTypeList.map(
   (type) =>
@@ -17,6 +18,36 @@ const TABS = CategoryTypeList.map(
       title: transactionTypeText[type],
     } as TabProps),
 );
+
+const InsightsPieChartTab: React.FC<{
+  type: CategoryType;
+  transactions: Transaction[];
+  onPress: (segmentId: string) => void;
+}> = ({ type, transactions, onPress }) => {
+  const getSegmentId = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).id,
+    [type],
+  );
+  const getSegmentName = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).name,
+    [type],
+  );
+  const getSegmentColor = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).color,
+    [type],
+  );
+
+  return (
+    <TransactionPieChart
+      transactions={transactions}
+      type={type}
+      getSegmentId={getSegmentId}
+      getSegmentName={getSegmentName}
+      getSegmentColor={getSegmentColor}
+      onPress={onPress}
+    />
+  );
+};
 
 const Insights: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -35,7 +66,11 @@ const Insights: React.FC = () => {
 
     return (
       <ScreenContent>
-        <CategoryPieChart transactions={transactions} type={type} onPress={handlePiePressed} />
+        <InsightsPieChartTab
+          type={type}
+          transactions={transactions}
+          onPress={handlePiePressed}
+        />
       </ScreenContent>
     );
   };

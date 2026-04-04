@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
-import { Data, VictoryPie } from 'victory-native';
+import { VictoryPie } from 'victory-native';
 import { Transaction, TransactionType } from '../../models';
-import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
@@ -16,11 +15,14 @@ const INLINE_NUMBER_OF_LINES = 3;
 
 type Variant = 'inline' | 'complete';
 
-export interface CategoryPieChartProps {
+export interface TransactionPieChartProps {
   transactions: Transaction[];
   type: TransactionType;
+  getSegmentId: (transaction: Transaction) => string;
+  getSegmentName: (transaction: Transaction) => string;
+  getSegmentColor: (transaction: Transaction) => string;
   variant?: Variant;
-  onPress?: (categoryId: string) => void;
+  onPress?: (segmentId: string) => void;
 }
 
 type Data = {
@@ -30,9 +32,12 @@ type Data = {
   color: string;
 };
 
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
+const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
   transactions,
   type,
+  getSegmentId,
+  getSegmentName,
+  getSegmentColor,
   variant,
   onPress,
 }) => {
@@ -65,20 +70,19 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
     }
 
     filteredTransactions.reduce((res, transaction) => {
-      const category =
-        getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
+      const id = getSegmentId(transaction);
 
-      if (!res[category.id]) {
-        res[category.id] = {
-          id: category.id,
-          x: category.name,
+      if (!res[id]) {
+        res[id] = {
+          id,
+          x: getSegmentName(transaction),
           y: 0,
-          color: category.color,
+          color: getSegmentColor(transaction),
         };
-        result.push(res[category.id]);
+        result.push(res[id]);
       }
 
-      res[category.id].y += Math.abs(transaction.amount);
+      res[id].y += Math.abs(transaction.amount);
 
       return res;
     }, {} as Record<string, Data>);
@@ -100,7 +104,15 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
     );
 
     return [...limitedData, otherData];
-  }, [filteredTransactions, variant, theme.colors, type]);
+  }, [
+    filteredTransactions,
+    variant,
+    theme.colors,
+    type,
+    getSegmentId,
+    getSegmentName,
+    getSegmentColor,
+  ]);
 
   const renderSliceLabel = (data: Data) => {
     if (totalValue === 0) {
@@ -189,4 +201,4 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
   );
 };
 
-export default CategoryPieChart;
+export default TransactionPieChart;
