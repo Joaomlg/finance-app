@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { VictoryPie } from 'victory-native';
-import { Transaction } from '../../models';
+import { CategoryType, Transaction, Wallet } from '../../models';
+import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
@@ -13,7 +14,23 @@ const INLINE_NUMBER_OF_LINES = 3;
 
 const EMPTY_CHART_LABEL = 'Sem dados';
 
+const UNKNOWN_WALLET_NAME = 'Carteira desconhecida';
+
 type Variant = 'inline' | 'complete';
+
+export interface CategoryPieChartProps {
+  type: CategoryType;
+  transactions: Transaction[];
+  variant?: Variant;
+  onPress?: (segmentId: string) => void;
+}
+
+export interface WalletPieChartProps {
+  wallets: Wallet[];
+  transactions: Transaction[];
+  variant?: Variant;
+  onPress?: (segmentId: string) => void;
+}
 
 export interface TransactionPieChartProps {
   transactions: Transaction[];
@@ -188,6 +205,70 @@ const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
         </LegendScrollContainer>
       </ChardContainer>
     </View>
+  );
+};
+
+export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
+  type,
+  transactions,
+  variant,
+  onPress,
+}) => {
+  const getSegmentId = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).id,
+    [type],
+  );
+  const getSegmentName = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).name,
+    [type],
+  );
+  const getSegmentColor = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).color,
+    [type],
+  );
+
+  return (
+    <TransactionPieChart
+      transactions={transactions}
+      variant={variant}
+      getSegmentId={getSegmentId}
+      getSegmentName={getSegmentName}
+      getSegmentColor={getSegmentColor}
+      onPress={onPress}
+    />
+  );
+};
+
+export const WalletPieChart: React.FC<WalletPieChartProps> = ({
+  wallets,
+  transactions,
+  variant,
+  onPress,
+}) => {
+  const theme = useTheme();
+
+  const getSegmentId = useCallback((t: Transaction) => t.walletId, []);
+
+  const getSegmentName = useCallback(
+    (t: Transaction) => wallets.find((w) => w.id === t.walletId)?.name ?? UNKNOWN_WALLET_NAME,
+    [wallets],
+  );
+
+  const getSegmentColor = useCallback(
+    (t: Transaction) =>
+      wallets.find((w) => w.id === t.walletId)?.styles.primaryColor ?? theme.colors.lightGray,
+    [wallets, theme.colors.lightGray],
+  );
+
+  return (
+    <TransactionPieChart
+      transactions={transactions}
+      variant={variant}
+      getSegmentId={getSegmentId}
+      getSegmentName={getSegmentName}
+      getSegmentColor={getSegmentColor}
+      onPress={onPress}
+    />
   );
 };
 
