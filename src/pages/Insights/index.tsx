@@ -27,9 +27,12 @@ const TABS: TabProps[] = [
 
 const Insights: React.FC = () => {
   const [selection, setSelection] = useState<InsightsSelection | null>(null);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const { expenseTransactions, incomeTransactions, transactions, wallets } = useContext(AppContext);
   const navigation = useNavigation();
+
+  const activeTabKey = TABS[activeTabIndex].key;
 
   const handleCategoryPiePressed = useCallback((segmentId: string) => {
     setSelection((prev) =>
@@ -45,9 +48,14 @@ const Insights: React.FC = () => {
     );
   }, []);
 
-  const clearSelection = useCallback(() => setSelection(null), []);
+  const handleTabIndexChange = useCallback((index: number) => {
+    setActiveTabIndex(index);
+    setSelection(null);
+  }, []);
 
   const renderScene = (tabKey: string) => {
+    const isActiveTab = tabKey === activeTabKey;
+
     if (tabKey === WALLET_TAB_KEY) {
       return (
         <ScreenContent>
@@ -55,6 +63,7 @@ const Insights: React.FC = () => {
             wallets={wallets}
             transactions={transactions}
             onPress={handleWalletPiePressed}
+            isFocused={isActiveTab}
           />
         </ScreenContent>
       );
@@ -69,6 +78,7 @@ const Insights: React.FC = () => {
           type={type}
           transactions={tabTransactions}
           onPress={handleCategoryPiePressed}
+          isFocused={isActiveTab}
         />
       </ScreenContent>
     );
@@ -108,7 +118,7 @@ const Insights: React.FC = () => {
           HideValuesAction(),
         ]}
       />
-      <ScreenTabs tabs={TABS} renderScene={renderScene} onTabIndexChange={clearSelection} />
+      <ScreenTabs tabs={TABS} renderScene={renderScene} onTabIndexChange={handleTabIndexChange} />
     </ScreenContainer>
   );
 };

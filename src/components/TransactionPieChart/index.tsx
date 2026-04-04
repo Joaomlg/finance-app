@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { VictoryPie } from 'victory-native';
 import { CategoryType, Transaction, Wallet } from '../../models';
@@ -23,6 +23,7 @@ export interface CategoryPieChartProps {
   transactions: Transaction[];
   variant?: Variant;
   onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
 }
 
 export interface WalletPieChartProps {
@@ -30,6 +31,7 @@ export interface WalletPieChartProps {
   transactions: Transaction[];
   variant?: Variant;
   onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
 }
 
 export interface TransactionPieChartProps {
@@ -39,6 +41,7 @@ export interface TransactionPieChartProps {
   getSegmentColor: (transaction: Transaction) => string;
   variant?: Variant;
   onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
 }
 
 type Data = {
@@ -55,8 +58,15 @@ const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
   getSegmentColor,
   variant,
   onPress,
+  isFocused = true,
 }) => {
   const [selected, setSelected] = useState('');
+
+  useEffect(() => {
+    if (!isFocused) {
+      setSelected('');
+    }
+  }, [isFocused]);
 
   const theme = useTheme();
 
@@ -213,6 +223,7 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
   transactions,
   variant,
   onPress,
+  isFocused,
 }) => {
   const getSegmentId = useCallback(
     (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).id,
@@ -235,6 +246,7 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
       getSegmentName={getSegmentName}
       getSegmentColor={getSegmentColor}
       onPress={onPress}
+      isFocused={isFocused}
     />
   );
 };
@@ -244,6 +256,7 @@ export const WalletPieChart: React.FC<WalletPieChartProps> = ({
   transactions,
   variant,
   onPress,
+  isFocused,
 }) => {
   const theme = useTheme();
 
@@ -268,6 +281,7 @@ export const WalletPieChart: React.FC<WalletPieChartProps> = ({
       getSegmentName={getSegmentName}
       getSegmentColor={getSegmentColor}
       onPress={onPress}
+      isFocused={isFocused}
     />
   );
 };
