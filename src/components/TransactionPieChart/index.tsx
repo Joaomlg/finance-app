@@ -1,23 +1,22 @@
 import React, { useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { VictoryPie } from 'victory-native';
-import { Transaction, TransactionType } from '../../models';
+import { Transaction } from '../../models';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
 import Text from '../Text';
 import { ChardContainer, LegendContainer, LegendScrollContainer } from './styles';
-import { Color } from '../../theme';
-import { transactionTypeText } from '../../utils/text';
 import { View } from 'react-native';
 
 const INLINE_NUMBER_OF_LINES = 3;
+
+const EMPTY_CHART_LABEL = 'Sem dados';
 
 type Variant = 'inline' | 'complete';
 
 export interface TransactionPieChartProps {
   transactions: Transaction[];
-  type: TransactionType;
   getSegmentId: (transaction: Transaction) => string;
   getSegmentName: (transaction: Transaction) => string;
   getSegmentColor: (transaction: Transaction) => string;
@@ -34,7 +33,6 @@ type Data = {
 
 const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
   transactions,
-  type,
   getSegmentId,
   getSegmentName,
   getSegmentColor,
@@ -62,8 +60,8 @@ const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
     if (filteredTransactions.length === 0) {
       return [
         {
-          color: theme.colors[type.toLowerCase() as Color],
-          x: transactionTypeText[type],
+          color: theme.colors.lightGray,
+          x: EMPTY_CHART_LABEL,
           y: 0.0001,
         } as Data,
       ];
@@ -104,15 +102,7 @@ const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
     );
 
     return [...limitedData, otherData];
-  }, [
-    filteredTransactions,
-    variant,
-    theme.colors,
-    type,
-    getSegmentId,
-    getSegmentName,
-    getSegmentColor,
-  ]);
+  }, [filteredTransactions, variant, theme.colors, getSegmentId, getSegmentName, getSegmentColor]);
 
   const renderSliceLabel = (data: Data) => {
     if (totalValue === 0) {

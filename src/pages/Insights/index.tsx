@@ -40,7 +40,6 @@ const InsightsPieChartTab: React.FC<{
   return (
     <TransactionPieChart
       transactions={transactions}
-      type={type}
       getSegmentId={getSegmentId}
       getSegmentName={getSegmentName}
       getSegmentColor={getSegmentColor}

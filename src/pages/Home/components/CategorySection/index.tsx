@@ -29,7 +29,6 @@ const CategorySection: React.FC = () => {
       </SectionHeader>
       <TransactionPieChart
         transactions={expenseTransactions}
-        type="EXPENSE"
         variant="inline"
         getSegmentId={getExpenseSegmentId}
         getSegmentName={getExpenseSegmentName}
