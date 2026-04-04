@@ -7,10 +7,15 @@ export type ConnectionStatus =
   | 'WAITING_USER_INPUT'
   | 'OUTDATED';
 
+export type ConnectionTemporaryData = {
+  investmentAmount: number;
+};
+
 export type Connection = {
   id: string;
   lastUpdatedAt: Date;
   updateDisabled: boolean;
   status: ConnectionStatus;
   provider: Provider;
+  temporaryData?: ConnectionTemporaryData;
 };

@@ -12,12 +12,18 @@ export type TabProps = {
 export interface ScreenTabsProps {
   tabs: TabProps[];
   renderScene: (tabKey: string) => React.ReactNode;
+  onTabIndexChange?: (index: number) => void;
 }
 
-const ScreenTabs: React.FC<ScreenTabsProps> = ({ tabs, renderScene }) => {
+const ScreenTabs: React.FC<ScreenTabsProps> = ({ tabs, renderScene, onTabIndexChange }) => {
   const theme = useTheme();
 
   const [index, setIndex] = useState(0);
+
+  const handleIndexChange = (nextIndex: number) => {
+    setIndex(nextIndex);
+    onTabIndexChange?.(nextIndex);
+  };
 
   const renderTabBar = (props: TabBarProps<TabProps>) => (
     <TabBar
@@ -43,7 +49,7 @@ const ScreenTabs: React.FC<ScreenTabsProps> = ({ tabs, renderScene }) => {
         borderLeftWidth: 0.2,
         borderLeftColor: theme.colors.primary,
       }}
-      onIndexChange={setIndex}
+      onIndexChange={handleIndexChange}
       renderTabBar={renderTabBar}
       lazy={({ route }) => route.key !== 'default'}
       renderLazyPlaceholder={() => <TabLazyPlaceholder />}

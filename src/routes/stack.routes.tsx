@@ -26,7 +26,7 @@ export type StackRouteParamList = {
   'connect/pluggy': { updateConnectionId?: string };
   'connect/belvo': { updateConnectionId?: string };
   manualConnect: undefined;
-  transactions: { categoryId?: string } | undefined;
+  transactions: { categoryId?: string; walletId?: string } | undefined;
   transaction: { transactionId: string };
   setTransaction: { transactionType: string; transactionId?: string };
   history: undefined;

@@ -126,12 +126,7 @@ export class BelvoService implements IProviderService {
       });
 
       await createTransactionsCallback(
-        transactions
-          .filter(
-            (transaction) =>
-              startDate === undefined || new Date(transaction.value_date) > startDate,
-          )
-          .map((transaction) => this.buildTransaction(transaction)),
+        transactions.map((transaction) => this.buildTransaction(transaction)),
       );
 
       page++;

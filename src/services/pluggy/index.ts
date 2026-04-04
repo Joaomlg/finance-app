@@ -25,7 +25,11 @@ export class PluggyService implements IProviderService {
   ) => {
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
-    await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
+    const totalInvestmentsAmount = await this.getInvestmentsTotalAmount(connectionId);
+
+    await createWalletsCallback(
+      accounts.map((account) => this.buildNewWallet(item, account, totalInvestmentsAmount)),
+    );
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
@@ -47,7 +51,11 @@ export class PluggyService implements IProviderService {
 
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
-    await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(item, account)));
+    const totalInvestmentsAmount = await this.getInvestmentsTotalAmount(connectionId);
+
+    await updateWalletsCallback(
+      accounts.map((account) => this.buildUpdateWallet(item, account, totalInvestmentsAmount)),
+    );
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
@@ -73,6 +81,13 @@ export class PluggyService implements IProviderService {
     return [item, filteredAccounts] as [Item, Account[]];
   };
 
+  private getInvestmentsTotalAmount = async (connectionId: string) => {
+    const investments = await this.client.fetchInvestments(connectionId);
+    return investments.results
+      .filter((inv) => inv.status === 'ACTIVE')
+      .reduce((sum, inv) => sum + (inv.amountWithdrawal || 0), 0);
+  };
+
   private fetchAndCreateTransactions = async (
     accountId: string,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
@@ -85,32 +100,24 @@ export class PluggyService implements IProviderService {
       transactions = await this.client.fetchTransactions(accountId, {
         pageSize: DEFAULT_PAGE_SIZE,
         page,
-        from: startDate?.toISOString(),
+        createdAtFrom: startDate?.toISOString(),
       });
 
       await createTransactionsCallback(
-        transactions.results
-          .filter(
-            (transaction) => startDate === undefined || new Date(transaction.date) > startDate,
-          )
-          .map((transaction) => this.buildTransaction(transaction, accountId)),
+        transactions.results.map((transaction) => this.buildTransaction(transaction, accountId)),
       );
 
       page++;
     } while (transactions.results.length !== 0);
   };
 
-  private computeAccountBalance = (account: Account) => {
-    return account.balance + (account.bankData?.automaticallyInvestedBalance || 0);
-  };
-
-  private buildNewWallet = (item: Item, account: Account) =>
+  private buildNewWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
     ({
       id: account.id,
       name: `${item.connector.name} - ${account.name}`,
       type: account.subtype,
-      balance: this.computeAccountBalance(account),
-      initialBalance: this.computeAccountBalance(account),
+      balance: account.balance,
+      initialBalance: account.balance,
       createdAt: new Date(item.createdAt),
       styles: {
         imageUrl: item.connector.imageUrl,
@@ -122,17 +129,23 @@ export class PluggyService implements IProviderService {
         provider: 'PLUGGY',
         lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
         updateDisabled: CONNECTORS_WITHOUT_UPDATE.includes(item.connector.name),
+        temporaryData: {
+          investmentAmount: totalInvestmentsAmount || 0,
+        },
       },
     } as Wallet);
 
-  private buildUpdateWallet = (item: Item, account: Account) =>
+  private buildUpdateWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
     ({
       id: account.id,
-      balance: this.computeAccountBalance(account),
+      balance: account.balance,
       connection: {
         id: item.id,
         status: item.status,
         lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+        temporaryData: {
+          investmentAmount: totalInvestmentsAmount || 0,
+        },
       },
     } as Wallet);
 

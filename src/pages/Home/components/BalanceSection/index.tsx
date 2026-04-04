@@ -6,10 +6,8 @@ import AppContext from '../../../../contexts/AppContext';
 import { BalanceContainer, BalanceFillLine, BalanceLine, ConnectionsButton } from './styles';
 
 const BalanceSection: React.FC = () => {
-  const { totalBalance, totalInvoice } = useContext(AppContext);
+  const { totalBalance, totalInvoice, totalInvestment } = useContext(AppContext);
   const navigation = useNavigation();
-
-  const totalInvestment = 0;
 
   return (
     <BalanceContainer>

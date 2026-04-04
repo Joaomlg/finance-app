@@ -23,4 +23,4 @@ export const formatDateHourFull = (date: Moment) => date.format('DD/MM/YYYY HH:m
 
 export const formatDate = (date: Moment) => date.format('DD [de] MMMM [de] YYYY');
 
-export const formatHour = (date: Moment) => date.format('HH:mm:ss');
+export const formatHour = (date: Moment) => date.format('HH:mm');

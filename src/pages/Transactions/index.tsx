@@ -17,6 +17,7 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
   navigation,
 }) => {
   const categoryId = route.params?.categoryId;
+  const walletId = route.params?.walletId;
 
   const {
     fetchingTransactions,
@@ -54,8 +55,12 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
           balance = totalIncomes - totalExpenses;
       }
 
-      if (categoryId) {
-        data = data.filter((transaction) => transaction.categoryId === categoryId);
+      if (categoryId || walletId) {
+        data = data.filter(
+          (transaction) =>
+            (!categoryId || transaction.categoryId === categoryId) &&
+            (!walletId || transaction.walletId === walletId),
+        );
         balance = data.reduce((total, item) => total + Math.abs(item.amount), 0);
       }
 
@@ -70,6 +75,7 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
     },
     [
       categoryId,
+      walletId,
       fetchingTransactions,
       fetchTransactions,
       incomeTransactions,

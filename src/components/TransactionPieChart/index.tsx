@@ -1,26 +1,47 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
-import { Data, VictoryPie } from 'victory-native';
-import { Transaction, TransactionType } from '../../models';
+import { VictoryPie } from 'victory-native';
+import { CategoryType, Transaction, Wallet } from '../../models';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
 import Text from '../Text';
 import { ChardContainer, LegendContainer, LegendScrollContainer } from './styles';
-import { Color } from '../../theme';
-import { transactionTypeText } from '../../utils/text';
 import { View } from 'react-native';
 
 const INLINE_NUMBER_OF_LINES = 3;
 
+const EMPTY_CHART_LABEL = 'Sem dados';
+
+const UNKNOWN_WALLET_NAME = 'Carteira desconhecida';
+
 type Variant = 'inline' | 'complete';
 
 export interface CategoryPieChartProps {
+  type: CategoryType;
   transactions: Transaction[];
-  type: TransactionType;
   variant?: Variant;
-  onPress?: (categoryId: string) => void;
+  onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
+}
+
+export interface WalletPieChartProps {
+  wallets: Wallet[];
+  transactions: Transaction[];
+  variant?: Variant;
+  onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
+}
+
+export interface TransactionPieChartProps {
+  transactions: Transaction[];
+  getSegmentId: (transaction: Transaction) => string;
+  getSegmentName: (transaction: Transaction) => string;
+  getSegmentColor: (transaction: Transaction) => string;
+  variant?: Variant;
+  onPress?: (segmentId: string) => void;
+  isFocused?: boolean;
 }
 
 type Data = {
@@ -30,13 +51,22 @@ type Data = {
   color: string;
 };
 
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
+const TransactionPieChart: React.FC<TransactionPieChartProps> = ({
   transactions,
-  type,
+  getSegmentId,
+  getSegmentName,
+  getSegmentColor,
   variant,
   onPress,
+  isFocused = true,
 }) => {
   const [selected, setSelected] = useState('');
+
+  useEffect(() => {
+    if (!isFocused) {
+      setSelected('');
+    }
+  }, [isFocused]);
 
   const theme = useTheme();
 
@@ -57,28 +87,27 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
     if (filteredTransactions.length === 0) {
       return [
         {
-          color: theme.colors[type.toLowerCase() as Color],
-          x: transactionTypeText[type],
+          color: theme.colors.lightGray,
+          x: EMPTY_CHART_LABEL,
           y: 0.0001,
         } as Data,
       ];
     }
 
     filteredTransactions.reduce((res, transaction) => {
-      const category =
-        getCategoryById(transaction.categoryId) || getDefaultCategoryByType('EXPENSE');
+      const id = getSegmentId(transaction);
 
-      if (!res[category.id]) {
-        res[category.id] = {
-          id: category.id,
-          x: category.name,
+      if (!res[id]) {
+        res[id] = {
+          id,
+          x: getSegmentName(transaction),
           y: 0,
-          color: category.color,
+          color: getSegmentColor(transaction),
         };
-        result.push(res[category.id]);
+        result.push(res[id]);
       }
 
-      res[category.id].y += Math.abs(transaction.amount);
+      res[id].y += Math.abs(transaction.amount);
 
       return res;
     }, {} as Record<string, Data>);
@@ -100,7 +129,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
     );
 
     return [...limitedData, otherData];
-  }, [filteredTransactions, variant, theme.colors, type]);
+  }, [filteredTransactions, variant, theme.colors, getSegmentId, getSegmentName, getSegmentColor]);
 
   const renderSliceLabel = (data: Data) => {
     if (totalValue === 0) {
@@ -189,4 +218,72 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
   );
 };
 
-export default CategoryPieChart;
+export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
+  type,
+  transactions,
+  variant,
+  onPress,
+  isFocused,
+}) => {
+  const getSegmentId = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).id,
+    [type],
+  );
+  const getSegmentName = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).name,
+    [type],
+  );
+  const getSegmentColor = useCallback(
+    (t: Transaction) => (getCategoryById(t.categoryId) ?? getDefaultCategoryByType(type)).color,
+    [type],
+  );
+
+  return (
+    <TransactionPieChart
+      transactions={transactions}
+      variant={variant}
+      getSegmentId={getSegmentId}
+      getSegmentName={getSegmentName}
+      getSegmentColor={getSegmentColor}
+      onPress={onPress}
+      isFocused={isFocused}
+    />
+  );
+};
+
+export const WalletPieChart: React.FC<WalletPieChartProps> = ({
+  wallets,
+  transactions,
+  variant,
+  onPress,
+  isFocused,
+}) => {
+  const theme = useTheme();
+
+  const getSegmentId = useCallback((t: Transaction) => t.walletId, []);
+
+  const getSegmentName = useCallback(
+    (t: Transaction) => wallets.find((w) => w.id === t.walletId)?.name ?? UNKNOWN_WALLET_NAME,
+    [wallets],
+  );
+
+  const getSegmentColor = useCallback(
+    (t: Transaction) =>
+      wallets.find((w) => w.id === t.walletId)?.styles.primaryColor ?? theme.colors.lightGray,
+    [wallets, theme.colors.lightGray],
+  );
+
+  return (
+    <TransactionPieChart
+      transactions={transactions}
+      variant={variant}
+      getSegmentId={getSegmentId}
+      getSegmentName={getSegmentName}
+      getSegmentColor={getSegmentColor}
+      onPress={onPress}
+      isFocused={isFocused}
+    />
+  );
+};
+
+export default TransactionPieChart;

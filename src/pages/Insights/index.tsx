@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import CategoryPieChart from '../../components/CategoryPieChart';
+import React, { useCallback, useContext, useState } from 'react';
+import { CategoryPieChart, WalletPieChart } from '../../components/TransactionPieChart';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenContent from '../../components/ScreenContent';
 import ScreenHeader from '../../components/ScreenHeader';
@@ -7,37 +7,97 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
 import { CategoryType, CategoryTypeList } from '../../models';
-import { transactionTypeText } from '../../utils/text';
+import { insightsWalletTabTitle, transactionTypeText } from '../../utils/text';
 import { useNavigation } from '@react-navigation/native';
 
-const TABS = CategoryTypeList.map(
-  (type) =>
-    ({
-      key: type,
-      title: transactionTypeText[type],
-    } as TabProps),
-);
+const WALLET_TAB_KEY = 'WALLET';
+
+type InsightsSelection = { kind: 'category' | 'wallet'; id: string };
+
+const TABS: TabProps[] = [
+  ...CategoryTypeList.map(
+    (type) =>
+      ({
+        key: type,
+        title: transactionTypeText[type],
+      } as TabProps),
+  ),
+  { key: WALLET_TAB_KEY, title: insightsWalletTabTitle },
+];
 
 const Insights: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selection, setSelection] = useState<InsightsSelection | null>(null);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const { expenseTransactions, incomeTransactions } = useContext(AppContext);
+  const { expenseTransactions, incomeTransactions, transactions, wallets } = useContext(AppContext);
   const navigation = useNavigation();
 
-  const handlePiePressed = (categoryId: string) => {
-    setSelectedCategory((prev) => (categoryId === prev ? '' : categoryId));
-  };
+  const activeTabKey = TABS[activeTabIndex].key;
+
+  const handleCategoryPiePressed = useCallback((segmentId: string) => {
+    setSelection((prev) =>
+      prev?.kind === 'category' && prev.id === segmentId
+        ? null
+        : { kind: 'category', id: segmentId },
+    );
+  }, []);
+
+  const handleWalletPiePressed = useCallback((segmentId: string) => {
+    setSelection((prev) =>
+      prev?.kind === 'wallet' && prev.id === segmentId ? null : { kind: 'wallet', id: segmentId },
+    );
+  }, []);
+
+  const handleTabIndexChange = useCallback((index: number) => {
+    setActiveTabIndex(index);
+    setSelection(null);
+  }, []);
 
   const renderScene = (tabKey: string) => {
-    const type = tabKey as CategoryType;
+    const isActiveTab = tabKey === activeTabKey;
 
-    const transactions = type === 'EXPENSE' ? expenseTransactions : incomeTransactions;
+    if (tabKey === WALLET_TAB_KEY) {
+      return (
+        <ScreenContent>
+          <WalletPieChart
+            wallets={wallets}
+            transactions={transactions}
+            onPress={handleWalletPiePressed}
+            isFocused={isActiveTab}
+          />
+        </ScreenContent>
+      );
+    }
+
+    const type = tabKey as CategoryType;
+    const tabTransactions = type === 'EXPENSE' ? expenseTransactions : incomeTransactions;
 
     return (
       <ScreenContent>
-        <CategoryPieChart transactions={transactions} type={type} onPress={handlePiePressed} />
+        <CategoryPieChart
+          type={type}
+          transactions={tabTransactions}
+          onPress={handleCategoryPiePressed}
+          isFocused={isActiveTab}
+        />
       </ScreenContent>
     );
+  };
+
+  const hasSelection = selection && selection.id;
+
+  const navigateToCategoryHistory = () => {
+    if (selection?.kind === 'category') {
+      navigation.navigate('categoryHistory', { categoryId: selection.id });
+    }
+  };
+
+  const navigateToTransactions = () => {
+    if (selection?.kind === 'category') {
+      navigation.navigate('transactions', { categoryId: selection.id });
+    } else if (selection?.kind === 'wallet') {
+      navigation.navigate('transactions', { walletId: selection.id });
+    }
   };
 
   return (
@@ -47,18 +107,18 @@ const Insights: React.FC = () => {
         actions={[
           {
             icon: 'history',
-            hidden: !selectedCategory || selectedCategory === '',
-            onPress: () => navigation.navigate('categoryHistory', { categoryId: selectedCategory }),
+            hidden: !hasSelection || selection?.kind !== 'category',
+            onPress: navigateToCategoryHistory,
           },
           {
             icon: 'receipt-long',
-            hidden: !selectedCategory || selectedCategory === '',
-            onPress: () => navigation.navigate('transactions', { categoryId: selectedCategory }),
+            hidden: !hasSelection,
+            onPress: navigateToTransactions,
           },
           HideValuesAction(),
         ]}
       />
-      <ScreenTabs tabs={TABS} renderScene={renderScene} />
+      <ScreenTabs tabs={TABS} renderScene={renderScene} onTabIndexChange={handleTabIndexChange} />
     </ScreenContainer>
   );
 };
