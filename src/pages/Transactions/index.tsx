@@ -11,6 +11,7 @@ import { StackRouteParamList } from '../../routes/stack.routes';
 import { formatMonthYearDate } from '../../utils/date';
 import { capitalize, transactionTypeText } from '../../utils/text';
 import TransactionList from './TransactionList';
+import { getTransactionSignedAmount } from '../../utils/money';
 
 const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transactions'>> = ({
   route,
@@ -61,7 +62,7 @@ const Transactions: React.FC<NativeStackScreenProps<StackRouteParamList, 'transa
             (!categoryId || transaction.categoryId === categoryId) &&
             (!walletId || transaction.walletId === walletId),
         );
-        balance = data.reduce((total, item) => total + Math.abs(item.amount), 0);
+        balance = data.reduce((total, item) => total + getTransactionSignedAmount(item), 0);
       }
 
       return (
