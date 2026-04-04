@@ -29,7 +29,7 @@ const Insights: React.FC = () => {
   const [selection, setSelection] = useState<InsightsSelection | null>(null);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const { expenseTransactions, incomeTransactions, transactions, wallets } = useContext(AppContext);
+  const { expenseTransactions, incomeTransactions, wallets } = useContext(AppContext);
   const navigation = useNavigation();
 
   const activeTabKey = TABS[activeTabIndex].key;
@@ -61,7 +61,7 @@ const Insights: React.FC = () => {
         <ScreenContent>
           <WalletPieChart
             wallets={wallets}
-            transactions={transactions}
+            transactions={expenseTransactions}
             onPress={handleWalletPiePressed}
             isFocused={isActiveTab}
           />
