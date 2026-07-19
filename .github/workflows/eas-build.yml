@@ -1,0 +1,40 @@
+name: EAS Build
+
+# Manually triggered from the Actions tab. Pick a profile and run.
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Build profile
+        type: choice
+        options:
+          - production
+          - development
+        default: production
+        required: true
+
+jobs:
+  build:
+    name: Build Android (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # Queues the build on EAS servers and returns. Track progress and download
+      # the APK from https://expo.dev once it finishes.
+      - name: Build APK
+        run: eas build --profile ${{ inputs.profile }} --platform android --non-interactive --no-wait

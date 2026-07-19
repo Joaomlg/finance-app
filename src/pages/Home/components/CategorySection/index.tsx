@@ -16,11 +16,7 @@ const CategorySection: React.FC = () => {
         <Text typography="title">Despesas por categoria</Text>
         <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('insights')} />
       </SectionHeader>
-      <CategoryPieChart
-        type="EXPENSE"
-        transactions={expenseTransactions}
-        variant="inline"
-      />
+      <CategoryPieChart type="EXPENSE" transactions={expenseTransactions} variant="inline" />
     </SectionContainer>
   );
 };

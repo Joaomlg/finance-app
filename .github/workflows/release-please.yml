@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Release Please & OTA update
+    runs-on: ubuntu-latest
+    steps:
+      # Opens/updates a Release PR on every push to main. When that Release PR
+      # is merged, this step creates the GitHub release + tag and sets
+      # release_created=true so the OTA update below runs.
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- The steps below run ONLY when a release was just published ---
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+
+      - uses: actions/setup-node@v4
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm ci
+
+      - name: Setup EAS
+        if: ${{ steps.release.outputs.release_created }}
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish OTA update
+        if: ${{ steps.release.outputs.release_created }}
+        run: eas update --channel production --message "Release ${{ steps.release.outputs.tag_name }}" --non-interactive
