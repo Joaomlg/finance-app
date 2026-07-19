@@ -2,22 +2,26 @@
 
 ## Branching model
 
+We follow a single-trunk (GitHub Flow) model.
+
 | Branch | Purpose |
 |--------|---------|
-| `main` | Production. Every merge here triggers a release. |
-| `develop` | Integration branch for the next release. |
+| `main` | The trunk. Always releasable. Protected. |
 | `feat/*`, `fix/*`, `chore/*` | Short-lived branches for individual changes. |
 
 Flow:
 
 ```
-feat/my-change  ──PR──▶  develop  ──PR──▶  main  ──▶  release
+feat/my-change  ──PR──▶  main  ──▶  release-please Release PR  ──▶  release
 ```
 
-1. Branch off `develop`.
-2. Open a PR into `develop`. CI runs lint, format and typecheck.
-3. When ready to release, open a PR from `develop` into `main`.
-4. Merging into `main` kicks off the automated release (see below).
+1. Branch off `main`.
+2. Open a PR into `main`. CI runs lint, format and typecheck.
+3. On merge, release-please gathers the changes into a **Release PR** — this is
+   your "about to ship" staging view. Merge it when you want to release.
+
+There is no `develop` branch: the Release PR plays the role of staging the next
+release, so unreleased work simply lives on `main` until the Release PR is merged.
 
 ## Commit messages
 
