@@ -15,21 +15,25 @@ import { transactionRepository } from '../../repositories';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { range } from '../../utils/array';
 import { getCategoryById } from '../../utils/category';
-import { checkCurrentYear, CURRENT_MONTH } from '../../utils/date';
+import { checkCurrentYear, CURRENT_MONTH, getCurrentYear } from '../../utils/date';
+import AnnualBalanceItem from './AnnualBalanceItem';
 import {
   HorizontalBarContainer,
   ItemContainer,
   ItemHeader,
   MonthTrendContainer,
+  SectionDivider,
   StyledButton,
   StyledDivider,
-  StyledFlatList,
   StyledHorizontalBar,
+  StyledSectionList,
   TouchableIconContainer,
 } from './styles';
-import { MonthData } from './types';
+import { CategoryAnnualBalance, MonthData } from './types';
 
 const ITEMS_PER_PAGE = 6;
+
+const CURRENT_YEAR = getCurrentYear();
 
 const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHistory'>> = ({
   route,
@@ -49,6 +53,31 @@ const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHis
 
   const maxAmount = useMemo(() => {
     return monthData.reduce((currentMax, item) => Math.max(currentMax, item.amount), 0);
+  }, [monthData]);
+
+  const annualBalances = useMemo(() => {
+    return monthData.reduce((summary, item) => {
+      const year = item.date.year();
+      const dataIndex = CURRENT_YEAR - year;
+
+      if (summary.length <= dataIndex) {
+        summary.push({
+          year,
+          amount: 0,
+          data: [],
+          complete: false,
+        });
+
+        if (dataIndex > 0) {
+          summary[dataIndex - 1].complete = true;
+        }
+      }
+
+      summary[dataIndex].amount += item.amount;
+      summary[dataIndex].data.push(item);
+
+      return summary;
+    }, [] as CategoryAnnualBalance[]);
   }, [monthData]);
 
   const fetchPage = useCallback(async () => {
@@ -148,6 +177,13 @@ const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHis
 
   const renderItemSeparator = useCallback(() => <StyledDivider />, []);
 
+  const renderSectionFooter = useCallback(
+    (section: CategoryAnnualBalance) => {
+      return section.complete ? renderItemSeparator() : null;
+    },
+    [renderItemSeparator],
+  );
+
   const renderFooter = useCallback(
     () =>
       monthData.length > 0 ? (
@@ -168,7 +204,7 @@ const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHis
   return (
     <ScreenContainer>
       <ScreenHeader title={`Histórico de "${category.name}"`} actions={[HideValuesAction()]} />
-      <StyledFlatList
+      <StyledSectionList
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -176,10 +212,17 @@ const History: React.FC<NativeStackScreenProps<StackRouteParamList, 'categoryHis
             colors={[theme.colors.primary]}
           />
         }
-        data={monthData}
+        sections={annualBalances}
+        keyExtractor={(item) => item.date.toISOString()}
         renderItem={renderItem}
         ItemSeparatorComponent={renderItemSeparator}
+        renderSectionHeader={({ section }) => (
+          <AnnualBalanceItem data={section} category={category} />
+        )}
+        SectionSeparatorComponent={() => <SectionDivider />}
+        renderSectionFooter={({ section }) => renderSectionFooter(section)}
         ListFooterComponent={renderFooter}
+        stickySectionHeadersEnabled={true}
       />
     </ScreenContainer>
   );
