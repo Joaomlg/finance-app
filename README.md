@@ -36,6 +36,9 @@ $ cd finance-app
 # Install dependences
 $ npm install
 
+# Create your environment file from the template and fill in the values
+$ cp .env.example .env
+
 # Server app
 $ npm start
 ```
