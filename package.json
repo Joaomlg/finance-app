@@ -16,6 +16,8 @@
     "web": "expo start --web",
     "lint": "eslint --ext .tsx --ext .ts ./src/",
     "format": "prettier --check ./src",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky",
     "eas-build-pre-install": "cp $DEV_GOOGLE_SERVICES_JSON $EAS_BUILD_WORKINGDIR/android/app/src/development/google-services.json && cp $GOOGLE_SERVICES_JSON $EAS_BUILD_WORKINGDIR/android/app/google-services.json"
   },
   "dependencies": {
@@ -35,6 +37,7 @@
     "apisauce": "^2.1.6",
     "expo": "^51.0.31",
     "expo-dev-client": "~4.0.26",
+    "expo-file-system": "~17.0.1",
     "expo-font": "~12.0.10",
     "expo-local-authentication": "~14.0.1",
     "expo-splash-screen": "~0.27.5",
@@ -63,11 +66,12 @@
     "react-native-webview": "13.8.6",
     "styled-components": "^5.3.6",
     "victory-native": "^37.0.3-next.0",
-    "yup": "^1.4.0",
-    "expo-file-system": "~17.0.1"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/react": "~18.2.79",
     "@types/react-native": "~0.70.6",
     "@types/react-native-base64": "^0.2.0",
@@ -79,6 +83,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.1.7",
     "prettier": "^2.8.1",
     "typescript": "^5.3.3"
   },
