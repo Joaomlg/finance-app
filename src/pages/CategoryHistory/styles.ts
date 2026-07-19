@@ -1,21 +1,29 @@
-import { FlatList, FlatListProps } from 'react-native';
+import { SectionList, SectionListProps } from 'react-native';
 import styled from 'styled-components/native';
 import Button from '../../components/Button';
 import Divider from '../../components/Divider';
 import HorizontalBar from '../../components/HorizontalBar';
-import { MonthData } from './types';
+import { CategoryAnnualBalance, MonthData } from './types';
 
-export const StyledFlatList = styled(
-  FlatList as new (props: FlatListProps<MonthData>) => FlatList<MonthData>,
+export const StyledSectionList = styled(
+  SectionList as new (props: SectionListProps<MonthData, CategoryAnnualBalance>) => SectionList<
+    MonthData,
+    CategoryAnnualBalance
+  >,
 ).attrs({
   contentContainerStyle: {
     padding: 24,
+    paddingTop: 12,
   },
 })`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.backgroundWhite};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
+`;
+
+export const SectionDivider = styled.View`
+  padding-bottom: 12px;
 `;
 
 export const ItemContainer = styled.View`

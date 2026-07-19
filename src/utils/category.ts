@@ -158,7 +158,7 @@ export const expensePresetCategories: Category[] = [
   {
     id: PRESET_CATEGORY_ID_PREFIX + 'expense-19',
     name: 'Manutenção',
-    icon: 'construction',
+    icon: 'handyman',
     color: '#ff7f0e',
     type: 'EXPENSE',
   },
@@ -188,6 +188,13 @@ export const expensePresetCategories: Category[] = [
     name: 'Assinaturas',
     icon: 'subscriptions',
     color: '#1f77b4',
+    type: 'EXPENSE',
+  },
+  {
+    id: PRESET_CATEGORY_ID_PREFIX + 'expense-24',
+    name: 'Obra',
+    icon: 'construction',
+    color: '#e66f0c',
     type: 'EXPENSE',
   },
 ];
