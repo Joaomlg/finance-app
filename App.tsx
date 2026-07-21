@@ -16,6 +16,7 @@ import SecurityGuard from './src/components/SecurityGuard';
 import { AppContextProvider } from './src/contexts/AppContext';
 import { AuthContextProvider } from './src/contexts/AuthContext';
 import { BottomSheetContextProvider } from './src/contexts/BottomSheetContext';
+import useAppUpdates from './src/hooks/useAppUpdates';
 import Routes from './src/routes';
 import dark from './src/theme/dark';
 import light from './src/theme/light';
@@ -32,6 +33,8 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   const theme = colorScheme === 'dark' ? dark : light;
+
+  useAppUpdates();
 
   useEffect(() => {
     if (fontsLoaded) {
