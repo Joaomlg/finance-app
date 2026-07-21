@@ -3,9 +3,11 @@ import {
   BANCO_INTER_LOGO_SVG_URL,
   BRADESCO_LOGO_SVG_URL,
   CAIXA_LOGO_SVG_URL,
+  FINANS_LOGO_SVG_URL,
   ITAU_LOGO_SVG_URL,
   NUBANK_LOGO_SVG_URL,
   SANTANDER_LOGO_SVG_URL,
+  XP_BANKING_LOGO_SVG_URL,
 } from '../../../utils/svg';
 
 export type PresetInstitution = {
@@ -16,6 +18,12 @@ export type PresetInstitution = {
 };
 
 const presetInstitutions: PresetInstitution[] = [
+  {
+    id: 0,
+    name: 'Finans',
+    imageUrl: FINANS_LOGO_SVG_URL,
+    primaryColor: '#284D63',
+  },
   {
     id: 1,
     name: 'Nubank',
@@ -57,6 +65,12 @@ const presetInstitutions: PresetInstitution[] = [
     name: 'Santander',
     imageUrl: SANTANDER_LOGO_SVG_URL,
     primaryColor: '#ec0000',
+  },
+  {
+    id: 8,
+    name: 'XP Banking',
+    imageUrl: XP_BANKING_LOGO_SVG_URL,
+    primaryColor: '#000000',
   },
 ];
 
