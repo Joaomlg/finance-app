@@ -59,6 +59,40 @@ when you add a native dependency, change native config, or bump the Expo SDK.
 - **From GitHub:** Actions tab → **EAS Build** → *Run workflow* → pick a profile.
 - **Locally:** `npm run build:production` (or `build:development`).
 
+## Running on a physical device from WSL2 (Windows)
+
+To scan the Expo QR code / connect a physical phone to Metro when developing inside WSL2, WSL needs to share your Windows machine's network (so your phone can reach it) instead of using its own isolated IP.
+
+1. Enable WSL2 mirrored networking. Edit (or create) `%UserProfile%\.wslconfig` on Windows:
+
+   ```ini
+   [wsl2]
+   networkingMode=mirrored
+
+   [experimental]
+   hostAddressLoopback=true
+   ```
+
+   Then restart WSL from Windows (PowerShell/cmd, not from inside WSL):
+
+   ```
+   wsl --shutdown
+   ```
+
+2. Set your Wi-Fi network profile to **Private** (Public profiles block inbound connections from other devices by default). In an elevated PowerShell:
+
+   ```powershell
+   Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private
+   ```
+
+3. Allow Metro's port through Windows Firewall. Program-based rules (e.g. for `node.exe`) don't cover WSL processes under mirrored networking, so add an explicit port rule in an elevated PowerShell:
+
+   ```powershell
+   New-NetFirewallRule -DisplayName "Metro Bundler (WSL2)" -Direction Inbound -Protocol TCP -LocalPort 8081 -Action Allow -Profile Private
+   ```
+
+After this, `npm start` / `npm run dev` works as-is — no special script or port-forwarding needed. WSL's IP will match your Windows Wi-Fi IP (verify with `ip addr` in WSL vs `ipconfig` on Windows).
+
 ## Useful scripts
 
 ```bash
