@@ -3,6 +3,12 @@ import { AppState, AppStateStatus } from 'react-native';
 import Toast from 'react-native-toast-message';
 import * as Updates from 'expo-updates';
 
+// TODO: temporary workaround for the update check racing with the connections
+// sync over the network at app launch/foreground, causing sync to fail.
+// Remove once the sync failure has proper visibility (e.g. Crashlytics) to
+// confirm the root cause and a permanent fix is in place.
+const CHECK_DELAY_MS = 10000;
+
 const useAppUpdates = () => {
   const appState = useRef(AppState.currentState);
 
@@ -36,17 +42,18 @@ const useAppUpdates = () => {
   }, []);
 
   useEffect(() => {
-    checkForUpdate();
+    const initialCheckTimeout = setTimeout(checkForUpdate, CHECK_DELAY_MS);
 
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        checkForUpdate();
+        setTimeout(checkForUpdate, CHECK_DELAY_MS);
       }
 
       appState.current = nextAppState;
     });
 
     return () => {
+      clearTimeout(initialCheckTimeout);
       subscription.remove();
     };
   }, [checkForUpdate]);
