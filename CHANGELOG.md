@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/Joaomlg/finance-app/compare/3.0.1...3.0.2) (2026-07-25)
+
+
+### Bug Fixes
+
+* resolve OTA env vars from EAS and fail the bundle when they are missing ([#36](https://github.com/Joaomlg/finance-app/issues/36)) ([ba8c0fb](https://github.com/Joaomlg/finance-app/commit/ba8c0fb1f2714b83b8048f4e3a21e7f49ee8fd8d))
+
 ## [3.0.1](https://github.com/Joaomlg/finance-app/compare/3.0.0...3.0.1) (2026-07-25)
 
 
