@@ -45,4 +45,4 @@ jobs:
 
       - name: Publish OTA update
         if: ${{ steps.release.outputs.release_created }}
-        run: eas update --channel production --message "Release ${{ steps.release.outputs.tag_name }}" --non-interactive
+        run: eas update --channel production --environment production --message "Release ${{ steps.release.outputs.tag_name }}" --non-interactive
