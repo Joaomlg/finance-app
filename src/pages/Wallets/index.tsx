@@ -1,28 +1,54 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import ScreenContainer from '../../components/ScreenContainer';
 import ScreenFloatingButton from '../../components/ScreenFloatingButton';
 import ScreenHeader from '../../components/ScreenHeader';
 import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideValuesAction';
 import AppContext from '../../contexts/AppContext';
-import WalletItem from './WalletItem';
+import { WalletGroupItem } from './types';
+import WalletGroupCard from './WalletGroupCard';
 import { HeaderText, StyledDivider, StyledFlatList } from './styles';
 
 const Wallets: React.FC = () => {
-  const { wallets, fetchWallets, fetchingWallets } = useContext(AppContext);
+  const {
+    wallets,
+    walletGroups,
+    fetchWallets,
+    fetchWalletGroups,
+    fetchingWallets,
+    fetchingWalletGroups,
+  } = useContext(AppContext);
 
   const navigation = useNavigation();
+
+  const walletGroupItems = useMemo<WalletGroupItem[]>(
+    () =>
+      walletGroups
+        .map((group) => ({
+          group,
+          wallets: wallets.filter((wallet) => wallet.walletGroupId === group.id),
+        }))
+        .filter((item) => item.wallets.length > 0),
+    [wallets, walletGroups],
+  );
+
+  const handleRefresh = () => {
+    fetchWallets();
+    fetchWalletGroups();
+  };
 
   return (
     <>
       <ScreenContainer>
         <ScreenHeader title="Carteiras" actions={[HideValuesAction()]} />
         <StyledFlatList
-          refreshing={fetchingWallets}
-          onRefresh={fetchWallets}
-          data={wallets}
-          renderItem={({ item }) => <WalletItem wallet={item} />}
-          keyExtractor={(item) => item.id}
+          refreshing={fetchingWallets || fetchingWalletGroups}
+          onRefresh={handleRefresh}
+          data={walletGroupItems}
+          renderItem={({ item }) => (
+            <WalletGroupCard walletGroup={item.group} wallets={item.wallets} />
+          )}
+          keyExtractor={(item) => item.group.id}
           ItemSeparatorComponent={() => <StyledDivider />}
           ListHeaderComponent={() => (
             <HeaderText typography="light" color="textLight">

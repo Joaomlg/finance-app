@@ -17,13 +17,13 @@ import Text from '../../components/Text';
 import TextInput from '../../components/TextInput';
 import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
-import { Wallet, WalletType } from '../../models';
+import { ManualWalletGroup, WalletType } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { onSubmitError, useYupValidationResolver } from '../../utils/forms';
 import { walletTypeText } from '../../utils/text';
 import presetInstituitions, { PresetInstitution } from './helpers/presetInstitutions';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
-import walletSchema from './walletSchema';
+import walletSchema, { SetWalletFormValues } from './walletSchema';
 
 const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet'>> = ({
   route,
@@ -31,17 +31,21 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
 }) => {
   const [isLoading, setLoading] = useState(false);
 
-  const { reset, setValue, watch, handleSubmit } = useForm<Wallet>({
+  const { reset, setValue, watch, handleSubmit } = useForm<SetWalletFormValues>({
     resolver: useYupValidationResolver(walletSchema),
   });
 
-  const { wallets, createWallet, updateWallet } = useContext(AppContext);
+  const { wallets, walletGroups, createManualWallet, updateWallet, updateWalletGroup } =
+    useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
-  const walletId = route.params?.walletId;
-  const isEditing = walletId !== undefined;
+  const walletGroupId = route.params?.walletGroupId;
+  const isEditing = walletGroupId !== undefined;
 
-  const isEditingAutomaticWallet = watch('connection') !== undefined;
+  const walletGroup = walletGroups.find(({ id }) => id === walletGroupId);
+  const groupWallets = wallets.filter((wallet) => wallet.walletGroupId === walletGroupId);
+
+  const isEditingAutomaticGroup = walletGroup?.type === 'AUTOMATIC';
 
   const selectedInstitution = presetInstituitions.find(({ id }) => id == watch('institutionId'));
 
@@ -103,20 +107,40 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
     return <ListItemSelection title="Instituição" items={items} />;
   };
 
-  const onSubmitWallet = async (data: Wallet) => {
+  const onSubmitWallet = async (data: SetWalletFormValues) => {
     setLoading(true);
 
     try {
-      if (isEditing) {
-        await updateWallet(walletId, data);
-      } else {
-        await createWallet({
-          ...data,
-          id: uuid.v4().toString(),
-          createdAt: new Date(),
-          balance: data.balance || 0,
-          initialBalance: data.balance || 0,
+      if (isEditing && walletGroup) {
+        await updateWalletGroup(walletGroup.id, {
+          name: data.name,
+          institutionId: data.institutionId,
+          styles: data.styles,
         });
+
+        if (walletGroup.type === 'MANUAL' && groupWallets[0]) {
+          await updateWallet(groupWallets[0].id, { type: data.type });
+        }
+      } else {
+        const newWalletGroupId = uuid.v4().toString();
+
+        await createManualWallet(
+          {
+            id: newWalletGroupId,
+            type: 'MANUAL',
+            name: data.name,
+            institutionId: data.institutionId,
+            styles: data.styles,
+            createdAt: new Date(),
+          } as ManualWalletGroup,
+          {
+            id: uuid.v4().toString(),
+            type: data.type,
+            balance: data.balance || 0,
+            initialBalance: data.balance || 0,
+            walletGroupId: newWalletGroupId,
+          },
+        );
       }
     } finally {
       setLoading(false);
@@ -126,31 +150,39 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
   };
 
   useEffect(() => {
-    const initialValue = wallets.find(({ id }) => id === walletId);
-    if (initialValue) {
-      reset(initialValue);
-    }
-  }, [reset, walletId, wallets]);
+    if (!walletGroup) return;
+
+    reset({
+      name: walletGroup.name,
+      institutionId: walletGroup.institutionId,
+      styles: walletGroup.styles,
+      type: groupWallets[0]?.type,
+      balance: groupWallets[0]?.balance,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reset, walletGroupId, walletGroups, wallets]);
 
   return (
     <>
       <ScreenContainer variant="scrollable">
         <ScreenHeader title={isEditing ? 'Editar carteira' : 'Nova carteira'} />
-        <HeaderExtensionContainer>
-          <BalanceValueContainer>
-            <Text typography="light" color="textWhite">
-              Saldo atual
-            </Text>
-            <CurrencyInput
-              typography="heading"
-              color="textWhite"
-              iconRight={!isEditing ? 'edit' : undefined}
-              defaultNumberValue={watch('balance')}
-              onChangeValue={(value) => setValue('balance', value)}
-              readOnly={isEditing}
-            />
-          </BalanceValueContainer>
-        </HeaderExtensionContainer>
+        {!isEditingAutomaticGroup && (
+          <HeaderExtensionContainer>
+            <BalanceValueContainer>
+              <Text typography="light" color="textWhite">
+                Saldo atual
+              </Text>
+              <CurrencyInput
+                typography="heading"
+                color="textWhite"
+                iconRight={!isEditing ? 'edit' : undefined}
+                defaultNumberValue={watch('balance')}
+                onChangeValue={(value) => setValue('balance', value)}
+                readOnly={isEditing}
+              />
+            </BalanceValueContainer>
+          </HeaderExtensionContainer>
+        )}
         <ScreenContent>
           <TextInput
             placeholder="Nome"
@@ -159,16 +191,19 @@ const SetWallet: React.FC<NativeStackScreenProps<StackRouteParamList, 'setWallet
             onChangeText={(value) => setValue('name', value)}
           />
           <Divider />
-          <TextInput
-            placeholder="Tipo"
-            iconLeft="account-balance-wallet"
-            iconRight="navigate-next"
-            onPress={() => openBottomSheet(renderWalletTypeSelector())}
-            value={walletTypeText[watch('type')]}
-            disabled={isEditingAutomaticWallet}
-            readOnly
-          />
-          <Divider />
+          {!isEditingAutomaticGroup && (
+            <>
+              <TextInput
+                placeholder="Tipo"
+                iconLeft="account-balance-wallet"
+                iconRight="navigate-next"
+                onPress={() => openBottomSheet(renderWalletTypeSelector())}
+                value={walletTypeText[watch('type')]}
+                readOnly
+              />
+              <Divider />
+            </>
+          )}
           <TextInput
             placeholder="Instituição"
             iconLeft="circle"

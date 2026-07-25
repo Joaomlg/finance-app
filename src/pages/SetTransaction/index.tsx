@@ -28,6 +28,7 @@ import { getCategoryById } from '../../utils/category';
 import { formatDate } from '../../utils/date';
 import { onSubmitError, useYupValidationResolver } from '../../utils/forms';
 import { transactionTypeText } from '../../utils/text';
+import { getWalletGroup } from '../../utils/walletGroup';
 import { BalanceValueContainer, HeaderExtensionContainer } from './styles';
 import transactionSchema from './transactionSchema';
 
@@ -41,7 +42,8 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     resolver: useYupValidationResolver(transactionSchema),
   });
 
-  const { wallets, transactions, createTransaction, updateTransaction } = useContext(AppContext);
+  const { wallets, walletGroups, transactions, createTransaction, updateTransaction } =
+    useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const transactionId = route.params.transactionId;
@@ -53,9 +55,10 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
 
   const selectedDate = watch('date') ? formatDate(moment(watch('date'))) : undefined;
   const selectedWallet = wallets.find(({ id }) => id === watch('walletId'));
+  const selectedWalletGroup = selectedWallet && getWalletGroup(selectedWallet, walletGroups);
   const selectedCategory = getCategoryById(watch('categoryId'));
 
-  const isAutomaticTransaction = selectedWallet?.connection !== undefined;
+  const isAutomaticTransaction = selectedWalletGroup?.type === 'AUTOMATIC';
   const isEditingAutomaticTransaction = isEditing && isAutomaticTransaction;
 
   const handleTransactionBalanceChange = (amount: number) => {
@@ -74,11 +77,15 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     setValue('amount', amount);
   };
 
-  const renderWalletInstitutionAvatar = (wallet: Wallet, size?: number) => (
-    <Avatar color={wallet.styles.primaryColor} size={size}>
-      <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
-    </Avatar>
-  );
+  const renderWalletInstitutionAvatar = (wallet: Wallet, size?: number) => {
+    const walletGroup = getWalletGroup(wallet, walletGroups);
+
+    return (
+      <Avatar color={walletGroup?.styles.primaryColor} size={size}>
+        <Svg height="100%" width="100%" src={walletGroup?.styles.imageUrl || ''} />
+      </Avatar>
+    );
+  };
 
   const renderTransactionWalletSelector = () => {
     const handleItemPressed = (walletId: string) => {
@@ -87,11 +94,11 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
     };
 
     const items = wallets
-      .filter((wallet) => !wallet.connection)
+      .filter((wallet) => getWalletGroup(wallet, walletGroups)?.type === 'MANUAL')
       .map(
         (wallet) =>
           ({
-            text: wallet.name,
+            text: getWalletGroup(wallet, walletGroups)?.name ?? '',
             renderIcon: () => renderWalletInstitutionAvatar(wallet),
             onPress: () => handleItemPressed(wallet.id),
           } as SelectionItem),
@@ -217,7 +224,7 @@ const SetTransaction: React.FC<NativeStackScreenProps<StackRouteParamList, 'setT
             }
             iconRight="navigate-next"
             onPress={() => openBottomSheet(renderTransactionWalletSelector())}
-            value={selectedWallet?.name}
+            value={selectedWalletGroup?.name}
             disabled={isEditing}
             readOnly
           />

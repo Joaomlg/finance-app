@@ -1,7 +1,15 @@
 import { mixed, object, string } from 'yup';
-import { Wallet, WalletTypeList } from '../../models';
+import { WalletGroupStyles, WalletType, WalletTypeList } from '../../models';
 
-export default object<Wallet>({
+export type SetWalletFormValues = {
+  name: string;
+  type: WalletType;
+  institutionId?: number;
+  styles: WalletGroupStyles;
+  balance: number;
+};
+
+export default object<SetWalletFormValues>({
   name: string().required('A carteira deve ter um nome'),
   type: mixed()
     .required('A carteira deve conter um tipo')

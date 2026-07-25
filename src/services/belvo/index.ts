@@ -1,12 +1,15 @@
 import moment from 'moment';
 import {
+  AutomaticWalletGroup,
   TransactionType as CommonTransactionType,
-  ConnectionStatus,
   Transaction,
   Wallet,
+  WalletGroup,
+  WalletGroupStatus,
   WalletTypeList,
 } from '../../models';
 import { IProviderService } from '../providerService.interface';
+import { RecursivePartial } from '../../utils/type';
 import { BelvoClient } from './client';
 import {
   Account,
@@ -34,15 +37,22 @@ export class BelvoService implements IProviderService {
 
   fetchConnection = async (
     connectionId: string,
+    createWalletGroupCallback: (walletGroup: WalletGroup) => Promise<void>,
     createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
-    const wallets = await this.fetchWallets(connectionId, this.buildNewWallet);
+    const [link, institution, accounts] = await this.fetchLinkAndAccounts(connectionId);
 
-    await createWalletsCallback(wallets);
+    if (accounts.length === 0) {
+      return;
+    }
+
+    await createWalletGroupCallback(this.buildNewWalletGroup(link, institution));
+
+    await createWalletsCallback(accounts.map((account) => this.buildNewWallet(link, account)));
 
     await Promise.all(
-      wallets.map(({ id }) =>
+      accounts.map(({ id }) =>
         this.fetchAndCreateTransactions(connectionId, id, createTransactionsCallback),
       ),
     );
@@ -52,6 +62,7 @@ export class BelvoService implements IProviderService {
     connectionId: string,
     lastUpdateDate: Date,
     shouldUpdate: boolean,
+    updateWalletGroupCallback: (values: RecursivePartial<WalletGroup>) => Promise<void>,
     updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
@@ -59,12 +70,14 @@ export class BelvoService implements IProviderService {
       await this.updateAccountAndTransactions(connectionId, lastUpdateDate);
     }
 
-    const wallets = await this.fetchWallets(connectionId, this.buildUpdateWallet);
+    const [link, , accounts] = await this.fetchLinkAndAccounts(connectionId);
 
-    await updateWalletsCallback(wallets);
+    await updateWalletGroupCallback(this.buildUpdateWalletGroup(link));
+
+    await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(account)));
 
     await Promise.all(
-      wallets.map(({ id }) =>
+      accounts.map(({ id }) =>
         this.fetchAndCreateTransactions(
           connectionId,
           id,
@@ -79,10 +92,7 @@ export class BelvoService implements IProviderService {
     await this.client.links.delete(connectionId);
   };
 
-  private fetchWallets = async (
-    connectionId: string,
-    walletFactory: (link: Link, institution: Institution, account: Account) => Wallet,
-  ) => {
+  private fetchLinkAndAccounts = async (connectionId: string) => {
     const link = await this.client.links.detail(connectionId);
 
     const institution = (
@@ -102,7 +112,7 @@ export class BelvoService implements IProviderService {
     //@ts-expect-error WalletTypeList is a string list
     const filteredAccounts = accounts.filter(({ category }) => WalletTypeList.includes(category));
 
-    return filteredAccounts.map((account) => walletFactory(link, institution, account));
+    return [link, institution, filteredAccounts] as [Link, Institution, Account[]];
   };
 
   private fetchAndCreateTransactions = async (
@@ -133,38 +143,44 @@ export class BelvoService implements IProviderService {
     } while (transactions.length !== 0);
   };
 
-  private buildNewWallet = (link: Link, institution: Institution, account: Account) =>
+  private buildNewWalletGroup = (link: Link, institution: Institution) =>
     ({
-      id: account.id,
+      id: link.id,
       name: institution.display_name || link.institution,
-      type: account.category,
-      balance: account.balance.available,
-      initialBalance: account.balance.available,
-      createdAt: new Date(link.created_at),
+      type: 'AUTOMATIC',
+      provider: 'BELVO',
+      status: this.linkStatusToConnectionStatus(link.status),
+      lastUpdatedAt: new Date(link.last_accessed_at),
+      updateDisabled: false,
       styles: {
         imageUrl: institution.icon_logo,
         primaryColor: institution.primary_color,
       },
-      connection: {
-        id: link.id,
-        status: this.linkStatusToConnectionStatus(link.status),
-        provider: 'BELVO',
-        lastUpdatedAt: new Date(link.last_accessed_at),
-      },
+      createdAt: new Date(link.created_at),
+    } as AutomaticWalletGroup);
+
+  private buildUpdateWalletGroup = (link: Link) =>
+    ({
+      status: this.linkStatusToConnectionStatus(link.status),
+      lastUpdatedAt: new Date(link.last_accessed_at),
+    } as RecursivePartial<WalletGroup>);
+
+  private buildNewWallet = (link: Link, account: Account) =>
+    ({
+      id: account.id,
+      type: account.category,
+      balance: account.balance.available,
+      initialBalance: account.balance.available,
+      walletGroupId: link.id,
     } as Wallet);
 
-  private buildUpdateWallet = (link: Link, institution: Institution, account: Account) =>
+  private buildUpdateWallet = (account: Account) =>
     ({
       id: account.id,
       balance: account.balance.available,
-      connection: {
-        id: link.id,
-        status: this.linkStatusToConnectionStatus(link.status),
-        lastUpdatedAt: new Date(link.last_accessed_at),
-      },
     } as Wallet);
 
-  private linkStatusToConnectionStatus: (status: LinkStatus) => ConnectionStatus = (
+  private linkStatusToConnectionStatus: (status: LinkStatus) => WalletGroupStatus = (
     status: LinkStatus,
   ) => {
     switch (status) {
