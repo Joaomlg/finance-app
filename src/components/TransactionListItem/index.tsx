@@ -9,6 +9,7 @@ import AppContext from '../../contexts/AppContext';
 import useBottomSheet from '../../hooks/useBottomSheet';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { ellipsize } from '../../utils/text';
+import { getWalletGroup } from '../../utils/walletGroup';
 import CategoryPicker from '../CategoryPicker';
 import Icon from '../Icon';
 import {
@@ -27,12 +28,13 @@ export interface TransactionListItemProps extends TouchableOpacityProps {
 const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...props }) => {
   const value = item.type === 'EXPENSE' && item.amount > 0 ? -1 * item.amount : item.amount;
 
-  const { wallets, updateTransaction } = useContext(AppContext);
+  const { wallets, walletGroups, updateTransaction } = useContext(AppContext);
   const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
   const navigation = useNavigation();
 
   const wallet = wallets.find(({ id }) => id === item.walletId);
+  const walletGroup = wallet && getWalletGroup(wallet, walletGroups);
   const category = getCategoryById(item.categoryId) || getDefaultCategoryByType(item.type);
 
   const handleItemPressed = () => {
@@ -90,9 +92,9 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ item, ...prop
         )}
       </ListItemContent>
       <ListItemAmount>
-        {wallet?.name && (
+        {walletGroup?.name && (
           <Text typography="extraLight" color="textLight">
-            {ellipsize(wallet.name, 10)}
+            {ellipsize(walletGroup.name, 10)}
             {item.changed ? '*' : ''}
           </Text>
         )}

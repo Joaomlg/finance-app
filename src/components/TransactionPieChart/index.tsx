@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { VictoryPie } from 'victory-native';
-import { CategoryType, Transaction, Wallet } from '../../models';
+import { CategoryType, Transaction, Wallet, WalletGroup } from '../../models';
+import { adjustColorLightness } from '../../utils/color';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
+import { walletTypeText } from '../../utils/text';
+import { getWalletGroup } from '../../utils/walletGroup';
 import Avatar from '../Avatar';
 import Money from '../Money';
 import RowContent from '../RowContent';
@@ -16,6 +19,8 @@ const EMPTY_CHART_LABEL = 'Sem dados';
 
 const UNKNOWN_WALLET_NAME = 'Carteira desconhecida';
 
+const WALLET_SHADE_OFFSETS = [0, 0.18, -0.18, 0.32, -0.32];
+
 type Variant = 'inline' | 'complete';
 
 export interface CategoryPieChartProps {
@@ -28,6 +33,7 @@ export interface CategoryPieChartProps {
 
 export interface WalletPieChartProps {
   wallets: Wallet[];
+  walletGroups: WalletGroup[];
   transactions: Transaction[];
   variant?: Variant;
   onPress?: (segmentId: string) => void;
@@ -253,6 +259,7 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({
 
 export const WalletPieChart: React.FC<WalletPieChartProps> = ({
   wallets,
+  walletGroups,
   transactions,
   variant,
   onPress,
@@ -262,15 +269,36 @@ export const WalletPieChart: React.FC<WalletPieChartProps> = ({
 
   const getSegmentId = useCallback((t: Transaction) => t.walletId, []);
 
+  const getWalletAndGroup = useCallback(
+    (t: Transaction) => {
+      const wallet = wallets.find((w) => w.id === t.walletId);
+      const walletGroup = wallet && getWalletGroup(wallet, walletGroups);
+      return { wallet, walletGroup };
+    },
+    [wallets, walletGroups],
+  );
+
   const getSegmentName = useCallback(
-    (t: Transaction) => wallets.find((w) => w.id === t.walletId)?.name ?? UNKNOWN_WALLET_NAME,
-    [wallets],
+    (t: Transaction) => {
+      const { wallet, walletGroup } = getWalletAndGroup(t);
+      if (!walletGroup) return UNKNOWN_WALLET_NAME;
+      return wallet ? `${walletGroup.name} - ${walletTypeText[wallet.type]}` : walletGroup.name;
+    },
+    [getWalletAndGroup],
   );
 
   const getSegmentColor = useCallback(
-    (t: Transaction) =>
-      wallets.find((w) => w.id === t.walletId)?.styles.primaryColor ?? theme.colors.lightGray,
-    [wallets, theme.colors.lightGray],
+    (t: Transaction) => {
+      const { wallet, walletGroup } = getWalletAndGroup(t);
+      if (!walletGroup) return theme.colors.lightGray;
+
+      const siblingWallets = wallets.filter((w) => w.walletGroupId === walletGroup.id);
+      const shadeIndex = wallet ? siblingWallets.findIndex((w) => w.id === wallet.id) : 0;
+      const shadeAmount = WALLET_SHADE_OFFSETS[shadeIndex % WALLET_SHADE_OFFSETS.length];
+
+      return adjustColorLightness(walletGroup.styles.primaryColor, shadeAmount);
+    },
+    [getWalletAndGroup, wallets, theme.colors.lightGray],
   );
 
   return (

@@ -19,7 +19,8 @@ import { Transaction } from '../../models';
 import { StackRouteParamList } from '../../routes/stack.routes';
 import { getCategoryById, getDefaultCategoryByType } from '../../utils/category';
 import { formatDate, formatHour } from '../../utils/date';
-import { transactionTypeText } from '../../utils/text';
+import { transactionTypeText, walletTypeText } from '../../utils/text';
+import { getWalletGroup } from '../../utils/walletGroup';
 import { BottomHeader, BottomHeaderContent, ChipContainer, InformationGroup } from './styles';
 
 const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'transaction'>> = ({
@@ -28,6 +29,7 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
 }) => {
   const {
     wallets,
+    walletGroups,
     transactions,
     fetchingTransactions,
     fetchTransactions,
@@ -45,10 +47,11 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
   }
 
   const wallet = wallets.find(({ id }) => id === transaction.walletId);
+  const walletGroup = wallet && getWalletGroup(wallet, walletGroups);
   const category =
     getCategoryById(transaction.categoryId) || getDefaultCategoryByType(transaction.type);
 
-  const isAutomaticTransaction = wallet?.connection !== undefined;
+  const isAutomaticTransaction = walletGroup?.type === 'AUTOMATIC';
 
   const toggleIgnore = async () => {
     await updateTransaction(
@@ -147,8 +150,11 @@ const TransactionDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 't
             <RowContent text="Horário">
               <Text typography="defaultBold">{formatHour(moment(transaction.date))}</Text>
             </RowContent>
-            <RowContent text="Conta">
-              <Text typography="defaultBold">{wallet?.name}</Text>
+            <RowContent text="Carteira">
+              <Text typography="defaultBold">
+                {walletGroup?.name}
+                {wallet ? ` - ${walletTypeText[wallet.type]}` : ''}
+              </Text>
             </RowContent>
             <RowContent text="Tipo">
               <Text typography="defaultBold">{transactionTypeText[transaction.type]}</Text>

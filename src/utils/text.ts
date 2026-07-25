@@ -1,4 +1,4 @@
-import { ConnectionStatus, TransactionType, WalletType } from '../models';
+import { TransactionType, WalletGroupStatus, WalletType } from '../models';
 
 export const capitalize = (text: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -29,7 +29,7 @@ export const transactionTypeText: Record<TransactionType, string> = {
 
 export const insightsWalletTabTitle = 'Carteira';
 
-export const ConnectionStatusMessage: Record<ConnectionStatus, string> = {
+export const ConnectionStatusMessage: Record<WalletGroupStatus, string> = {
   UPDATED: '',
   UPDATING: '',
   LOGIN_ERROR: 'Atualize as credenciais da conexão.',

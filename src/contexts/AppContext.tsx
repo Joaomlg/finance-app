@@ -4,9 +4,9 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import LoadingModal from '../components/LoadingModal';
-import { Transaction, Wallet } from '../models';
+import { Transaction, Wallet, WalletGroup } from '../models';
 import Provider from '../models/provider';
-import { transactionRepository, walletRepository } from '../repositories';
+import { transactionRepository, walletGroupRepository, walletRepository } from '../repositories';
 import { getProviderService } from '../services/providerServiceFactory';
 import { range } from '../utils/array';
 import { CURRENT_MONTH, NOW } from '../utils/date';
@@ -25,15 +25,20 @@ export type AppContextValue = {
   setHideValues: (value: boolean) => void;
 
   setupConnection: (connectionId: string, provider: Provider) => Promise<void>;
-  syncWalletConnection: (wallet: Wallet) => Promise<void>;
+  syncWalletGroup: (walletGroup: WalletGroup) => Promise<void>;
 
   wallets: Wallet[];
   fetchWallets: () => Promise<void>;
   fetchingWallets: boolean;
-  createWallet: (wallet: Wallet) => Promise<void>;
   updateWallet: (id: string, values: RecursivePartial<Wallet>) => Promise<void>;
-  deleteWallet: (wallet: Wallet) => Promise<void>;
   totalBalance: number;
+
+  walletGroups: WalletGroup[];
+  fetchWalletGroups: () => Promise<void>;
+  fetchingWalletGroups: boolean;
+  createManualWallet: (walletGroup: WalletGroup, wallet: Wallet) => Promise<void>;
+  updateWalletGroup: (id: string, values: RecursivePartial<WalletGroup>) => Promise<void>;
+  deleteWalletGroup: (walletGroup: WalletGroup) => Promise<void>;
 
   transactions: Transaction[];
   fetchTransactions: () => Promise<void>;
@@ -73,6 +78,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const [wallets, setWallets] = useState([] as Wallet[]);
   const [fetchingWallets, setFetchingWallets] = useState(false);
+
+  const [walletGroups, setWalletGroups] = useState([] as WalletGroup[]);
+  const [fetchingWalletGroups, setFetchingWalletGroups] = useState(false);
 
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [fetchingTransactions, setFetchingTransactions] = useState(false);
@@ -138,17 +146,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [wallets],
   );
 
-  const totalInvestment = useMemo(() => {
-    const seenIds = new Set<string>();
-    return wallets.reduce((total, wallet) => {
-      const connection = wallet.connection;
-      if (connection && !seenIds.has(connection.id)) {
-        seenIds.add(connection.id);
-        return total + (connection.temporaryData?.investmentAmount || 0);
-      }
-      return total;
-    }, 0);
-  }, [wallets]);
+  const totalInvestment = useMemo(
+    () =>
+      walletGroups.reduce(
+        (total, walletGroup) =>
+          total + (walletGroup.type === 'AUTOMATIC' ? walletGroup.investmentAmount || 0 : 0),
+        0,
+      ),
+    [walletGroups],
+  );
 
   const setLoading = (status: boolean, message?: string) => {
     setIsLoading(status);
@@ -162,6 +168,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     await providerService.fetchConnection(
       connectionId,
+      walletGroupRepository.setWalletGroup,
       walletRepository.setWalletsBatch,
       transactionRepository.setTransactionsBatch,
     );
@@ -169,34 +176,48 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setLoading(false);
   };
 
-  const syncWalletConnection = useCallback(async (wallet: Wallet, configureLoading = true) => {
-    if (wallet.connection === undefined) {
-      return;
-    }
+  const syncWalletGroup = useCallback(
+    async (walletGroup: WalletGroup, configureLoading = true) => {
+      if (walletGroup.type !== 'AUTOMATIC') {
+        return;
+      }
 
-    const providerService = getProviderService(wallet.connection.provider);
+      const providerService = getProviderService(walletGroup.provider);
 
-    configureLoading && setLoading(true, 'Sincronizando conexão');
+      configureLoading && setLoading(true, 'Sincronizando conexão');
 
-    try {
-      const lastTransaction = await transactionRepository.getLastWalletTransaction(wallet.id);
+      try {
+        const groupWallets = wallets.filter((wallet) => wallet.walletGroupId === walletGroup.id);
 
-      await providerService.syncConnection(
-        wallet.connection.id,
-        lastTransaction?.date || wallet.connection.lastUpdatedAt,
-        !wallet.connection.updateDisabled,
-        walletRepository.updateWalletsBatch,
-        transactionRepository.securelySetTransactionsBatch,
-      );
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: `Erro ao sincronizar conexão "${wallet.name}"!`,
-      });
-    }
+        const lastTransactions = await Promise.all(
+          groupWallets.map((wallet) => transactionRepository.getLastWalletTransaction(wallet.id)),
+        );
 
-    configureLoading && setLoading(false);
-  }, []);
+        const lastUpdateDate = lastTransactions.reduce(
+          (oldest, transaction) =>
+            transaction && transaction.date < oldest ? transaction.date : oldest,
+          walletGroup.lastUpdatedAt,
+        );
+
+        await providerService.syncConnection(
+          walletGroup.id,
+          lastUpdateDate,
+          !walletGroup.updateDisabled,
+          (values) => walletGroupRepository.updateWalletGroup(walletGroup.id, values),
+          walletRepository.updateWalletsBatch,
+          transactionRepository.securelySetTransactionsBatch,
+        );
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: `Erro ao sincronizar conexão "${walletGroup.name}"!`,
+        });
+      }
+
+      configureLoading && setLoading(false);
+    },
+    [wallets],
+  );
 
   const fetchWallets = async () => {
     setFetchingWallets(true);
@@ -211,10 +232,24 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingWallets(false);
   };
 
-  const createWallet = async (wallet: Wallet) => {
+  const fetchWalletGroups = async () => {
+    setFetchingWalletGroups(true);
+
+    try {
+      const walletGroups = await walletGroupRepository.getWalletGroups();
+      setWalletGroups(walletGroups);
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Não foi possível obter informações das carteiras!' });
+    }
+
+    setFetchingWalletGroups(false);
+  };
+
+  const createManualWallet = async (walletGroup: WalletGroup, wallet: Wallet) => {
     setFetchingWallets(true);
 
     try {
+      await walletGroupRepository.setWalletGroup(walletGroup);
       await walletRepository.setWallet(wallet);
       Toast.show({ type: 'success', text1: 'Carteira criada com sucesso!' });
     } catch (error) {
@@ -240,23 +275,46 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFetchingWallets(false);
   };
 
-  const deleteWallet = async (wallet: Wallet) => {
+  const updateWalletGroup = async (id: string, values: RecursivePartial<WalletGroup>) => {
+    setFetchingWallets(true);
+
+    try {
+      await walletGroupRepository.updateWalletGroup(id, values);
+      Toast.show({ type: 'success', text1: 'Carteira atualizada com sucesso!' });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não foi possível atualizar as informações da carteira!',
+      });
+    }
+
+    setFetchingWallets(false);
+  };
+
+  const deleteWalletGroup = async (walletGroup: WalletGroup) => {
     setFetchingWallets(true);
 
     let hasError = false;
 
+    const groupWallets = wallets.filter((wallet) => wallet.walletGroupId === walletGroup.id);
+
     try {
-      await walletRepository.deleteWallet(wallet);
+      await Promise.all(groupWallets.map((wallet) => walletRepository.deleteWallet(wallet)));
     } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Não foi possível apagar a carteira!',
       });
+      setFetchingWallets(false);
       return;
     }
 
     try {
-      await transactionRepository.deleteAllTransactionsByWalletId(wallet.id);
+      await Promise.all(
+        groupWallets.map((wallet) =>
+          transactionRepository.deleteAllTransactionsByWalletId(wallet.id),
+        ),
+      );
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -266,7 +324,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     try {
-      await deleteWalletConnectionIfNecessary(wallet);
+      if (walletGroup.type === 'AUTOMATIC') {
+        const providerService = getProviderService(walletGroup.provider);
+        await providerService.deleteConnection(walletGroup.id);
+      }
+
+      await walletGroupRepository.deleteWalletGroup(walletGroup);
     } catch (error) {
       Toast.show({
         type: 'info',
@@ -280,24 +343,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     setFetchingWallets(false);
-  };
-
-  const deleteWalletConnectionIfNecessary = async (wallet: Wallet) => {
-    if (!wallet.connection) {
-      return;
-    }
-
-    const hasOtherWalletWithSameConnection = wallets.find(
-      (item) => item.connection?.id === wallet.connection?.id && item.id !== wallet.id,
-    );
-
-    if (hasOtherWalletWithSameConnection) {
-      return;
-    }
-
-    const providerService = getProviderService(wallet.connection.provider);
-
-    await providerService.deleteConnection(wallet.connection.id);
   };
 
   const fetchTransactions = async () => {
@@ -460,27 +505,35 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   useEffect(() => {
-    if (!wallets || wallets.length === 0) {
+    return walletGroupRepository.onWalletGroupsChange((walletGroups) =>
+      setWalletGroups(walletGroups),
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!walletGroups || walletGroups.length === 0) {
       return;
     }
 
-    const walletsToSync = wallets.filter(
-      (wallet) =>
-        wallet.connection !== undefined && NOW.isAfter(wallet.connection.lastUpdatedAt, 'day'),
+    const walletGroupsToSync = walletGroups.filter(
+      (walletGroup) =>
+        walletGroup.type === 'AUTOMATIC' && NOW.isAfter(walletGroup.lastUpdatedAt, 'day'),
     );
 
-    if (!walletsToSync.length) {
+    if (!walletGroupsToSync.length) {
       return;
     }
 
     const syncAllConnections = async () => {
       setLoading(true, 'Sincronizando conexões');
-      await Promise.all(walletsToSync.map((wallet) => syncWalletConnection(wallet, false)));
+      await Promise.all(
+        walletGroupsToSync.map((walletGroup) => syncWalletGroup(walletGroup, false)),
+      );
       setLoading(false);
     };
 
     syncAllConnections();
-  }, [syncWalletConnection, wallets]);
+  }, [syncWalletGroup, walletGroups]);
 
   useEffect(() => {
     return transactionRepository.onTransactionsChange(
@@ -502,14 +555,18 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         hideValues,
         setHideValues,
         setupConnection,
-        syncWalletConnection,
+        syncWalletGroup,
         wallets,
         fetchWallets,
         fetchingWallets,
-        createWallet,
         updateWallet,
-        deleteWallet,
         totalBalance,
+        walletGroups,
+        fetchWalletGroups,
+        fetchingWalletGroups,
+        createManualWallet,
+        updateWalletGroup,
+        deleteWalletGroup,
         transactions,
         fetchTransactions,
         fetchingTransactions,

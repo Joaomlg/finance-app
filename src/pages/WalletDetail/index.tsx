@@ -25,38 +25,50 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
   route,
   navigation,
 }) => {
-  const { wallets, fetchingWallets, fetchWallets, updateWallet, deleteWallet } =
-    useContext(AppContext);
+  const {
+    wallets,
+    walletGroups,
+    fetchingWallets,
+    fetchWallets,
+    updateWalletGroup,
+    deleteWalletGroup,
+  } = useContext(AppContext);
 
-  const wallet = wallets.find(({ id }) => id === route.params.walletId);
+  const walletGroup = walletGroups.find(({ id }) => id === route.params.walletGroupId);
+  const groupWallets = wallets.filter(
+    (wallet) => wallet.walletGroupId === route.params.walletGroupId,
+  );
 
-  if (!wallet) return;
+  if (!walletGroup) return;
 
+  const isAutomatic = walletGroup.type === 'AUTOMATIC';
   const hasError =
-    wallet.connection?.status !== 'UPDATED' && wallet.connection?.status !== 'UPDATING';
+    isAutomatic && walletGroup.status !== 'UPDATED' && walletGroup.status !== 'UPDATING';
 
   const toggleAutoUpdate = async () => {
-    if (!wallet.connection) {
+    if (walletGroup.type !== 'AUTOMATIC') {
       return;
     }
 
-    await updateWallet(wallet.id, {
-      connection: {
-        updateDisabled: !wallet.connection.updateDisabled,
-      },
+    await updateWalletGroup(walletGroup.id, {
+      updateDisabled: !walletGroup.updateDisabled,
     });
   };
 
   const handleUpdateConnection = () => {
-    const provider = wallet.connection?.provider.toLowerCase();
+    if (walletGroup.type !== 'AUTOMATIC') {
+      return;
+    }
+
+    const provider = walletGroup.provider.toLowerCase();
     const uri = `connect/${provider}`;
 
     // @ts-expect-error Initially, the route to connect using a provider is `connect/<provider>`
-    navigation.navigate(uri, { updateConnectionId: wallet.connection.id });
+    navigation.navigate(uri, { updateConnectionId: walletGroup.id });
   };
 
   const handleEditWallet = () => {
-    navigation.navigate('setWallet', { walletId: wallet.id });
+    navigation.navigate('setWallet', { walletGroupId: walletGroup.id });
   };
 
   const handleDeleteWallet = async () => {
@@ -68,7 +80,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
         {
           text: 'Apagar',
           onPress: async () => {
-            await deleteWallet(wallet);
+            await deleteWalletGroup(walletGroup);
             navigation.goBack();
           },
         },
@@ -82,60 +94,67 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
       <ScreenContainer refreshing={fetchingWallets} onRefresh={fetchWallets}>
         <ScreenHeader title="Detalhes da carteira" actions={[HideValuesAction()]} />
         <ScreenContent>
-          {wallet.connection && hasError && (
+          {isAutomatic && hasError && (
             <Banner
               icon="error"
               message="Não foi possível sincronizar os dados!"
-              message2={ConnectionStatusMessage[wallet.connection?.status]}
+              message2={ConnectionStatusMessage[walletGroup.status]}
               rounded={true}
             />
           )}
           <BottomHeader>
-            <Avatar color={wallet.styles.primaryColor} size={48}>
-              <Svg height="100%" width="100%" src={wallet.styles.imageUrl} />
+            <Avatar color={walletGroup.styles.primaryColor} size={48}>
+              <Svg height="100%" width="100%" src={walletGroup.styles.imageUrl} />
             </Avatar>
             <BottomHeaderContent>
-              <Text typography="heading">{wallet.name}</Text>
+              <Text typography="heading">{walletGroup.name}</Text>
               <Text typography="extraLight" color="textLight" selectable={true}>
-                {wallet.connection?.id || wallet.id}
+                {walletGroup.id}
               </Text>
             </BottomHeaderContent>
           </BottomHeader>
           <InformationGroup>
             <RowContent text="Criado em">
-              <Text typography="defaultBold">{formatDateHourFull(moment(wallet.createdAt))}</Text>
+              <Text typography="defaultBold">
+                {formatDateHourFull(moment(walletGroup.createdAt))}
+              </Text>
             </RowContent>
             <RowContent text="Tipo">
-              <Text typography="defaultBold">{wallet.connection ? 'Automático' : 'Manual'}</Text>
+              <Text typography="defaultBold">{isAutomatic ? 'Automático' : 'Manual'}</Text>
             </RowContent>
-            {wallet.connection && (
+            {isAutomatic && (
               <>
                 <RowContent text="Atualizado em">
                   <Text typography="defaultBold">
-                    {formatDateHourFull(moment(wallet.connection?.lastUpdatedAt))}
+                    {formatDateHourFull(moment(walletGroup.lastUpdatedAt))}
                   </Text>
                 </RowContent>
                 <RowContent text="Provedor">
-                  <Text typography="defaultBold">
-                    {capitalize(wallet.connection?.provider || '')}
-                  </Text>
+                  <Text typography="defaultBold">{capitalize(walletGroup.provider)}</Text>
                 </RowContent>
               </>
             )}
           </InformationGroup>
           <Divider />
           <InformationGroup>
-            <RowContent text={walletTypeText[wallet.type]}>
-              <Money
-                typography="defaultBold"
-                value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
-              />
-            </RowContent>
+            {isAutomatic && !!walletGroup.investmentAmount && (
+              <RowContent text="Investimentos">
+                <Money typography="defaultBold" value={walletGroup.investmentAmount} />
+              </RowContent>
+            )}
+            {groupWallets.map((wallet) => (
+              <RowContent key={wallet.id} text={walletTypeText[wallet.type]}>
+                <Money
+                  typography="defaultBold"
+                  value={wallet.type === 'CREDIT_CARD' ? -1 * wallet.balance : wallet.balance}
+                />
+              </RowContent>
+            ))}
           </InformationGroup>
           <Divider />
-          {wallet.connection && (
+          {isAutomatic && (
             <RowContent text="Pausar sincronização">
-              <Switch onValueChange={toggleAutoUpdate} value={wallet.connection?.updateDisabled} />
+              <Switch onValueChange={toggleAutoUpdate} value={walletGroup.updateDisabled} />
             </RowContent>
           )}
         </ScreenContent>
@@ -145,7 +164,7 @@ const WalletDetail: React.FC<NativeStackScreenProps<StackRouteParamList, 'wallet
           {
             text: 'Atualizar',
             icon: 'sync',
-            hidden: wallet.connection === undefined,
+            hidden: !isAutomatic,
             onPress: handleUpdateConnection,
           },
           { text: 'Editar', icon: 'edit', onPress: handleEditWallet },

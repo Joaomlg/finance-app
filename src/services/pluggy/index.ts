@@ -1,5 +1,12 @@
-import { Transaction, Wallet, WalletTypeList } from '../../models';
+import {
+  AutomaticWalletGroup,
+  Transaction,
+  Wallet,
+  WalletGroup,
+  WalletTypeList,
+} from '../../models';
 import { IProviderService } from '../providerService.interface';
+import { RecursivePartial } from '../../utils/type';
 import { PluggyClient } from './client';
 import { Account, Item, PageResponse, Transaction as PluggyTransaction } from './types';
 
@@ -20,16 +27,21 @@ export class PluggyService implements IProviderService {
 
   fetchConnection = async (
     connectionId: string,
+    createWalletGroupCallback: (walletGroup: WalletGroup) => Promise<void>,
     createWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
     const [item, accounts] = await this.fetchItemAndAccounts(connectionId);
 
+    if (accounts.length === 0) {
+      return;
+    }
+
     const totalInvestmentsAmount = await this.getInvestmentsTotalAmount(connectionId);
 
-    await createWalletsCallback(
-      accounts.map((account) => this.buildNewWallet(item, account, totalInvestmentsAmount)),
-    );
+    await createWalletGroupCallback(this.buildNewWalletGroup(item, totalInvestmentsAmount));
+
+    await createWalletsCallback(accounts.map((account) => this.buildNewWallet(item, account)));
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
@@ -42,6 +54,7 @@ export class PluggyService implements IProviderService {
     connectionId: string,
     lastUpdateDate: Date,
     shouldUpdate: boolean,
+    updateWalletGroupCallback: (values: RecursivePartial<WalletGroup>) => Promise<void>,
     updateWalletsCallback: (wallets: Wallet[]) => Promise<void>,
     createTransactionsCallback: (transactions: Transaction[]) => Promise<void>,
   ) => {
@@ -53,9 +66,9 @@ export class PluggyService implements IProviderService {
 
     const totalInvestmentsAmount = await this.getInvestmentsTotalAmount(connectionId);
 
-    await updateWalletsCallback(
-      accounts.map((account) => this.buildUpdateWallet(item, account, totalInvestmentsAmount)),
-    );
+    await updateWalletGroupCallback(this.buildUpdateWalletGroup(item, totalInvestmentsAmount));
+
+    await updateWalletsCallback(accounts.map((account) => this.buildUpdateWallet(account)));
 
     await Promise.all(
       accounts.map(({ id: accountId }) =>
@@ -111,42 +124,43 @@ export class PluggyService implements IProviderService {
     } while (transactions.results.length !== 0);
   };
 
-  private buildNewWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
+  private buildNewWalletGroup = (item: Item, totalInvestmentsAmount?: number) =>
     ({
-      id: account.id,
-      name: `${item.connector.name} - ${account.name}`,
-      type: account.subtype,
-      balance: account.balance,
-      initialBalance: account.balance,
-      createdAt: new Date(item.createdAt),
+      id: item.id,
+      name: item.connector.name,
+      type: 'AUTOMATIC',
+      provider: 'PLUGGY',
+      status: item.status,
+      lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+      updateDisabled: CONNECTORS_WITHOUT_UPDATE.includes(item.connector.name),
+      investmentAmount: totalInvestmentsAmount || 0,
       styles: {
         imageUrl: item.connector.imageUrl,
         primaryColor: '#' + item.connector.primaryColor,
       },
-      connection: {
-        id: item.id,
-        status: item.status,
-        provider: 'PLUGGY',
-        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
-        updateDisabled: CONNECTORS_WITHOUT_UPDATE.includes(item.connector.name),
-        temporaryData: {
-          investmentAmount: totalInvestmentsAmount || 0,
-        },
-      },
+      createdAt: new Date(item.createdAt),
+    } as AutomaticWalletGroup);
+
+  private buildUpdateWalletGroup = (item: Item, totalInvestmentsAmount?: number) =>
+    ({
+      status: item.status,
+      lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
+      investmentAmount: totalInvestmentsAmount || 0,
+    } as RecursivePartial<WalletGroup>);
+
+  private buildNewWallet = (item: Item, account: Account) =>
+    ({
+      id: account.id,
+      type: account.subtype,
+      balance: account.balance,
+      initialBalance: account.balance,
+      walletGroupId: item.id,
     } as Wallet);
 
-  private buildUpdateWallet = (item: Item, account: Account, totalInvestmentsAmount?: number) =>
+  private buildUpdateWallet = (account: Account) =>
     ({
       id: account.id,
       balance: account.balance,
-      connection: {
-        id: item.id,
-        status: item.status,
-        lastUpdatedAt: item.lastUpdatedAt ? new Date(item.lastUpdatedAt) : new Date(),
-        temporaryData: {
-          investmentAmount: totalInvestmentsAmount || 0,
-        },
-      },
     } as Wallet);
 
   private buildTransaction = (transaction: PluggyTransaction, accountId: string) =>

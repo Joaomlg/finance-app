@@ -1,11 +1,11 @@
 import { FlatList, FlatListProps } from 'react-native';
 import styled from 'styled-components/native';
 import Divider from '../../components/Divider';
-import { Wallet } from '../../models';
 import Text from '../../components/Text';
+import { WalletGroupItem } from './types';
 
 export const StyledFlatList = styled(
-  FlatList as new (props: FlatListProps<Wallet>) => FlatList<Wallet>,
+  FlatList as new (props: FlatListProps<WalletGroupItem>) => FlatList<WalletGroupItem>,
 ).attrs(() => ({
   contentContainerStyle: {
     padding: 24,

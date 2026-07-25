@@ -11,17 +11,7 @@ const getWalletsCollectionReference = () =>
   getBaseCollectionRef().collection(getRepositoryName(WALLETS_FIREBASE_COLLECTION));
 
 const parseWallet = (data: FirebaseFirestoreTypes.DocumentData) => {
-  const { createdAt, ...values } = data;
-
-  const connection = values.connection;
-  if (connection) {
-    connection.lastUpdatedAt = connection.lastUpdatedAt.toDate();
-  }
-
-  return {
-    ...values,
-    createdAt: createdAt.toDate(),
-  } as Wallet;
+  return { ...data } as Wallet;
 };
 
 export const getWallets = async () => {

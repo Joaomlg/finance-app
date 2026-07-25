@@ -3,8 +3,8 @@ export declare global {
     interface RootParamList {
       home: undefined;
       wallets: undefined;
-      wallet: { walletId: string };
-      setWallet: { walletId?: string } | undefined;
+      wallet: { walletGroupId: string };
+      setWallet: { walletGroupId?: string } | undefined;
       connect: undefined;
       'connect/pluggy':
         | {
