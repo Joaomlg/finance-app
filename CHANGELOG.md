@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.0.0](https://github.com/Joaomlg/finance-app/compare/2.4.0...3.0.0) (2026-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* group wallets by source on the wallets screen ([#33](https://github.com/Joaomlg/finance-app/issues/33))
+
+### Features
+
+* group wallets by source on the wallets screen ([#33](https://github.com/Joaomlg/finance-app/issues/33)) ([c662271](https://github.com/Joaomlg/finance-app/commit/c662271fac59a62d81d787c893a51b452751bdd7))
+
+
+### Bug Fixes
+
+* delay update check to avoid racing with connections sync ([#32](https://github.com/Joaomlg/finance-app/issues/32)) ([8df3582](https://github.com/Joaomlg/finance-app/commit/8df358290a51b5d5b2863507c9cff7caf7c0e5f2))
+
+
+### Documentation
+
+* replace WSL2 port-forwarding workaround with mirrored networking setup ([#30](https://github.com/Joaomlg/finance-app/issues/30)) ([1cfd7d1](https://github.com/Joaomlg/finance-app/commit/1cfd7d108bfb46d7ee2944f69a90fa686132d170))
+
 ## [2.4.0](https://github.com/Joaomlg/finance-app/compare/2.3.0...2.4.0) (2026-07-21)
 
 
