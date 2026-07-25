@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/Joaomlg/finance-app/compare/3.0.0...3.0.1) (2026-07-25)
+
+
+### Bug Fixes
+
+* pass --environment to the OTA update step so it picks up EAS secrets ([#34](https://github.com/Joaomlg/finance-app/issues/34)) ([6df716f](https://github.com/Joaomlg/finance-app/commit/6df716f6f552f36b85e9ee1dca50dc94357ef75e))
+
 ## [3.0.0](https://github.com/Joaomlg/finance-app/compare/2.4.0...3.0.0) (2026-07-25)
 
 
