@@ -19,9 +19,12 @@ const TransactionsSection: React.FC = () => {
         <SeeMoreButton text="Ver mais" onPress={() => navigation.navigate('transactions')} />
       </SectionHeader>
       <TransactionListContainer>
-        {transactions.slice(0, NUMBER_OF_TRANSACTIONS).map((transaction, index) => (
-          <TransactionListItem item={transaction} key={index} />
-        ))}
+        {transactions
+          .filter((transaction) => !transaction.ignore)
+          .slice(0, NUMBER_OF_TRANSACTIONS)
+          .map((transaction, index) => (
+            <TransactionListItem item={transaction} key={index} />
+          ))}
       </TransactionListContainer>
     </>
   );

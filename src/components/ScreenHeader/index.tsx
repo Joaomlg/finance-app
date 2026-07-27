@@ -3,10 +3,11 @@ import React, { useCallback, useState } from 'react';
 import { ViewProps } from 'react-native';
 import Icon, { IconName } from '../Icon';
 import Text from '../Text';
-import { Actions, Container, Content, TitleButton } from './styles';
+import { ActionContainer, Actions, Badge, Container, Content, TitleButton } from './styles';
 
 export type Action = {
   icon: IconName;
+  badge?: number;
   onPress?: () => void;
   onLongPress?: () => void;
   hidden?: boolean;
@@ -69,14 +70,22 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           {actions
             .filter((action) => !action.hidden)
             .map((action, index) => (
-              <Icon
-                key={index}
-                name={action.icon}
-                color="textWhite"
-                size={28}
-                onPress={action.onPress}
-                onLongPress={action.onLongPress}
-              />
+              <ActionContainer key={index}>
+                <Icon
+                  name={action.icon}
+                  color="textWhite"
+                  size={28}
+                  onPress={action.onPress}
+                  onLongPress={action.onLongPress}
+                />
+                {!!action.badge && (
+                  <Badge>
+                    <Text typography="extraLight" color="text">
+                      {action.badge}
+                    </Text>
+                  </Badge>
+                )}
+              </ActionContainer>
             ))}
         </Actions>
       )}
