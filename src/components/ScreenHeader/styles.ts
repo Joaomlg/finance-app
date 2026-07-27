@@ -23,3 +23,18 @@ export const Actions = styled.View`
   gap: 24px;
   justify-content: flex-end;
 `;
+
+export const ActionContainer = styled.View``;
+
+export const Badge = styled.View`
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0px 4px;
+  border-radius: 100px;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  align-items: center;
+  justify-content: center;
+`;
