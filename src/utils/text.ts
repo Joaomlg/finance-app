@@ -27,7 +27,7 @@ export const transactionTypeText: Record<TransactionType, string> = {
   EXPENSE: 'Despesa',
 };
 
-export const insightsWalletTabTitle = 'Carteira';
+export const analysisWalletTabTitle = 'Carteira';
 
 export const ConnectionStatusMessage: Record<WalletGroupStatus, string> = {
   UPDATED: '',

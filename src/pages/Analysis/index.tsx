@@ -7,12 +7,12 @@ import HideValuesAction from '../../components/ScreenHeader/CommonActions/HideVa
 import ScreenTabs, { TabProps } from '../../components/ScreenTabs';
 import AppContext from '../../contexts/AppContext';
 import { CategoryType, CategoryTypeList } from '../../models';
-import { insightsWalletTabTitle, transactionTypeText } from '../../utils/text';
+import { analysisWalletTabTitle, transactionTypeText } from '../../utils/text';
 import { useNavigation } from '@react-navigation/native';
 
 const WALLET_TAB_KEY = 'WALLET';
 
-type InsightsSelection = { kind: 'category' | 'wallet'; id: string };
+type AnalysisSelection = { kind: 'category' | 'wallet'; id: string };
 
 const TABS: TabProps[] = [
   ...CategoryTypeList.map(
@@ -22,11 +22,11 @@ const TABS: TabProps[] = [
         title: transactionTypeText[type],
       } as TabProps),
   ),
-  { key: WALLET_TAB_KEY, title: insightsWalletTabTitle },
+  { key: WALLET_TAB_KEY, title: analysisWalletTabTitle },
 ];
 
-const Insights: React.FC = () => {
-  const [selection, setSelection] = useState<InsightsSelection | null>(null);
+const Analysis: React.FC = () => {
+  const [selection, setSelection] = useState<AnalysisSelection | null>(null);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const { expenseTransactions, incomeTransactions, wallets, walletGroups } = useContext(AppContext);
@@ -104,7 +104,7 @@ const Insights: React.FC = () => {
   return (
     <ScreenContainer>
       <ScreenHeader
-        title="Insights"
+        title="Análises"
         actions={[
           {
             icon: 'history',
@@ -124,4 +124,4 @@ const Insights: React.FC = () => {
   );
 };
 
-export default Insights;
+export default Analysis;

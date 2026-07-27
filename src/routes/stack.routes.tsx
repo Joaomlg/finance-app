@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import Analysis from '../pages/Analysis';
 import Categories from '../pages/Categories';
 import CategoryHistory from '../pages/CategoryHistory';
 import Connect from '../pages/Connect';
@@ -7,7 +8,6 @@ import BelvoConnect from '../pages/Connect/BelvoConnect';
 import PluggyConnect from '../pages/Connect/PluggyConnect';
 import History from '../pages/History';
 import Home from '../pages/Home';
-import Insights from '../pages/Insights';
 import ManualConnect from '../pages/ManualConnect';
 import Settings from '../pages/Settings';
 import SetTransaction from '../pages/SetTransaction';
@@ -32,7 +32,7 @@ export type StackRouteParamList = {
   history: undefined;
   settings: undefined;
   categories: undefined;
-  insights: undefined;
+  analysis: undefined;
   categoryHistory: { categoryId: string };
 };
 
@@ -56,7 +56,7 @@ const StackRoutes: React.FC = () => {
         <Screen name="history" component={History} />
         <Screen name="settings" component={Settings} />
         <Screen name="categories" component={Categories} />
-        <Screen name="insights" component={Insights} />
+        <Screen name="analysis" component={Analysis} />
         <Screen name="categoryHistory" component={CategoryHistory} />
       </Group>
     </Navigator>

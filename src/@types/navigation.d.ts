@@ -23,7 +23,7 @@ export declare global {
       history: undefined;
       settings: undefined;
       categories: undefined;
-      insights: undefined;
+      analysis: undefined;
       categoryHistory: { categoryId: string };
     }
   }
