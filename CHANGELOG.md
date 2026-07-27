@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.0](https://github.com/Joaomlg/finance-app/compare/3.0.2...3.1.0) (2026-07-27)
+
+
+### Features
+
+* add filter bottom sheet to transactions screen ([#38](https://github.com/Joaomlg/finance-app/issues/38)) ([2bfe730](https://github.com/Joaomlg/finance-app/commit/2bfe730472dfe8f79be6e9a2c7619516f3dbbd7b))
+* rename the Insights screen to "Análises" ([#40](https://github.com/Joaomlg/finance-app/issues/40)) ([fa155cf](https://github.com/Joaomlg/finance-app/commit/fa155cfe582377db707e6eedd9fe46b0fe63492f))
+
 ## [3.0.2](https://github.com/Joaomlg/finance-app/compare/3.0.1...3.0.2) (2026-07-25)
 
 
